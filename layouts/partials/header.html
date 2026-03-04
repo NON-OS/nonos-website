@@ -1,0 +1,13 @@
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo" aria-label="NØNOS Home">
+      <img src="/images/logo-nonos.svg" alt="NØNOS" class="logo-img" height="28">
+    </a>
+    <nav class="nav" aria-label="Main navigation">
+      {{ range .Site.Menus.main }}
+      <a href="{{ .URL }}"{{ if $.IsMenuCurrent "main" . }} class="active" aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{ end }}
+      <a href="https://github.com/NON-OS/nonos-kernel" class="nav-github" aria-label="GitHub Repository">src</a>
+    </nav>
+  </div>
+</header>

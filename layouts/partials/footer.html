@@ -1,0 +1,19 @@
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-meta">
+      <span>NØNOS {{ .Site.Params.version }}</span>
+      <span class="separator">|</span>
+      <span>AGPL-3.0</span>
+      <span class="separator">|</span>
+      <span>Zero State Cryptographic OS</span>
+    </div>
+    <div class="footer-links">
+      <a href="/about/license/">License</a>
+      <a href="https://github.com/NON-OS/nonos-kernel">Source</a>
+      {{ with .Site.Params.onionAddress }}<a href="http://{{ . }}/" class="onion-link">.onion</a>{{ end }}
+    </div>
+    <div class="footer-notice">
+      <p>No tracking. No analytics. No external resources.</p>
+    </div>
+  </div>
+</footer>

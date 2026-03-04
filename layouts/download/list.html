@@ -1,0 +1,52 @@
+{{ define "main" }}
+<div class="page-container">
+  <article>
+    <h1>{{ .Title }}</h1>
+
+    <div class="download-section">
+      <div class="download-card">
+        <div class="download-header">
+          <h2 class="download-title">NØNOS {{ .Site.Params.version }}</h2>
+          <span class="download-badge">Alpha</span>
+        </div>
+        <div class="download-meta">
+          <span>Released: {{ .Site.Params.releaseDate }}</span>
+          <span>Size: {{ .Site.Params.isoSize }}</span>
+          <span>Arch: x86_64</span>
+        </div>
+        <div class="download-actions">
+          {{ if .Site.Params.isoSHA256 }}
+          <a href="https://github.com/NON-OS/nonos-kernel/releases/download/v{{ .Site.Params.version }}/nonos-{{ .Site.Params.version }}.iso" class="btn btn-primary">Download ISO</a>
+          <a href="https://github.com/NON-OS/nonos-kernel/releases/download/v{{ .Site.Params.version }}/nonos-{{ .Site.Params.version }}.img" class="btn btn-secondary">Download IMG</a>
+          <a href="https://github.com/NON-OS/nonos-kernel/releases/download/v{{ .Site.Params.version }}/SHA256SUMS" class="btn btn-secondary">Checksums</a>
+          {{ else }}
+          <span class="btn btn-disabled">Download ISO (pending release)</span>
+          <span class="btn btn-disabled">Download IMG (pending release)</span>
+          <span class="btn btn-disabled">Checksums (pending release)</span>
+          {{ end }}
+        </div>
+
+        <div class="verify-section">
+          <div class="verify-title">Verify Download</div>
+          <div class="verify-hash">
+            <span class="label">SHA256</span>
+            {{ if .Site.Params.isoSHA256 }}
+            <code class="value">{{ .Site.Params.isoSHA256 }}</code>
+            {{ else }}
+            <code class="value placeholder">Generated after build — run: sha256sum nonos-{{ .Site.Params.version }}.iso</code>
+            {{ end }}
+          </div>
+          {{ if .Site.Params.isoBLAKE3 }}
+          <div class="verify-hash">
+            <span class="label">BLAKE3</span>
+            <code class="value">{{ .Site.Params.isoBLAKE3 }}</code>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    {{ .Content }}
+  </article>
+</div>
+{{ end }}

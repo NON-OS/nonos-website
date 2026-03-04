@@ -1,0 +1,84 @@
+{{ define "main" }}
+<section class="hero">
+  <div class="hero-inner">
+    <h1 class="hero-logo">N<span class="accent">Ø</span>NOS</h1>
+    <p class="hero-tagline">SOVEREIGNTY FROM Ø</p>
+    <p class="hero-features">ZeroState · Ed25519 · Groth16/BLS12-381 · AES-256-GCM · ML-KEM · ML-DSA</p>
+    <div class="hero-actions">
+      <a href="/download/" class="btn btn-primary">Download Alpha</a>
+      <a href="/docs/" class="btn btn-secondary">Documentation</a>
+    </div>
+  </div>
+</section>
+
+<section class="news-preview">
+  <div class="features-inner">
+    <h2>Latest News</h2>
+    <ul class="news-list">
+      <li><span class="news-date">2026-03-05</span> <a href="/news/#2026-03-05--alpha-080-released">Alpha 0.8.0 Released</a></li>
+      <li><span class="news-date">2026-03-05</span> <a href="/news/#2026-03-05--documentation-site-live">Documentation Site Live</a></li>
+    </ul>
+    <p><a href="/news/">All news...</a></p>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-inner">
+    <div class="features-grid">
+      <div class="feature">
+        <h3 class="feature-title">ZeroState by Design</h3>
+        <p class="feature-desc">Everything runs in RAM. When you shut down, data doesn't get deleted—it ceases to exist. Encryption keys live only in CPU registers. Power off and they vanish. Physics-based security.</p>
+      </div>
+      <div class="feature">
+        <h3 class="feature-title">Cryptographically Verified Boot</h3>
+        <p class="feature-desc">Ten-stage boot process with Ed25519 signature verification and mandatory Groth16 zero-knowledge attestation. The kernel proves its integrity before executing a single line of code.</p>
+      </div>
+      <div class="feature">
+        <h3 class="feature-title">~340,000 Lines of Rust</h3>
+        <p class="feature-desc">Complete microkernel with 33 subsystems: shell, graphics, networking, cryptography, filesystem, drivers. Built from scratch—no Linux, no BSD, no borrowed kernels.</p>
+      </div>
+      <div class="feature">
+        <h3 class="feature-title">Post-Quantum Cryptography</h3>
+        <p class="feature-desc">ML-KEM-768 and ML-DSA-3 for quantum-resistant encryption and signatures. Classical suite includes Ed25519, X25519, AES-256-GCM, ChaCha20-Poly1305, and BLAKE3.</p>
+      </div>
+      <div class="feature">
+        <h3 class="feature-title">17 Capability Types</h3>
+        <p class="feature-desc">Every privileged operation requires a cryptographic capability token. No root user, no ambient authority. Processes get exactly the permissions they need—nothing more.</p>
+      </div>
+      <div class="feature">
+        <h3 class="feature-title">Built-in Onion Routing</h3>
+        <p class="feature-desc">Three-hop encrypted circuits integrated into the network stack. All traffic anonymized transparently—no configuration, no external software. DNS queries go through the anonymity network too.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-inner">
+    <h2>Alpha Release 0.8.0</h2>
+    <p>A complete operating system that boots on real hardware. Full graphical desktop with 8 applications, 100+ shell commands, integrated onion routing, and post-quantum cryptography.</p>
+
+    <h3>What You Get</h3>
+    <ul>
+      <li><strong>Desktop Environment</strong> — Window compositor, dock, menu bar, and 8 built-in applications</li>
+      <li><strong>Terminal</strong> — Full shell with 100+ commands including ls, grep, sed, vi, curl, ssh</li>
+      <li><strong>Applications</strong> — File Manager, Text Editor, Web Browser, Wallet, Calculator, Settings, Process Manager</li>
+      <li><strong>Networking</strong> — Full TCP/IP stack with onion routing, DoH/DoT, MAC randomization</li>
+      <li><strong>Drivers</strong> — 20+ drivers for storage (AHCI, NVMe), network (e1000, RTL, WiFi), USB, audio</li>
+      <li><strong>Cryptography</strong> — 25+ algorithms including ML-KEM, ML-DSA, Groth16 ZK proofs</li>
+      <li><strong>Filesystem</strong> — RAM filesystem, CryptoFS with ChaCha20-Poly1305, ext4/FAT32 for external media</li>
+    </ul>
+
+    <h3>Current Limitations</h3>
+    <ul>
+      <li>All processes execute in ring 0 (user-space isolation coming in beta)</li>
+      <li>Volatile storage only—by design. External media support works for intentional persistence</li>
+    </ul>
+
+    <h3>Tested Hardware</h3>
+    <p>HP ProBook/EliteBook, Dell Latitude, Lenovo ThinkPad, and QEMU/KVM with OVMF. See <a href="/docs/hardware-drivers/">hardware compatibility</a> for details.</p>
+
+    <p><a href="/download/">Download</a> · <a href="/docs/getting-started/full-installation-guide/">Installation Guide</a> · <a href="https://github.com/NON-OS/nonos-kernel">Source Code</a></p>
+  </div>
+</section>
+{{ end }}

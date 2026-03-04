@@ -1,0 +1,118 @@
+baseURL = "https://nonos.software"
+languageCode = "en-us"
+title = "NØNOS"
+
+enableRobotsTXT = true
+enableGitInfo = false
+enableEmoji = false
+
+disableHugoGeneratorInject = true
+disableKinds = ["taxonomy", "term", "RSS"]
+
+[security]
+  [security.exec]
+    allow = []
+  [security.http]
+    methods = []
+    urls = []
+
+[markup]
+  [markup.highlight]
+    anchorLineNos = false
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineAnchors = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = false
+    style = "monokai"
+    tabWidth = 4
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = false
+    [markup.goldmark.extensions]
+      table = true
+      strikethrough = true
+      linkify = false
+      taskList = true
+      typographer = false
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+    ordered = false
+
+[minify]
+  disableCSS = false
+  disableHTML = false
+  disableJS = true
+  disableJSON = true
+  disableSVG = false
+  disableXML = true
+  minifyOutput = true
+  [minify.tdewolff]
+    [minify.tdewolff.css]
+      precision = 0
+    [minify.tdewolff.html]
+      keepDocumentTags = true
+      keepEndTags = true
+      keepQuotes = true
+      keepWhitespace = false
+
+[params]
+  description = "Sovereignty From Ø — Documentation and Downloads"
+  author = "NØNOS Operating System"
+  version = "0.8.0-alpha"
+  disableExternalJS = true
+  disableExternalCSS = true
+  disableAnalytics = true
+  disableFonts = true
+  onionAddress = ""
+  currentRelease = "0.8.0-alpha"
+  releaseDate = "2026-03-03"
+  isoSize = "375 MB"
+  imgSize = "375 MB"
+  isoSHA256 = ""
+  isoBLAKE3 = ""
+
+[menus]
+  [[menus.main]]
+    name = "News"
+    pageRef = "/news"
+    weight = 5
+  [[menus.main]]
+    name = "Docs"
+    pageRef = "/docs"
+    weight = 10
+  [[menus.main]]
+    name = "Roadmap"
+    pageRef = "/roadmap"
+    weight = 15
+  [[menus.main]]
+    name = "Download"
+    pageRef = "/download"
+    weight = 20
+  [[menus.main]]
+    name = "Releases"
+    pageRef = "/releases"
+    weight = 30
+  [[menus.main]]
+    name = "About"
+    pageRef = "/about"
+    weight = 40
+  [[menus.main]]
+    name = "Privacy"
+    pageRef = "/privacy"
+    weight = 50
+
+[outputs]
+  home = ["HTML"]
+  section = ["HTML"]
+  page = ["HTML"]
+
+[permalinks]
+  [permalinks.page]
+    docs = "/docs/:sections[1:]/:contentbasename/"
+  [permalinks.section]
+    docs = "/docs/:sections[1:]/"

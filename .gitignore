@@ -1,0 +1,30 @@
+# Hugo build output
+public/
+resources/_gen/
+
+# Hugo cache
+.hugo_build.lock
+
+# Server configs (sensitive)
+server/
+deploy/
+scripts/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Secrets
+*.key
+*.pem
+*.env

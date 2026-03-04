@@ -1,0 +1,88 @@
+{{ define "main" }}
+<div class="docs-layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Overview</div>
+      <ul class="sidebar-links">
+        <li><a href="/docs/"{{ if eq .RelPermalink "/docs/" }} class="active"{{ end }}>Documentation Home</a></li>
+        <li><a href="/docs/roadmap/"{{ if eq .RelPermalink "/docs/roadmap/" }} class="active"{{ end }}>Roadmap</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Technical Specification</div>
+      <ul class="sidebar-links">
+        <li><a href="/docs/technical-specification/"{{ if eq .RelPermalink "/docs/technical-specification/" }} class="active"{{ end }}>Full Specification</a></li>
+        <li><a href="/docs/technical-specification/#2-definitions-and-formal-model">Formal Model</a></li>
+        <li><a href="/docs/technical-specification/#3-system-goals-and-non-goals">Goals &amp; Non-Goals</a></li>
+        <li><a href="/docs/technical-specification/#4-security-architecture">Security Architecture</a></li>
+        <li><a href="/docs/technical-specification/#5-threat-model">Threat Model</a></li>
+        <li><a href="/docs/technical-specification/#6-networking-architecture">Networking</a></li>
+        <li><a href="/docs/technical-specification/#7-onion-network-protocol-details">Onion Routing</a></li>
+        <li><a href="/docs/technical-specification/#8-kernel-internal-structures">Kernel Internals</a></li>
+        <li><a href="/docs/technical-specification/#9-capability-system">Capability System</a></li>
+        <li><a href="/docs/technical-specification/#10-filesystem-architecture">Filesystem</a></li>
+        <li><a href="/docs/technical-specification/#11-device-driver-architecture">Device Drivers</a></li>
+        <li><a href="/docs/technical-specification/#12-module-system">Module System</a></li>
+        <li><a href="/docs/technical-specification/#13-application-environment">Applications</a></li>
+        <li><a href="/docs/technical-specification/#16-comparative-analysis">Comparison</a></li>
+        <li><a href="/docs/technical-specification/#19-glossary">Glossary</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Installation Guide</div>
+      <ul class="sidebar-links">
+        <li><a href="/docs/getting-started/full-installation-guide/"{{ if eq .RelPermalink "/docs/getting-started/full-installation-guide/" }} class="active"{{ end }}>Full Guide</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#2-system-requirements">System Requirements</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#3-iso-download-and-integrity-verification">Download &amp; Verify</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#4-bootable-usb-creation">Create USB</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#5-first-boot-technical-walkthrough">First Boot</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#6-desktop-initialization">Desktop Init</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#8-alpha-known-issues">Known Issues</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#10-troubleshooting">Troubleshooting</a></li>
+        <li><a href="/docs/getting-started/full-installation-guide/#appendix-a-cryptographic-keys-reference">Crypto Keys</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Architecture</div>
+      <ul class="sidebar-links">
+        <li><a href="/docs/architecture/memory-hardware/"{{ if eq .RelPermalink "/docs/architecture/memory-hardware/" }} class="active"{{ end }}>Memory &amp; Hardware</a></li>
+        <li><a href="/docs/architecture/kernel-abi/"{{ if eq .RelPermalink "/docs/architecture/kernel-abi/" }} class="active"{{ end }}>Kernel ABI</a></li>
+      </ul>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Build Manual</div>
+      <ul class="sidebar-links">
+        <li><a href="/docs/development/build-manual/"{{ if eq .RelPermalink "/docs/development/build-manual/" }} class="active"{{ end }}>Full Manual</a></li>
+        <li><a href="/docs/development/build-manual/#1-repository-structure">Repository Structure</a></li>
+        <li><a href="/docs/development/build-manual/#2-toolchain-requirements">Toolchain</a></li>
+        <li><a href="/docs/development/build-manual/#3-build-targets">Build Targets</a></li>
+        <li><a href="/docs/development/build-manual/#4-kernel-compilation-pipeline">Kernel Pipeline</a></li>
+        <li><a href="/docs/development/build-manual/#5-artifact-signing-pipeline">Signing Pipeline</a></li>
+        <li><a href="/docs/development/build-manual/#6-zero-knowledge-proof-generation">ZK Proofs</a></li>
+        <li><a href="/docs/development/build-manual/#8-testing">Testing</a></li>
+        <li><a href="/docs/development/build-manual/#9-reproducible-builds">Reproducible Builds</a></li>
+        <li><a href="/docs/development/build-manual/#10-release-process">Release Process</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <div class="content">
+    <article>
+      <h1>{{ .Title }}</h1>
+
+      {{ if .TableOfContents }}
+      <nav class="toc">
+        <div class="toc-title">Contents</div>
+        {{ .TableOfContents }}
+      </nav>
+      {{ end }}
+
+      {{ .Content }}
+    </article>
+  </div>
+</div>
+{{ end }}
