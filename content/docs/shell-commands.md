@@ -2,6 +2,7 @@
 title: "Shell Commands"
 description: "Complete NØNOS shell command reference"
 weight: 15
+---
 
 # NØNOS Shell Command Reference
 

@@ -2,6 +2,7 @@
 title: "Filesystems"
 description: "NØNOS filesystem architecture, VFS, RAM filesystem, and CryptoFS"
 weight: 16
+---
 
 # NØNOS Filesystems
 

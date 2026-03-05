@@ -2,6 +2,7 @@
 title: "Alpha to Beta Roadmap"
 description: "The path to the most secure privacy-first operating system"
 weight: 100
+---
 
 # NØNOS Alpha to Beta Roadmap
 

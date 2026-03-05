@@ -2,6 +2,7 @@
 title: "Architecture"
 description: "NØNOS kernel architecture overview"
 weight: 20
+---
 
 # NØNOS Architecture
 

@@ -2,6 +2,7 @@
 title: "Getting Started"
 description: "Quick start guide for NØNOS"
 weight: 1
+---
 
 # Getting Started with NØNOS
 

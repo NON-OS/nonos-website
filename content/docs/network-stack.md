@@ -2,6 +2,7 @@
 title: "Network Stack"
 description: "NØNOS networking architecture, TCP/IP, onion routing, and DNS privacy"
 weight: 17
+---
 
 # NØNOS Network Stack
 

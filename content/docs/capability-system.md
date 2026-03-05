@@ -2,6 +2,7 @@
 title: "Capability System"
 description: "NØNOS capability-based security model and access control"
 weight: 13
+---
 
 # NØNOS Capability System
 

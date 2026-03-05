@@ -2,6 +2,7 @@
 title: "Memory and Hardware Architecture"
 description: "Complete NØNOS memory and hardware architecture specification"
 weight: 20
+---
 
 # NØNOS Memory and Hardware Architecture Specification
 

@@ -2,6 +2,7 @@
 title: "Technical Specification"
 description: "Complete NØNOS Alpha technical specification"
 weight: 5
+---
 
 # NØNOS Alpha Technical Specification
 

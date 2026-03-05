@@ -2,6 +2,7 @@
 title: "Desktop Environment"
 description: "NØNOS graphical desktop environment and built-in applications"
 weight: 12
+---
 
 # NØNOS Desktop Environment
 

@@ -2,7 +2,7 @@
 title: "Boot Process"
 description: "NØNOS boot sequence, verification, and initialization"
 weight: 11
-
+---
 # NØNOS Boot Process
 
 **Version 0.8.0** | March 2026

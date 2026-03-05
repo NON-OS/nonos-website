@@ -2,6 +2,7 @@
 title: "Full Installation Guide"
 description: "Complete NØNOS installation guide with full technical details"
 weight: 5
+---
 
 # NØNOS Alpha Installation Guide
 
