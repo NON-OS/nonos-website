@@ -1,4 +1,4 @@
-baseURL = "https://nonos.software"
+baseURL = "/"
 languageCode = "en-us"
 title = "NØNOS"
 
@@ -75,6 +75,7 @@ disableKinds = ["taxonomy", "term", "RSS"]
   imgSize = "375 MB"
   isoSHA256 = ""
   isoBLAKE3 = ""
+  disableCSP = true
 
 [menus]
   [[menus.main]]
@@ -110,9 +111,3 @@ disableKinds = ["taxonomy", "term", "RSS"]
   home = ["HTML"]
   section = ["HTML"]
   page = ["HTML"]
-
-[permalinks]
-  [permalinks.page]
-    docs = "/docs/:sections[1:]/:contentbasename/"
-  [permalinks.section]
-    docs = "/docs/:sections[1:]/"
