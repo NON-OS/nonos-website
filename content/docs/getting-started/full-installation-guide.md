@@ -6,16 +6,16 @@ weight: 5
 
 # NØNOS Alpha Installation Guide
 
-## Version 0.8.0-alpha
+## Version 0.8.1-alpha
 
 ## March 2026
 
 
 **Document Classification:** Public Technical Documentation
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 
-**Applicable Release:** NØNOS 0.8.0-ALPHA
+**Applicable Release:** NØNOS 0.8.1-alpha
 
 **License:** GNU Affero General Public License v3.0 (AGPL-3.0)
 
@@ -38,7 +38,7 @@ weight: 5
 
 ### 1.1 Document Purpose
 
-This document provides deterministic, reproducible procedures for obtaining, verifying, and booting the NØNOS 0.8.0-ALPHA operating system from USB media on x86-64 UEFI systems. It assumes the reader possesses working knowledge of UEFI firmware configuration, command-line operations on POSIX systems, cryptographic verification procedures, and low-level system diagnostics.
+This document provides deterministic, reproducible procedures for obtaining, verifying, and booting the NØNOS 0.8.1-alpha operating system from USB media on x86-64 UEFI systems. It assumes the reader possesses working knowledge of UEFI firmware configuration, command-line operations on POSIX systems, cryptographic verification procedures, and low-level system diagnostics.
 
 ### 1.2 Intended Audience
 
@@ -54,7 +54,7 @@ This guide is not intended for general end users. No attempt is made to simplify
 
 ### 1.3 Alpha Software Declaration
 
-**NØNOS 0.8.0-ALPHA is pre-release software.**
+**NØNOS 0.8.1-alpha is pre-release software.**
 
 The following conditions apply to all alpha releases:
 
@@ -260,7 +260,7 @@ Network connectivity is optional. Supported adapters:
 | Realtek RTL8168/8111 | rtl8168 | Experimental |
 | VirtIO | virtio-net | Stable (VM only) |
 
-Wireless networking is not supported in the alpha release.
+Wireless networking is **experimental** in the alpha release. Supported chipsets include Intel AX200/210 and select Realtek chips. Use wired Ethernet for production stability.
 
 ### 2.8 Known Incompatible Hardware
 
@@ -290,12 +290,12 @@ Do not download NØNOS images from any other source. Third-party mirrors are not
 
 ### 3.2 Release Artifacts
 
-**Version 0.8.0-alpha** | Released 2026-03-03
+**Version 0.8.1-alpha** | Released 2026-03-07
 
 | File | Size | Format |
 |------|------|--------|
-| `nonos-0.8.0-alpha.iso` | ~70 MB | Hybrid ISO (UEFI boot) |
-| `nonos-0.8.0-alpha.img` | ~65 MB | GPT with EFI System Partition |
+| `nonos-0.8.1-alpha.iso` | ~380 MB | Hybrid ISO (UEFI boot) |
+| `nonos-0.8.1-alpha.img` | ~450 MB | GPT with EFI System Partition |
 
 ### 3.3 SHA-256 Verification
 
@@ -307,8 +307,8 @@ Checksums are published in `SHA256SUMS` alongside the release artifacts. Verify 
 
 ```bash
 # Download checksum file
-curl -O https://nonos.software/releases/0.8.0-alpha/SHA256SUMS
-curl -O https://nonos.software/releases/0.8.0-alpha/SHA256SUMS.sig
+curl -O https://nonos.software/releases/0.8.1-alpha/SHA256SUMS
+curl -O https://nonos.software/releases/0.8.1-alpha/SHA256SUMS.sig
 ```
 
 #### 3.3.1 Linux
@@ -320,14 +320,14 @@ sha256sum -c SHA256SUMS
 
 Expected output on success:
 ```
-nonos-0.8.0-alpha.iso: OK
+nonos-0.8.1-alpha.iso: OK
 ```
 
 #### 3.3.2 macOS
 
 ```bash
 cd ~/Downloads
-shasum -a 256 nonos-0.8.0-alpha.iso
+shasum -a 256 nonos-0.8.1-alpha.iso
 ```
 
 Compare the output manually with the expected checksum from `SHA256SUMS`.
@@ -336,7 +336,7 @@ Compare the output manually with the expected checksum from `SHA256SUMS`.
 
 ```powershell
 cd $HOME\Downloads
-Get-FileHash -Algorithm SHA256 nonos-0.8.0-alpha.iso | Format-List
+Get-FileHash -Algorithm SHA256 nonos-0.8.1-alpha.iso | Format-List
 ```
 
 Compare the `Hash` field with the expected value from `SHA256SUMS`.
@@ -405,7 +405,7 @@ Cross-reference this fingerprint with:
 #### 3.5.4 Verify Signature
 
 ```bash
-gpg --verify nonos-0.8.0-alpha.iso.sig nonos-0.8.0-alpha.iso
+gpg --verify nonos-0.8.1-alpha.iso.sig nonos-0.8.1-alpha.iso
 ```
 
 Expected output on success:
@@ -434,7 +434,7 @@ RWQ8Kd5rCz6bPQSf4xXjK7NvLm2pHqYt1AeFgDhBwC9MsN3xV0Jy7P8Z
 # Linux: apt install minisign
 
 # Verify
-minisign -Vm nonos-0.8.0-alpha.iso -P RWQ8Kd5rCz6bPQSf4xXjK7NvLm2pHqYt1AeFgDhBwC9MsN3xV0Jy7P8Z
+minisign -Vm nonos-0.8.1-alpha.iso -P RWQ8Kd5rCz6bPQSf4xXjK7NvLm2pHqYt1AeFgDhBwC9MsN3xV0Jy7P8Z
 ```
 
 ### 3.7 Ed25519 ISO Signature Verification (Direct)
@@ -446,7 +446,7 @@ For cryptographic verification without GPG or Minisign, raw Ed25519 signatures a
 d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a
 ```
 
-**Signature file:** `nonos-0.8.0-alpha.iso.ed25519.sig` (64 bytes, raw Ed25519 signature)
+**Signature file:** `nonos-0.8.1-alpha.iso.ed25519.sig` (64 bytes, raw Ed25519 signature)
 
 Verification requires a tool that supports raw Ed25519 signature verification against the ISO file's SHA-256 hash.
 
@@ -506,7 +506,7 @@ sudo umount /dev/sdb*
 #### 4.2.3 Write Image
 
 ```bash
-sudo dd if=nonos-0.8.0-alpha.iso of=/dev/sdb bs=4M status=progress conv=fsync
+sudo dd if=nonos-0.8.1-alpha.iso of=/dev/sdb bs=4M status=progress conv=fsync
 sync
 ```
 
@@ -527,7 +527,7 @@ diskutil unmountDisk /dev/diskN
 #### 4.3.3 Write Image
 
 ```bash
-sudo dd if=nonos-0.8.0-alpha.iso of=/dev/rdiskN bs=4m
+sudo dd if=nonos-0.8.1-alpha.iso of=/dev/rdiskN bs=4m
 ```
 
 #### 4.3.4 Eject
@@ -937,9 +937,14 @@ NØNOS Alpha does not support optional persistence modes. All operation is purel
 
 | Issue | Description | Workaround |
 |-------|-------------|------------|
-| WiFi | No driver support | Use USB Ethernet adapter |
+| WiFi | Experimental support; some access points incompatible | Use wired Ethernet for reliability |
 | Bluetooth | No driver support | Not available |
 | 2.5 GbE | Limited chipset support | Use 1 GbE port |
+
+**Supported WiFi chipsets (experimental):**
+- Intel AX200/201 (WiFi 6)
+- Intel AX210/211 (WiFi 6E)
+- Realtek RTL8821CE
 
 **Supported USB Ethernet chipsets:**
 - ASIX AX88179 (USB 3.0 gigabit)
@@ -1239,7 +1244,7 @@ For direct Ed25519 verification without GPG or Minisign.
 ```
 Algorithm:       Ed25519
 Public Key:      d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a
-Signature File:  nonos-0.8.0-alpha.iso.ed25519.sig (64 bytes raw)
+Signature File:  nonos-0.8.1-alpha.iso.ed25519.sig (64 bytes raw)
 ```
 
 ### A.6 Key Generation
@@ -1411,7 +1416,7 @@ gpg --keyserver keys.openpgp.org --send-keys [KEY_ID]
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | March 2026 | Initial release for NØNOS 0.8.0-ALPHA |
+| 1.0 | March 2026 | Initial release for NØNOS 0.8.1-alpha |
 
 
 **NØNOS: Sovereignty From Ø**
