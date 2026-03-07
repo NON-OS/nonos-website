@@ -6,7 +6,7 @@ weight: 10
 
 # NØNOS Developer Build & Release Manual
 
-**Version 0.8.0** | March 2026
+**Version 0.8.1** | March 2026
 
 
 **Classification:** Internal Engineering Documentation
@@ -33,7 +33,7 @@ weight: 10
 ### 1.1 Top-Level Directory Tree
 
 ```
-nonos-os/
+nonos-kernel/
 ├── Cargo.toml                    # Workspace manifest
 ├── Makefile                      # Build orchestration
 ├── keys/                         # Signing keys (gitignored)
@@ -52,12 +52,14 @@ nonos-os/
 │   ├── attestation_proof.bin
 │   └── nonos.iso
 ├── zk-artifacts/                 # ZK ceremony outputs
-├── nonos-kernel/                 # Kernel source
-├── nonos-boot/                   # Bootloader source
+├── nonos-bootloader/             # Bootloader source (38 dirs, 153 files)
+├── src/                          # Kernel source (542 dirs, 3110 files)
 └── docs/
 ```
 
 ### 1.2 Kernel Source Layout
+
+The kernel comprises 542 directories and 3,110 source files:
 
 ```
 nonos-kernel/
@@ -67,13 +69,17 @@ nonos-kernel/
 ├── x86_64-nonos.json             # Custom target spec
 ├── .cargo/config.toml
 ├── third_party/pqclean/          # ML-KEM (Kyber)
+├── nonos-bootloader/             # Bootloader (see section 1.3)
 ├── src/
 │   ├── lib.rs
 │   ├── nonos_main.rs             # Entry point (_start)
-│   ├── arch/x86_64/
-│   │   ├── gdt.rs
-│   │   ├── idt.rs
-│   │   └── time.rs
+│   ├── arch/
+│   │   └── x86_64/
+│   │       ├── gdt.rs
+│   │       ├── idt.rs
+│   │       ├── apic.rs
+│   │       ├── smp.rs
+│   │       └── time.rs
 │   ├── boot/
 │   │   ├── handoff.rs            # BootHandoffV1
 │   │   └── init.rs
@@ -82,39 +88,82 @@ nonos-kernel/
 │   │   ├── curve25519.rs
 │   │   ├── aead.rs
 │   │   ├── mlkem.rs
+│   │   ├── mldsa.rs
+│   │   ├── sphincs.rs
 │   │   └── pqclean_support/randombytes.c
 │   ├── drivers/
 │   │   ├── console.rs
 │   │   ├── pci.rs
 │   │   ├── ahci.rs
 │   │   ├── nvme.rs
+│   │   ├── usb/
+│   │   ├── audio/
 │   │   └── virtio/
+│   │       ├── virtio_net.rs
+│   │       └── virtio_rng.rs
 │   ├── fs/
+│   │   ├── vfs.rs
+│   │   ├── ramfs.rs
+│   │   ├── cryptofs.rs
+│   │   ├── ext4.rs
+│   │   └── fat32.rs
 │   ├── graphics/
+│   │   ├── framebuffer.rs
+│   │   ├── compositor.rs
+│   │   └── fonts/
 │   ├── input/
+│   │   ├── keyboard.rs
+│   │   ├── mouse.rs
+│   │   └── touchpad.rs
 │   ├── interrupts/
 │   ├── ipc/
 │   ├── memory/
+│   │   ├── heap.rs
+│   │   ├── paging.rs
+│   │   └── kaslr.rs
 │   ├── network/
+│   │   ├── stack.rs
+│   │   ├── tcp.rs
+│   │   ├── udp.rs
+│   │   ├── dns.rs
+│   │   └── onion/
 │   ├── process/
 │   ├── sched/
 │   ├── security/
+│   │   ├── capabilities.rs
+│   │   └── sandbox.rs
 │   ├── shell/
+│   │   └── commands/              # 100+ commands
 │   ├── storage/
 │   ├── syscall/
 │   ├── ui/
+│   │   ├── desktop.rs
+│   │   ├── window_manager.rs
+│   │   ├── dock.rs
+│   │   └── apps/
+│   │       ├── terminal.rs
+│   │       ├── file_manager.rs
+│   │       ├── text_editor.rs
+│   │       ├── browser.rs
+│   │       ├── wallet.rs
+│   │       ├── calculator.rs
+│   │       ├── settings.rs
+│   │       └── process_manager.rs
 │   ├── vault/
 │   └── zk_engine/
+│       ├── groth16.rs
+│       └── halo2.rs
 └── tests/
 ```
 
 ### 1.3 Bootloader Source Layout
 
+The bootloader resides within the kernel repository at `nonos-kernel/nonos-bootloader/` and comprises 38 directories and 153 source files:
+
 ```
-nonos-boot/
+nonos-kernel/nonos-bootloader/
 ├── Cargo.toml
 ├── build.rs                      # Key embedding
-├── keys/signing_key_v1.bin
 ├── src/
 │   ├── main.rs                   # efi_main
 │   ├── crypto/
@@ -124,31 +173,43 @@ nonos-boot/
 │   ├── display/
 │   │   ├── framebuffer.rs
 │   │   └── log_panel.rs
-│   ├── kernel_verify/verify.rs
+│   ├── kernel_verify/
+│   │   └── verify.rs
+│   ├── memory/
+│   │   └── map.rs
 │   ├── zk/
 │   │   ├── groth16.rs
-│   │   ├── registry/keys.rs
+│   │   ├── registry/
+│   │   │   └── keys.rs
 │   │   └── verifier.rs
 │   └── elf/
+│       └── loader.rs
 └── tools/
     ├── keygen/
     ├── sign-kernel/
     ├── embed-zk-proof/
+    ├── generate-keys/
     ├── nonos-attestation-circuit/
     ├── threshold-sign/
     └── zk-ceremony/
 ```
 
+Source: [github.com/NON-OS/nonos-kernel/tree/main/nonos-bootloader](https://github.com/NON-OS/nonos-kernel/tree/main/nonos-bootloader)
+
 ### 1.4 Build Pipeline
 
+All builds run from the `nonos-kernel/` root directory:
+
 ```
-make bootloader    → target/x86_64-unknown-uefi/release/nonos_boot.efi
-make kernel        → target/x86_64-nonos/release/nonos-kernel
-make sign-kernel   → target/kernel_signed.bin
+make bootloader        → target/x86_64-unknown-uefi/release/nonos_bootloader.efi
+make kernel            → target/x86_64-nonos/release/nonos-kernel
+make sign-kernel       → target/kernel_signed.bin
+make generate-zk-keys  → zk-artifacts/attestation_{proving,verifying}_key.bin
 make generate-zk-proof → target/attestation_proof.bin
-make embed-zk-proof → target/kernel_attested.bin
-make esp           → target/esp/EFI/...
-make iso           → target/nonos.iso
+make embed-zk-proof    → target/kernel_attested.bin
+make esp               → target/esp/EFI/...
+make iso               → target/nonos.iso
+make usb               → target/nonos.img
 ```
 
 
@@ -278,10 +339,12 @@ pip3 install pynacl
 ### 3.1 Debug
 
 ```bash
-cd nonos-kernel && cargo build --target x86_64-nonos.json \
+# Kernel (from nonos-kernel/)
+cargo build --target x86_64-nonos.json \
   -Zbuild-std=core,alloc -Zbuild-std-features=compiler-builtins-mem
 
-cd nonos-boot && cargo build --target x86_64-unknown-uefi
+# Bootloader (from nonos-kernel/)
+cd nonos-bootloader && cargo build --target x86_64-unknown-uefi
 ```
 
 **Profile:**
@@ -324,13 +387,13 @@ make kernel
 Direct invocation (macOS):
 
 ```bash
-cd nonos-kernel && \
-  SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk \
-  AR=/Library/Developer/CommandLineTools/usr/bin/ar \
-  CC=/Library/Developer/CommandLineTools/usr/bin/clang \
-  NONOS_SIGNING_KEY=$(pwd)/../keys/signing_key_v1.bin \
-  cargo build --release --target x86_64-nonos.json \
-    -Zbuild-std=core,alloc -Zbuild-std-features=compiler-builtins-mem
+# From nonos-kernel/
+SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk \
+AR=/Library/Developer/CommandLineTools/usr/bin/ar \
+CC=/Library/Developer/CommandLineTools/usr/bin/clang \
+NONOS_SIGNING_KEY=$(pwd)/keys/signing_key_v1.bin \
+cargo build --release --target x86_64-nonos.json \
+  -Zbuild-std=core,alloc -Zbuild-std-features=compiler-builtins-mem
 ```
 
 Output: `target/x86_64-nonos/release/nonos-kernel`
@@ -341,15 +404,16 @@ Output: `target/x86_64-nonos/release/nonos-kernel`
 make bootloader
 ```
 
-Direct:
+Direct invocation:
 
 ```bash
-cd nonos-boot && \
+# From nonos-kernel/
+cd nonos-bootloader && \
   NONOS_SIGNING_KEY=$(pwd)/../keys/signing_key_v1.bin \
   cargo build --target x86_64-unknown-uefi --release --features zk-groth16
 ```
 
-Output: `target/x86_64-unknown-uefi/release/nonos_boot.efi`
+Output: `target/x86_64-unknown-uefi/release/nonos_bootloader.efi`
 
 ### 3.5 ISO
 
@@ -591,12 +655,12 @@ python3 scripts/sign_kernel.py \
 
 ### 5.4 Public Key Embedding
 
-**`nonos-boot/build.rs`:**
+**`nonos-bootloader/build.rs`:**
 
 ```rust
 fn generate_keys() {
     let signing_key_path = env::var("NONOS_SIGNING_KEY")
-        .unwrap_or_else(|_| "keys/signing_key_v1.bin".to_string());
+        .unwrap_or_else(|_| "../keys/signing_key_v1.bin".to_string());
 
     let key_data = fs::read(&signing_key_path)?;
     let seed: [u8; 32] = key_data[..32].try_into()?;
@@ -638,12 +702,13 @@ Release builds panic without a valid key.
 ### 5.6 Production Ceremony
 
 ```bash
-cd nonos-boot/tools/keygen
+# From nonos-kernel/
+cd nonos-bootloader/tools/keygen
 cargo build --release
 
 ./target/release/nonos-keygen \
   --count 1 \
-  --out-dir ../../keys \
+  --out-dir ../../../keys \
   --allow-write-secrets \
   --operator "release@nonos.systems"
 ```
@@ -661,7 +726,7 @@ keys/
 ### 5.7 Key Rotation
 
 1. Generate new key pair
-2. Update `nonos-boot/src/crypto/keys.rs`
+2. Update `nonos-bootloader/src/crypto/keys.rs`
 3. Rebuild bootloader
 4. Sign kernel with new key
 5. Publish revocation at `https://nonos.software/keys/revoked.txt`
@@ -761,7 +826,7 @@ Offset  Field
 5. Lookup VK by program hash
 6. Verify Groth16 proof (arkworks BLS12-381)
 
-**Registry (`zk/registry/keys.rs`):**
+**Registry (`nonos-bootloader/src/zk/registry/keys.rs`):**
 
 ```rust
 pub const PROGRAM_HASH_BOOT_AUTHORITY: [u8; 32] = [
@@ -801,7 +866,7 @@ Update bootloader:
 
 ```bash
 make show-vk
-# Paste into nonos-boot/src/zk/registry/keys.rs
+# Paste into nonos-bootloader/src/zk/registry/keys.rs
 ```
 
 
@@ -1015,12 +1080,13 @@ diff checksums_a.txt checksums_b.txt
 ### 10.1 Tagging
 
 ```bash
-sed -i 's/version = "0.7.0"/version = "0.8.0"/' nonos-kernel/Cargo.toml
+# From nonos-kernel/
+sed -i 's/version = "0.8.0"/version = "0.8.1"/' Cargo.toml
 git add -A
-git commit -m "Release v0.8.0"
-git tag -a v0.8.0 -m "NØNOS v0.8.0"
+git commit -m "Release v0.8.1"
+git tag -a v0.8.1 -m "NØNOS v0.8.1"
 git push origin main
-git push origin v0.8.0
+git push origin v0.8.1
 ```
 
 ### 10.2 Checksums
@@ -1042,7 +1108,7 @@ gpg --detach-sign --armor B3SUMS
 ```bash
 gpg --detach-sign --armor nonos.iso
 scp nonos.iso nonos.iso.asc SHA256SUMS SHA256SUMS.asc B3SUMS B3SUMS.asc \
-  releases@nonos.software:/var/www/releases/0.8.0/
+  releases@nonos.software:/var/www/nonos.software/iso/
 ```
 
 ### 10.4 Key Distribution
