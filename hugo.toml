@@ -63,17 +63,17 @@ disableKinds = ["taxonomy", "term", "RSS"]
 [params]
   description = "Sovereignty From Ø — Documentation and Downloads"
   author = "NØNOS Operating System"
-  version = "0.8.0-alpha"
+  version = "0.8.1-alpha"
   disableExternalJS = true
   disableExternalCSS = true
   disableAnalytics = true
   disableFonts = true
   onionAddress = ""
-  currentRelease = "0.8.0-alpha"
-  releaseDate = "2026-03-03"
-  isoSize = "375 MB"
-  imgSize = "375 MB"
-  isoSHA256 = ""
+  currentRelease = "0.8.1-alpha"
+  releaseDate = "2026-03-07"
+  isoSize = "377 MB"
+  imgSize = "445 MB"
+  isoSHA256 = "cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351"
   isoBLAKE3 = ""
   disableCSP = true
 
