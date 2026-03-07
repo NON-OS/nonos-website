@@ -6,372 +6,429 @@ weight: 13
 
 # NØNOS Capability System
 
-**Version 0.8.0** | March 2026
+**Version 0.8.1-alpha** | March 2026
 
-NØNOS uses a capability-based security model instead of traditional user/group permissions. Every privileged operation requires holding the appropriate capability. This document explains how capabilities work, what they control, and how they're managed.
+NØNOS uses a capability-based security model instead of traditional user/group permissions. Every privileged operation requires holding the appropriate capability. This document explains how capabilities work, what they control, and how they are managed.
 
 
 ## What Is a Capability?
 
-A capability is a cryptographic token that grants permission to perform specific actions. Think of it like a signed permission slip that says "this process is allowed to do X."
-
-Unlike traditional Unix permissions (which check "who are you?"), capabilities check "what are you holding?" A process either has the token or it doesn't—there's no ambient authority based on user ID.
+A capability is a cryptographic token that grants permission to perform specific actions. Unlike traditional Unix permissions which check identity ("who are you?"), capabilities check possession ("what token are you holding?"). A process either holds a valid capability token or it does not. There is no ambient authority based on user ID.
 
 ### Why Capabilities?
 
-Traditional permission systems have problems:
+Traditional permission systems have several problems:
 
-| Traditional | Capability-Based |
-|-------------|------------------|
+| Traditional Model | Capability-Based Model |
+|-------------------|------------------------|
 | Root can do anything | Must hold specific capability |
-| Ambient authority (UID 0) | Explicit token required |
-| Confused deputy attacks | Process knows exactly what's allowed |
-| All-or-nothing escalation | Fine-grained permission |
+| Ambient authority based on UID | Explicit token required for each action |
+| Confused deputy attacks possible | Process knows exactly what is allowed |
+| All-or-nothing privilege escalation | Fine-grained permission control |
 
 With capabilities:
-- A process that handles network traffic can be denied filesystem access
+- A process that handles network traffic can be denied file system access
 - A cryptographic service can be denied network access
-- Compromise of one capability doesn't grant all privileges
+- Compromise of one capability does not grant all privileges
 
 
 ## Capability Types
 
-NØNOS defines 17 capability types, each controlling a specific domain of operations.
-
-### File System Capabilities
+NØNOS defines 10 capability types, each controlling a specific domain of operations.
 
 | Capability | Bit | Description |
 |------------|-----|-------------|
-| **FILE_READ** | 0 | Read file contents |
-| **FILE_WRITE** | 1 | Write to files |
-| **FILE_EXECUTE** | 2 | Execute files as programs |
-| **FILE_CREATE** | 3 | Create new files |
-| **FILE_DELETE** | 4 | Delete files |
+| **CoreExec** | 0 | Execute code and perform basic computations |
+| **IO** | 1 | Access input/output devices and ports |
+| **Network** | 2 | Use network sockets and connections |
+| **IPC** | 3 | Inter-process communication and messaging |
+| **Memory** | 4 | Memory allocation and management beyond basic needs |
+| **Crypto** | 5 | Access cryptographic operations and key material |
+| **FileSystem** | 6 | Read, write, and modify files |
+| **Hardware** | 7 | Direct hardware access and device control |
+| **Debug** | 8 | Debug other processes and inspect system state |
+| **Admin** | 9 | Administrative operations including shutdown and configuration |
 
-**Usage Examples:**
-- A text editor needs FILE_READ, FILE_WRITE, FILE_CREATE
-- A log viewer needs only FILE_READ
-- A cleanup utility needs FILE_READ, FILE_DELETE
+### CoreExec
 
-### Network Capabilities
+Required for any process to execute. This is the fundamental capability that allows code execution.
 
-| Capability | Bit | Description |
-|------------|-----|-------------|
-| **NET_ACCESS** | 5 | Basic network access |
-| **NET_BIND** | 6 | Bind to a port |
-| **NET_LISTEN** | 7 | Listen for incoming connections |
-| **NET_RAW** | 8 | Raw socket access |
+**Grants access to:**
+- Basic CPU instruction execution
+- Stack and heap allocation within process limits
+- System calls that do not require other capabilities
 
-**Usage Examples:**
-- A web browser needs NET_ACCESS
-- A web server needs NET_ACCESS, NET_BIND, NET_LISTEN
-- A packet sniffer needs NET_RAW
+### IO
 
-### Process Capabilities
+Controls access to input/output operations.
 
-| Capability | Bit | Description |
-|------------|-----|-------------|
-| **PROC_SPAWN** | 9 | Create child processes |
-| **PROC_KILL** | 10 | Terminate other processes |
-| **PROC_DEBUG** | 11 | Debug/ptrace other processes |
+**Grants access to:**
+- Port I/O operations
+- Device read/write through standard interfaces
+- Console input and output
 
-**Usage Examples:**
-- A shell needs PROC_SPAWN to run commands
-- A task manager needs PROC_KILL
-- A debugger needs PROC_DEBUG
+### Network
 
-### System Capabilities
+Controls all network-related operations.
 
-| Capability | Bit | Description |
-|------------|-----|-------------|
-| **SYS_SHUTDOWN** | 12 | Shut down the system |
-| **SYS_REBOOT** | 13 | Reboot the system |
-| **SYS_CONFIG** | 14 | Modify system configuration |
+**Grants access to:**
+- Creating sockets (TCP, UDP)
+- Connecting to remote hosts
+- Binding to ports
+- Listening for connections
+- Sending and receiving data
+- Raw socket access
 
-**Usage Examples:**
-- The Settings app needs SYS_CONFIG
-- Power management needs SYS_SHUTDOWN, SYS_REBOOT
+### IPC
 
-### Cryptographic Capabilities
+Controls inter-process communication.
 
-| Capability | Bit | Description |
-|------------|-----|-------------|
-| **CRYPTO_SIGN** | 15 | Access signing keys |
-| **CRYPTO_ENCRYPT** | 16 | Perform encryption operations |
+**Grants access to:**
+- Message passing between processes
+- Shared memory creation and attachment
+- Channel creation and communication
+- Signal sending
 
-**Usage Examples:**
-- A code signing tool needs CRYPTO_SIGN
-- An encrypted file handler needs CRYPTO_ENCRYPT
+### Memory
+
+Controls advanced memory operations.
+
+**Grants access to:**
+- Large memory allocations
+- Memory mapping operations
+- DMA buffer allocation
+- Memory protection changes
+
+### Crypto
+
+Controls cryptographic operations and key access.
+
+**Grants access to:**
+- Signing and signature verification
+- Encryption and decryption
+- Key generation and derivation
+- Access to hardware cryptographic accelerators
+- Random number generation from secure sources
+
+### FileSystem
+
+Controls file system operations.
+
+**Grants access to:**
+- File reading and writing
+- Directory creation and traversal
+- File creation and deletion
+- Permission changes
+- Mount operations
+
+### Hardware
+
+Controls direct hardware access.
+
+**Grants access to:**
+- PCI device enumeration and configuration
+- MMIO region access
+- Interrupt handling
+- DMA operations
+- TPM access
+
+### Debug
+
+Controls debugging operations.
+
+**Grants access to:**
+- Process inspection
+- Memory reading of other processes
+- Breakpoint setting
+- Trace operations
+
+### Admin
+
+Controls administrative operations.
+
+**Grants access to:**
+- System shutdown and reboot
+- Configuration changes
+- Module loading
+- Security policy modification
+
+
+## Predefined Roles
+
+NØNOS provides predefined capability sets for common process types.
+
+### Kernel
+
+All capabilities. The kernel operates with full system access.
+
+```rust
+KERNEL: [CoreExec, IO, Network, IPC, Memory, Crypto, FileSystem, Hardware, Debug, Admin]
+```
+
+### System Service
+
+Standard system services that need file access and IPC.
+
+```rust
+SYSTEM_SERVICE: [CoreExec, IPC, Memory, FileSystem]
+```
+
+### Sandboxed Module
+
+Minimal capabilities for isolated computation.
+
+```rust
+SANDBOXED_MOD: [CoreExec, IPC, Memory]
+```
+
+### Network Service
+
+Services that handle network traffic.
+
+```rust
+NETWORK_SERVICE: [CoreExec, IPC, Memory, Network]
+```
+
+### User Application
+
+Default for user-facing applications.
+
+```rust
+USER_APP: [CoreExec, IPC]
+```
+
+### Crypto Service
+
+Cryptographic services and key managers.
+
+```rust
+CRYPTO_SERVICE: [CoreExec, IPC, Memory, Crypto]
+```
+
+### Driver
+
+Device drivers requiring hardware access.
+
+```rust
+DRIVER: [CoreExec, IPC, Memory, Hardware, IO]
+```
+
+### Debugger
+
+Debugging tools.
+
+```rust
+DEBUGGER: [CoreExec, IPC, Memory, Debug]
+```
 
 
 ## Capability Tokens
 
-Capabilities are represented as cryptographically signed tokens.
+Capabilities are represented as cryptographically signed tokens stored in a compact binary format.
 
 ### Token Structure
 
 | Field | Size | Description |
 |-------|------|-------------|
-| Module ID | 8 bytes | Who created this token |
-| Capability Bits | 8 bytes | Which capabilities granted |
-| Expiration | 8 bytes | When token expires (milliseconds) |
-| Nonce | 32 bytes | Unique random value |
+| Version | 1 byte | Token format version |
+| Owner ID | 8 bytes | Module or process identifier |
+| Capability Bits | 8 bytes | Bitmask of granted capabilities |
+| Expiration | 8 bytes | Timestamp when token expires |
+| Nonce | 8 bytes | Unique value preventing replay |
 | Signature | 64 bytes | Ed25519 signature |
 
-**Total Size:** 120 bytes per token
+**Total Size:** 97 bytes per token
 
 ### Token Properties
 
 **Non-Forgeable:**
-The Ed25519 signature prevents token creation without the signing key. Only the kernel can mint valid tokens.
+The Ed25519 signature prevents token creation without the kernel signing key. Only the kernel can mint valid capability tokens.
 
 **Time-Limited:**
-Tokens expire after a set duration (default: 24 hours). Expired tokens are rejected.
+Tokens expire after a configured duration. Expired tokens are rejected regardless of signature validity.
 
 **Non-Replayable:**
-The random nonce ensures each token is unique. The kernel tracks used nonces to prevent replay.
+Each token contains a unique nonce. The kernel tracks used nonces to prevent replay attacks.
 
 **Delegatable:**
-Token holders can create child tokens with a subset of their capabilities (not more).
+Token holders can create child tokens with a subset of their capabilities. A token cannot delegate capabilities it does not possess.
 
 
 ## Token Operations
 
-### Token Creation
+### Creating Tokens
 
-When a process is created, it receives a capability token from its parent:
+The kernel creates tokens when processes are spawned:
 
 ```rust
-// Kernel-side token creation
-let token = CapabilityToken {
-    module_id: parent.module_id,
-    capabilities: requested & parent.capabilities,  // Cannot exceed parent's
-    expiration: now + DEFAULT_EXPIRATION,
-    nonce: random_bytes(32),
-    signature: sign(token_data),
-};
+let token = create_token(
+    owner_id,
+    caps_to_bits(&[Capability::CoreExec, Capability::IPC]),
+    expiration_ms,
+);
 ```
 
-### Token Verification
+### Verifying Tokens
 
-Every system call checks capabilities before proceeding:
+Before any privileged operation, the kernel verifies the token:
 
 ```rust
-fn syscall_open(path: &str, flags: u32) -> Result<Fd> {
-    let caps = current_process().capability_bits;
+if !is_token_valid(&token) {
+    return Err(EPERM);
+}
 
-    if flags.contains(O_RDONLY) && !caps.contains(FILE_READ) {
-        return Err(EPERM);
-    }
-    if flags.contains(O_WRONLY) && !caps.contains(FILE_WRITE) {
-        return Err(EPERM);
-    }
-    if flags.contains(O_CREAT) && !caps.contains(FILE_CREATE) {
-        return Err(EPERM);
-    }
-
-    // Proceed with open...
+if !has_capability(token.capabilities, Capability::Network) {
+    return Err(EPERM);
 }
 ```
 
-### Token Delegation
+### Delegation
 
-A process can delegate capabilities to another process:
+A process can delegate capabilities to child processes:
 
 ```rust
-// Create a child token with reduced capabilities
-let child_token = parent_token.delegate([FILE_READ, NET_ACCESS]);
+let child_caps = parent_caps & requested_caps;  // Intersection only
+let child_token = create_delegation(parent_token, child_caps);
 ```
 
-**Rules:**
-- Can only delegate capabilities you hold
-- Cannot add capabilities
-- Cannot extend expiration
-- Child tokens are signed by the kernel, not the delegator
+Delegation rules:
+- Can only delegate capabilities the parent holds
+- Cannot add capabilities not in the parent token
+- Cannot extend expiration beyond parent token
+- Delegation chain depth is limited
 
-### Token Revocation
+### Revocation
 
 Tokens can be revoked before expiration:
 
 ```rust
-// Kernel revokes all tokens for a module
-kernel.revoke_tokens(module_id);
-
-// Or revoke specific token by nonce
-kernel.revoke_token(token_nonce);
+revoke_token(token_nonce);
+revoke_all_for_owner(owner_id);
 ```
 
 Revocation takes effect immediately. The kernel maintains a revocation list checked on every operation.
 
 
-## Process Capabilities
+## Capability Chains
 
-### At Process Creation
+For complex delegation scenarios, NØNOS supports capability chains where each link represents a delegation step.
 
-New processes receive capabilities through several mechanisms:
+### Chain Structure
 
-| Method | Capability Source |
-|--------|-------------------|
-| Inheritance | Subset of parent's capabilities |
-| Module Manifest | Capabilities declared in signed module |
-| Explicit Grant | Parent grants specific capabilities |
-| System Default | Minimal capabilities for basic operation |
+```rust
+struct CapabilityChain {
+    tokens: [CapabilityToken; MAX_CHAIN_DEPTH],
+    length: usize,
+}
+```
 
-### Default Capabilities
+### Chain Validation
 
-By default, new processes receive:
+A chain is valid if:
 
-| Capability | Granted |
-|------------|---------|
-| FILE_READ | No |
-| FILE_WRITE | No |
-| NET_ACCESS | No |
-| PROC_SPAWN | No |
-| ... | No |
+1. Every token signature is valid
+2. Every token is not expired
+3. Every token is not revoked
+4. Each child has capabilities subset of parent
+5. Chain depth does not exceed maximum
 
-**Everything is denied by default.** Capabilities must be explicitly granted.
+```rust
+if !verify_chain(&chain) {
+    return Err(ChainError::InvalidChain);
+}
 
-### Capability Checking
-
-The kernel checks capabilities atomically—either all required capabilities are present, or the operation fails entirely.
-
-```bash
-# Check capabilities from shell
-capabilities
+let effective = effective_capabilities(&chain);
 ```
 
 
-## System Call Requirements
+## Multi-Signature Tokens
 
-Each system call has specific capability requirements:
+For high-security operations, NØNOS supports multi-signature capability tokens requiring multiple parties to authorize.
 
-### File Operations
+### Structure
 
-| System Call | Required Capabilities |
-|-------------|----------------------|
-| read() | FILE_READ |
-| write() | FILE_WRITE |
-| open(O_RDONLY) | FILE_READ |
-| open(O_WRONLY) | FILE_WRITE |
-| open(O_CREAT) | FILE_CREATE |
-| unlink() | FILE_DELETE |
-| chmod() | FILE_WRITE |
-| execve() | FILE_EXECUTE |
+| Field | Size | Description |
+|-------|------|-------------|
+| Threshold | 1 byte | Signatures required |
+| Signer Count | 1 byte | Total authorized signers |
+| Signer Keys | variable | Public keys of signers |
+| Signatures | variable | Collected signatures |
 
-### Network Operations
+### Usage
 
-| System Call | Required Capabilities |
-|-------------|----------------------|
-| socket() | NET_ACCESS |
-| connect() | NET_ACCESS |
-| bind() | NET_BIND |
-| listen() | NET_LISTEN |
-| accept() | NET_LISTEN |
-| send() | NET_ACCESS |
-| recv() | NET_ACCESS |
-| raw socket | NET_RAW |
+```rust
+let multisig = create_multisig_token(
+    capabilities,
+    threshold,
+    &signer_public_keys,
+);
 
-### Process Operations
+add_signature(&mut multisig, signer_index, signature);
 
-| System Call | Required Capabilities |
-|-------------|----------------------|
-| fork() | PROC_SPAWN |
-| clone() | PROC_SPAWN |
-| kill() | PROC_KILL |
-| ptrace() | PROC_DEBUG |
-| execve() | PROC_SPAWN |
-
-### System Operations
-
-| System Call | Required Capabilities |
-|-------------|----------------------|
-| shutdown() | SYS_SHUTDOWN |
-| reboot() | SYS_REBOOT |
-| mount() | SYS_CONFIG |
-| module_load() | SYS_CONFIG |
-
-### Cryptographic Operations
-
-| System Call | Required Capabilities |
-|-------------|----------------------|
-| crypto_sign() | CRYPTO_SIGN |
-| crypto_verify() | None (verification is public) |
-| crypto_encrypt() | CRYPTO_ENCRYPT |
-| crypto_decrypt() | CRYPTO_ENCRYPT |
-
-
-## Capability in Practice
-
-### Example: Web Browser
-
-A web browser needs:
-
-| Capability | Why |
-|------------|-----|
-| FILE_READ | Read cached files, bookmarks |
-| FILE_WRITE | Write downloads, cache |
-| FILE_CREATE | Create download files |
-| NET_ACCESS | Connect to websites |
-
-It does **not** need:
-- NET_BIND (it's a client, not a server)
-- NET_LISTEN (it's not accepting connections)
-- PROC_KILL (it shouldn't kill other processes)
-- SYS_SHUTDOWN (it shouldn't shut down the system)
-
-If the browser is compromised, the attacker cannot:
-- Listen for incoming connections (no backdoor server)
-- Kill other processes
-- Modify system configuration
-- Access signing keys
-
-### Example: Password Manager
-
-A password manager needs:
-
-| Capability | Why |
-|------------|-----|
-| FILE_READ | Read encrypted vault |
-| FILE_WRITE | Update vault |
-| CRYPTO_ENCRYPT | Encrypt/decrypt vault |
-
-It does **not** need:
-- NET_ACCESS (if offline-only)
-- PROC_SPAWN (no need to run other programs)
-- FILE_EXECUTE (just data, no executables)
-
-### Example: Shell
-
-The shell needs broad capabilities:
-
-| Capability | Why |
-|------------|-----|
-| FILE_READ | Read scripts, display files |
-| FILE_WRITE | Output redirection |
-| FILE_CREATE | Create files |
-| FILE_EXECUTE | Run programs |
-| PROC_SPAWN | Execute commands |
-| NET_ACCESS | Network commands |
-
-This is why the shell is a high-privilege component. Users should be careful what they run.
-
-
-## Capability Audit Trail
-
-All capability operations are logged:
-
-```
-[AUDIT] 2026-03-04 14:23:15 GRANT module=shell caps=FILE_READ|FILE_WRITE
-[AUDIT] 2026-03-04 14:23:16 CHECK module=editor caps=FILE_READ result=ALLOW
-[AUDIT] 2026-03-04 14:23:17 CHECK module=editor caps=NET_ACCESS result=DENY
-[AUDIT] 2026-03-04 14:23:18 REVOKE module=editor reason=EXPIRED
+if count_valid_signatures(&multisig) >= threshold {
+    // Token is now valid
+}
 ```
 
-The audit trail provides:
-- Who requested what capability
-- Whether it was granted or denied
-- When capabilities expired or were revoked
-- Chain of delegation
+
+## Resource Tokens
+
+Beyond capability tokens, NØNOS supports resource tokens that track quota consumption.
+
+### Structure
+
+| Field | Description |
+|-------|-------------|
+| Operations | Number of operations allowed |
+| Bytes | Amount of data allowed |
+| Consumed | Current consumption |
+
+### Usage
+
+```rust
+let resource = create_resource_token(max_ops, max_bytes);
+
+if try_consume_ops(&mut resource, 1).is_ok() {
+    // Operation allowed
+}
+
+if try_consume_bytes(&mut resource, 1024).is_ok() {
+    // Transfer allowed
+}
+```
+
+
+## Audit Trail
+
+All capability operations are logged for security auditing.
+
+### Audit Entry Structure
+
+| Field | Description |
+|-------|-------------|
+| Timestamp | When the operation occurred |
+| Module ID | Which module performed the action |
+| Capability | Which capability was involved |
+| Action | Grant, check, revoke, or delegate |
+| Result | Success or failure |
+
+### Querying the Audit Log
+
+```rust
+let recent = get_recent(100);
+let failures = get_failures();
+let by_cap = get_by_capability(Capability::Admin);
+let by_module = get_by_module(module_id);
+```
+
+### Audit Statistics
+
+```rust
+let stats = get_stats();
+println!("Total checks: {}", stats.total_checks);
+println!("Grants: {}", stats.grants);
+println!("Denials: {}", stats.denials);
+```
 
 
 ## Capability API
@@ -379,69 +436,41 @@ The audit trail provides:
 ### Checking Capabilities
 
 ```rust
-// Check if current process has capability
-if kernel.has_capability(Capability::NetAccess) {
+use crate::capabilities::{has_capability, Capability};
+
+let caps: u64 = current_process().capability_bits;
+
+if has_capability(caps, Capability::Network) {
     // Proceed with network operation
 }
-
-// Check multiple capabilities
-if kernel.has_all_capabilities([Capability::FileRead, Capability::FileWrite]) {
-    // Proceed
-}
 ```
 
-### Dropping Capabilities
-
-A process can voluntarily drop capabilities:
+### Manipulating Capability Bits
 
 ```rust
-// Drop network access (cannot be regained)
-kernel.drop_capability(Capability::NetAccess);
+use crate::capabilities::{caps_to_bits, bits_to_caps, add_capability, remove_capability};
+
+// Convert capability list to bitmask
+let bits = caps_to_bits(&[Capability::CoreExec, Capability::IPC]);
+
+// Add a capability
+let with_network = add_capability(bits, Capability::Network);
+
+// Remove a capability
+let without_network = remove_capability(with_network, Capability::Network);
+
+// Convert back to list
+let caps = bits_to_caps(bits);
 ```
 
-Once dropped, a capability cannot be regained without creating a new process.
-
-### Querying Capabilities
+### Counting Capabilities
 
 ```rust
-// Get current capability set
-let caps = kernel.get_capabilities();
+use crate::capabilities::capability_count;
 
-// Check specific capability
-let can_sign = caps.contains(Capability::CryptoSign);
+let count = capability_count(token.capabilities);
+println!("Token has {} capabilities", count);
 ```
-
-
-## Module Capabilities
-
-Loaded modules declare capabilities in their manifest:
-
-```rust
-ModuleManifest {
-    name: "network_monitor",
-    requested_capabilities: [
-        Capability::NetAccess,
-        Capability::NetRaw,
-    ],
-    ...
-}
-```
-
-The kernel validates:
-1. Requested capabilities are appropriate for module type
-2. Module signature is valid
-3. No capability escalation beyond policy
-
-### Module Types and Allowed Capabilities
-
-| Module Type | Maximum Capabilities |
-|-------------|---------------------|
-| User | FILE_*, limited NET |
-| Service | Most capabilities |
-| Driver | Full hardware access |
-| System | All capabilities |
-
-User modules cannot request SYS_CONFIG, PROC_DEBUG, or other dangerous capabilities.
 
 
 ## Security Properties
@@ -451,100 +480,154 @@ User modules cannot request SYS_CONFIG, PROC_DEBUG, or other dangerous capabilit
 Each process receives only the capabilities it needs:
 
 - Reduces attack surface
-- Limits blast radius of compromise
+- Limits damage from compromise
 - Makes privilege escalation harder
 
 ### No Ambient Authority
 
-Unlike traditional Unix:
-- Being "root" doesn't grant all permissions
-- Must hold specific capability token
-- Capabilities are explicit, not implicit
+Unlike traditional Unix systems:
+
+- No root user with implicit permissions
+- Every action requires an explicit capability
+- Capabilities are checked, not identities
 
 ### Unforgeable Tokens
 
-Ed25519 signatures prevent:
-- Token creation by non-kernel code
-- Token modification after creation
-- Token transfer (except through delegation)
+Ed25519 signatures ensure:
+
+- Only the kernel can create valid tokens
+- Token modification invalidates the signature
+- Stolen signing keys can be rotated
 
 ### Timeboxed Permissions
 
-Token expiration means:
-- Stolen tokens become useless after expiration
-- Long-running processes must refresh tokens
-- Abandoned tokens automatically clean up
+Token expiration provides:
+
+- Automatic cleanup of abandoned tokens
+- Limited window for stolen token use
+- Forced re-authorization for long-running processes
 
 
-## Common Patterns
+## Examples
 
-### Temporary Elevation
+### Web Browser
 
-Sometimes a process needs temporary elevated capabilities:
+A web browser needs:
 
-```rust
-// Request elevated token for specific operation
-let elevated = kernel.request_elevation([Capability::SysConfig]);
-// Use elevated capabilities
-kernel.modify_config(...);
-// Token automatically expires
+| Capability | Reason |
+|------------|--------|
+| CoreExec | Execute code |
+| IPC | Communicate with other processes |
+| Network | Connect to websites |
+| FileSystem | Read/write downloads and cache |
+
+If compromised, the attacker cannot:
+- Access hardware directly (no Hardware)
+- Perform cryptographic signing (no Crypto)
+- Debug other processes (no Debug)
+- Shut down the system (no Admin)
+
+### Cryptographic Service
+
+A key management service needs:
+
+| Capability | Reason |
+|------------|--------|
+| CoreExec | Execute code |
+| IPC | Receive signing requests |
+| Memory | Secure key storage |
+| Crypto | Perform cryptographic operations |
+
+It does not need:
+- Network (if purely local)
+- FileSystem (if keys are in memory only)
+- Hardware (unless using HSM)
+
+### Sandboxed Computation
+
+An untrusted computation module:
+
+| Capability | Reason |
+|------------|--------|
+| CoreExec | Execute code |
+| IPC | Return results |
+| Memory | Working memory |
+
+This process cannot:
+- Access the network
+- Read or write files
+- Access cryptographic keys
+- Interact with hardware
+
+
+## Shell Commands
+
+### View Current Capabilities
+
+```bash
+capabilities
 ```
 
-### Capability Brokering
+### Verbose Capability Information
 
-A trusted broker can grant capabilities:
-
-```rust
-// Broker verifies request and grants capability
-if broker.verify_request(requestor) {
-    broker.delegate_capability(requestor, [Capability::NetAccess]);
-}
+```bash
+capabilities -v
 ```
 
-### Sandbox Patterns
+### Check Audit Log for Denials
 
-Create highly restricted processes:
-
-```rust
-// Spawn with minimal capabilities
-let sandbox = spawn_with_capabilities([], []);  // Empty capability set
-
-// Sandbox can compute but not access files or network
+```bash
+audit | grep DENY
 ```
 
 
 ## Troubleshooting
 
-### Permission Denied Errors
+### Permission Denied (EPERM)
 
-If you see `EPERM`:
+If you receive permission denied errors:
 
-1. Check current capabilities: `capabilities`
-2. Identify required capability for operation
-3. Verify capability in process chain
-4. Check token expiration
+1. Check current capabilities with `capabilities`
+2. Identify which capability the operation requires
+3. Verify the process was granted that capability
+4. Check if the token has expired
 
-### Capability Not Working
+### Token Verification Failures
 
-If a capability seems ignored:
+If token verification fails:
 
-1. Verify token signature (shouldn't fail silently)
-2. Check expiration time
-3. Look for revocation in audit log
-4. Verify capability bit is actually set
+1. Check token expiration timestamp
+2. Verify the token is not in the revocation list
+3. Ensure the signing key matches
+4. Check delegation chain validity
 
-### Debugging Capability Issues
+### Capability Not Taking Effect
 
-```bash
-# Show current capabilities
-capabilities
+If a granted capability seems ignored:
 
-# Check audit log
-audit | grep DENY
+1. Verify the capability bit is set correctly
+2. Check for additional requirements (some operations need multiple capabilities)
+3. Look for resource quota exhaustion
+4. Examine the audit log for details
 
-# Verbose capability info
-capabilities -v
-```
+
+## Implementation Notes
+
+### Performance
+
+Capability checks are designed to be fast:
+
+- Bitmask operations for capability checks
+- Efficient signature verification
+- Cached revocation list lookups
+
+### Memory Safety
+
+All capability operations are implemented in safe Rust where possible:
+
+- No raw pointer manipulation in capability logic
+- Bounds checking on all arrays
+- Cryptographic operations use audited libraries
 
 
 AGPL-3.0 | Copyright 2026 NØNOS Contributors
