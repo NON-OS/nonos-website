@@ -190,7 +190,7 @@ Boot from USB. Disable Secure Boot. Watch the ZK proof verify.
 - **0.9.0** — User-space isolation, persistent encrypted storage
 - **1.0.0** — Stable ABI, package manager, ARM64 support
 
-Follow development: [github.com/NON-OS/nonos](https://github.com/NON-OS/nonos)
+Follow development: [github.com/NON-OS/nonos-kernel](https://github.com/NON-OS/nonos-kernel)
 
 ---
 
@@ -198,7 +198,7 @@ Follow development: [github.com/NON-OS/nonos](https://github.com/NON-OS/nonos)
 
 Documentation site is online. Technical specs, build instructions, and downloads available.
 
-Source: [github.com/NON-OS/nonos](https://github.com/NON-OS/nonos)
+Source: [github.com/NON-OS/nonos-kernel](https://github.com/NON-OS/nonos-kernel)
 
 ---
 

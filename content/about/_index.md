@@ -58,7 +58,7 @@ The kernel itself proves its integrity at boot using Groth16 proofs over BLS12-3
 | Shell commands | 100+ |
 | Device drivers | 20+ (storage, network, input, audio) |
 | Cryptographic primitives | 25+ algorithms |
-| Capability types | 17 |
+| Capability types | 10 |
 | GUI applications | 8 built-in apps |
 
 
@@ -126,7 +126,13 @@ You can use it, modify it, and distribute it. If you distribute modified version
 Everything is open source and available on GitHub:
 
 - **Kernel:** [github.com/NON-OS/nonos-kernel](https://github.com/NON-OS/nonos-kernel)
-- **Bootloader:** [github.com/NON-OS/nonos-boot](https://github.com/NON-OS/nonos-boot)
+- **Bootloader:** [github.com/NON-OS/nonos-kernel/nonos-bootloader](https://github.com/NON-OS/nonos-kernel/tree/main/nonos-bootloader)
+
+## Mirrors
+
+- **Anyone Network:** [6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon](http://6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon/)
+
+Access via [Anyone](https://anyone.io/) for anonymous browsing.
 
 
 ## Who This Is For
