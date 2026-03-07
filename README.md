@@ -9,7 +9,7 @@ Static documentation site for nonos.software.
 - **JavaScript**: None
 - **Build**: Make + shell scripts
 - **Server**: Nginx (hardened)
-- **Privacy**: hidden service
+- **Privacy**: Anyone Network hidden service
 
 ## Security
 
@@ -17,7 +17,7 @@ Static documentation site for nonos.software.
 - TLS 1.3 only
 - HSTS preload enabled
 - Strict CSP headers
-- Tor hidden service mirror
+- Anyone Network mirror (http://6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon/)
 
 ## Anon Hidden Service
 
