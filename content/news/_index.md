@@ -7,36 +7,52 @@ description: "NØNOS announcements and releases"
 
 ---
 
-## 2026-03-07 — Real Hardware Fixes: 0.8.1-alpha
+## 2026-03-07 — NØNOS 0.8.1-alpha Released
 
-Two days after launch, two critical bugs squashed. If 0.8.0 hung on your machine, this one should boot.
+Two days after the initial launch, we are shipping 0.8.1-alpha with critical hardware compatibility fixes and new virtualization support. If 0.8.0 hung on your machine, this release should boot.
 
-### The Bugs
+### Critical Bug Fixes
 
-**ExitBootServices Hang (Issue #8)** — Users on Intel i5-11400H, Acer boards, and various HP machines reported freezes right after "Calling ExitBootServices..." with occasional screen corruption. QEMU worked fine. Real hardware died.
+**ExitBootServices Hang (Issue #8)**
 
-Root cause: struct layout mismatch. The bootloader's `MemoryMapEntry` had a 4-byte padding field to match EFI_MEMORY_DESCRIPTOR alignment. The kernel's version didn't. Every field after `memory_type` was shifted by 4 bytes. The kernel saw garbage memory regions and hung during heap init trying to use ACPI reserved memory as free RAM.
+Users on Intel Core i5-11400H processors, various Acer motherboards, and HP systems reported freezes immediately after the bootloader displayed "Calling ExitBootServices..." — sometimes accompanied by screen corruption. QEMU ran without issue. Real hardware failed.
 
-Fix: added `_pad: u32` to kernel's struct. Took 48 hours to find, one line to fix.
+The root cause was a struct layout mismatch between the bootloader and kernel. The bootloader's `MemoryMapEntry` included a 4-byte padding field to match EFI_MEMORY_DESCRIPTOR alignment requirements. The kernel's corresponding struct lacked this padding. Every field after `memory_type` was shifted by 4 bytes, causing the kernel to interpret garbage values as memory regions. During heap initialization, the kernel attempted to use ACPI reserved memory as free RAM and hung.
 
-**Mouse Cursor Vanishing (Issue #6)** — On Proxmox VMs, clicking anywhere in Settings > Network made the cursor disappear until you moved the mouse. Bare metal was fine.
+The fix: a single line adding `_pad: u32` to the kernel's struct definition. Finding the cause took 48 hours of debugging across multiple hardware configurations.
 
-Root cause: click handler return value wasn't propagating. `dispatch_app_click` returned void and `handle_content_click` always returned false. When Settings handled a click, the main loop never knew. No redraw triggered. Cursor erase/restore cycle showed stale pixels.
+**Cursor Disappearing in Settings (Issue #6)**
 
-Fix: made click handlers return bool all the way up the chain.
+On Proxmox virtual machines, clicking anywhere within the Settings application's Network panel caused the mouse cursor to vanish until the user moved the mouse. Bare metal systems were unaffected.
 
-### Virtio Support (Issue #10)
+The issue traced to click handler return values not propagating through the window manager. The `dispatch_app_click` function returned void, and `handle_content_click` always returned false regardless of whether the click was handled. When Settings processed a click, the main event loop never received confirmation. No redraw was triggered, and the cursor erase/restore cycle displayed stale pixel data.
 
-QEMU users get proper hardware entropy now. Added `virtio-rng-pci` driver that pulls entropy from the host. Wallet key generation prioritizes this over RDRAND/RDSEED. Also wired up `virtio-net` as primary network driver with e1000 fallback.
+The fix: refactored click handlers throughout the window manager to return boolean values indicating whether events were consumed.
+
+### New Virtio Drivers (Issue #10)
+
+Virtual machine users now have access to proper hardware entropy and improved networking.
+
+**virtio-rng-pci** — Hardware random number generator driver that pulls entropy directly from the host system. Wallet key generation now prioritizes this source over RDRAND/RDSEED when running under QEMU or KVM.
+
+**virtio-net** — Primary network driver for QEMU/KVM environments. The e1000 driver remains as fallback for systems without virtio support.
 
 ### Download
 
-| File | Size |
-|------|------|
-| [nonos-0.8.1-alpha.iso](/iso/nonos-0.8.1-alpha.iso) | ~380 MB |
-| [nonos-0.8.1-alpha.img](/iso/nonos-0.8.1-alpha.img) | ~450 MB |
+| File | Size | SHA256 |
+|------|------|--------|
+| [nonos-0.8.1-alpha.iso](/iso/nonos-0.8.1-alpha.iso) | ~380 MB | `cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351` |
+| [nonos-0.8.1-alpha.img](/iso/nonos-0.8.1-alpha.img) | ~450 MB | `a9610a760c7660cca54290570834f250271591d59f1cdae53943d163fb1fb9ca` |
 
-Checksums: [SHA256SUMS](/iso/SHA256SUMS)
+Full checksums available at [SHA256SUMS](/iso/SHA256SUMS).
+
+### Cryptographic Attestation
+
+| Parameter | Value |
+|-----------|-------|
+| Program Hash | `fa02d10e8804169a47233e34a6ff3566248958adff55e1248d50304aff4ab230` |
+| Capsule Commitment | `2e0884e37c600272a090d1a90ffbf6e6a367fed38bd912a3dd2062f39c1eff9f` |
+| Signing Key | `4c5a3309bc2b13c8a85e2f780f7fd714e07e8e589084fac88e37c803634e705c` |
 
 ### Commits
 
@@ -47,7 +63,9 @@ a31bd91e fix: align kernel MemoryMapEntry with bootloader struct
 78652d1a bootloader: pass memory map to kernel (fixes #8)
 ```
 
-Thanks to @eeeeeee-enjoyer and @blakavabob for the detailed hardware reports.
+### Acknowledgments
+
+Thanks to @eeeeeee-enjoyer for the detailed Intel i5-11400H hardware report and @blakavabob for providing Proxmox VM reproduction steps.
 
 ---
 
