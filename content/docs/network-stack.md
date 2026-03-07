@@ -6,7 +6,7 @@ weight: 17
 
 # NØNOS Network Stack
 
-**Version 0.8.0** | March 2026
+**Version 0.8.1-alpha** | March 2026
 
 NØNOS implements a complete network stack from device drivers through transport protocols to application interfaces. Privacy is built into every layer—onion routing is a first-class transport option, DNS queries go through encrypted channels, and MAC addresses randomize per session.
 
@@ -333,7 +333,7 @@ Circuits use the ntor handshake for key agreement:
 | Circuit ID | 2 bytes | Circuit identifier |
 | Command | 1 byte | Cell type |
 | Stream ID | 2 bytes | Stream within circuit |
-| Payload | 498 bytes | Cell data |
+| Payload | 509 bytes | Cell data |
 
 **Cell Types:**
 
@@ -475,16 +475,13 @@ firewall list
 
 ### Network Capabilities
 
-Network access requires capabilities:
+Network access requires the **Network** capability from the kernel's 10-type capability system:
 
 | Capability | Required For |
 |------------|--------------|
-| NET_ACCESS | Any network access |
-| NET_BIND | Binding to ports |
-| NET_LISTEN | Accepting connections |
-| NET_RAW | Raw sockets |
+| Network | All socket operations: creating sockets, connecting, binding, listening, sending, receiving, raw sockets |
 
-Without NET_ACCESS, a process cannot open sockets at all.
+Without the Network capability, a process cannot perform any network operations. The Network capability is a coarse-grained permission that grants full network access when held. Fine-grained network filtering is handled by the firewall system rather than the capability system.
 
 
 ## Network Configuration
