@@ -22,13 +22,15 @@ This site collects nothing.
 
 Your browser connects directly to our server. We serve static HTML and CSS. The connection is encrypted with TLS 1.3. When you leave, no record of your visit exists.
 
-## Tor
+## Anyone Network
 
-This site is accessible via Tor:
+This site is accessible via [Anyone](https://anyone.io/):
 
 ```
-[.onion address]
+http://6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon/
 ```
+
+Access requires the Anyone client for anonymous browsing.
 
 ## Verification
 
