@@ -1252,12 +1252,13 @@ Signature File:  nonos-0.8.1-alpha.iso.ed25519.sig (64 bytes raw)
 Generate a new kernel signing key:
 
 ```bash
-cd nonos-boot/tools/keygen
+# From nonos-kernel/
+cd nonos-bootloader/tools/keygen
 cargo build --release
 
 ./target/release/nonos-keygen \
   --count 1 \
-  --out-dir ../../keys \
+  --out-dir ../../../keys \
   --allow-write-secrets \
   --operator "release@nonos.systems"
 ```
