@@ -5,17 +5,17 @@ description: "NØNOS Alpha to Beta Development Roadmap"
 
 # Alpha → Beta Roadmap
 
-**Version 0.8.0-alpha → 1.0.0-beta** | March–July 2026
+**Version 0.8.1-alpha → 1.0.0-beta** | March–July 2026
 
 
 ## Mission Statement
 
 NØNOS exists to deliver an operating system where privacy is not a feature but an architectural guarantee. Every byte of user data remains under user control. No telemetry. No cloud dependencies. No trust assumptions beyond verified cryptographic proofs. The kernel enforces isolation not through policy but through mathematical certainty.
 
-This roadmap defines the 16-week journey from alpha to beta. Upon completion, NØNOS will stand as the most secure general-purpose operating system available to individuals who refuse compromise on privacy.
+This roadmap defines the 16-week journey from alpha to beta.
 
 
-## Current State: Alpha (0.8.0)
+## Current State: Alpha (0.8.1)
 
 The alpha release is a fully functional operating system with a complete feature set:
 
@@ -27,7 +27,7 @@ The alpha release is a fully functional operating system with a complete feature
 - RAM filesystem with CryptoFS (ChaCha20-Poly1305 + Merkle tree integrity)
 - Post-quantum cryptography (ML-KEM-768, ML-DSA-3)
 - Ed25519 + Groth16 ZK boot verification
-- 17-type capability-based security system
+- 10-type capability-based security system
 - TPM 2.0 integration (basic)
 - ext4/FAT32 read/write for external media
 
