@@ -510,7 +510,7 @@ NØNOS provides security guarantees no existing system matches. The custom kerne
 
 - Primary download server
 - Mirror network (3+ geographic regions)
-- Tor hidden service mirror
+- Anyone Network mirror ([.anon address](http://6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon/))
 - IPFS distribution
 
 
