@@ -5,7 +5,7 @@ description: "NØNOS Technical Documentation"
 
 # Documentation
 
-Complete technical documentation for NØNOS 0.8.0-alpha.
+Complete technical documentation for NØNOS 0.8.1-alpha.
 
 
 ## Getting Started
@@ -22,7 +22,7 @@ Understand how NØNOS works.
 
 - [**Technical Specification**](/docs/technical-specification/) — Comprehensive system overview
 - [**Boot Process**](/docs/boot-process/) — 10-stage verified boot sequence
-- [**Capability System**](/docs/capability-system/) — Permission model with 17 capability types
+- [**Capability System**](/docs/capability-system/) — Permission model with 10 capability types
 - [**Cryptography**](/docs/cryptography/) — 25+ algorithms including post-quantum
 
 
@@ -31,7 +31,7 @@ Understand how NØNOS works.
 Deep dives into major subsystems.
 
 - [**Desktop Environment**](/docs/desktop-environment/) — GUI, windows, and 8 built-in applications
-- [**Shell Commands**](/docs/shell-commands/) — 100+ command reference
+- [**Shell Commands**](/docs/shell-commands/) — Command reference
 - [**Filesystems**](/docs/filesystems/) — VFS, RAM filesystem, and CryptoFS
 - [**Network Stack**](/docs/network-stack/) — TCP/IP, onion routing, and DNS privacy
 - [**Hardware Drivers**](/docs/hardware-drivers/) — Storage, network, input, and audio drivers
