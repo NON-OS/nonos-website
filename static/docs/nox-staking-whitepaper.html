@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOX Staking Protocol | Technical Documentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --black: #0a0a0a;
+            --dark: #141414;
+            --gray-900: #1f1f1f;
+            --gray-800: #2d2d2d;
+            --gray-700: #404040;
+            --gray-600: #595959;
+            --gray-500: #737373;
+            --gray-400: #a3a3a3;
+            --gray-300: #d4d4d4;
+            --gray-200: #e5e5e5;
+            --gray-100: #f5f5f5;
+            --white: #ffffff;
+            --accent: #171717;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 11pt;
+            line-height: 1.7;
+            color: var(--gray-800);
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 28mm 32mm;
+            margin: 0 auto;
+            background: var(--white);
+            position: relative;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           COVER PAGE
+           ═══════════════════════════════════════════════════════════════ */
+        .cover {
+            background: var(--black);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            min-height: 297mm;
+        }
+
+        .cover-main {
+            padding: 50mm 40mm 0;
+            flex: 1;
+        }
+
+        .cover-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 70px;
+        }
+
+        .cover-brand img {
+            height: 36px;
+            width: auto;
+        }
+
+        .cover-brand-text {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 11pt;
+            font-weight: 300;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--gray-400);
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 58pt;
+            font-weight: 400;
+            line-height: 1.05;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .cover-subtitle {
+            font-size: 13pt;
+            font-weight: 300;
+            color: var(--gray-500);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        .cover-line {
+            width: 60px;
+            height: 1px;
+            background: var(--gray-700);
+            margin-bottom: 35px;
+        }
+
+        .cover-desc {
+            font-size: 12pt;
+            line-height: 1.9;
+            color: var(--gray-400);
+            max-width: 420px;
+            font-weight: 300;
+        }
+
+        .cover-bottom {
+            background: linear-gradient(to bottom, var(--dark) 0%, var(--black) 100%);
+            padding: 35mm 40mm;
+        }
+
+        .cover-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .cover-item {
+            padding: 0 24px;
+            border-left: 1px solid var(--gray-800);
+        }
+
+        .cover-item:first-child {
+            padding-left: 0;
+            border-left: none;
+        }
+
+        .cover-label {
+            font-size: 8pt;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .cover-value {
+            font-size: 12pt;
+            color: var(--white);
+            font-weight: 400;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TYPOGRAPHY
+           ═══════════════════════════════════════════════════════════════ */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 34pt;
+            font-weight: 400;
+            color: var(--black);
+            margin: 0 0 35px 0;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 17pt;
+            font-weight: 500;
+            color: var(--black);
+            margin: 45px 0 20px 0;
+        }
+
+        h3 {
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 10pt;
+            font-weight: 700;
+            color: var(--gray-700);
+            margin: 35px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        p {
+            margin-bottom: 18px;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .lead {
+            font-size: 13pt;
+            line-height: 1.9;
+            color: var(--gray-600);
+            margin-bottom: 35px;
+            font-weight: 300;
+            text-align: left;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           SECTION HEADERS
+           ═══════════════════════════════════════════════════════════════ */
+        .section-head {
+            display: flex;
+            align-items: flex-end;
+            gap: 28px;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .section-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 72pt;
+            font-weight: 400;
+            color: var(--gray-200);
+            line-height: 0.8;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 30pt;
+            font-weight: 400;
+            color: var(--black);
+            margin: 0;
+            padding-bottom: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           STATS ROW
+           ═══════════════════════════════════════════════════════════════ */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin: 45px 0;
+            border: 1px solid var(--gray-200);
+        }
+
+        .stat {
+            padding: 30px 20px;
+            text-align: center;
+            border-right: 1px solid var(--gray-200);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat-val {
+            font-family: 'Playfair Display', serif;
+            font-size: 36pt;
+            font-weight: 400;
+            color: var(--black);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray-500);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TABLES
+           ═══════════════════════════════════════════════════════════════ */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-size: 10pt;
+        }
+
+        thead tr {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 8pt;
+        }
+
+        td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--gray-100);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CALLOUTS
+           ═══════════════════════════════════════════════════════════════ */
+        .note {
+            background: var(--gray-100);
+            border-left: 3px solid var(--black);
+            padding: 28px 32px;
+            margin: 35px 0;
+        }
+
+        .note-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 8pt;
+            margin-bottom: 14px;
+            color: var(--black);
+        }
+
+        .note p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           CODE
+           ═══════════════════════════════════════════════════════════════ */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9pt;
+            background: var(--gray-100);
+            padding: 4px 8px;
+            border-radius: 2px;
+        }
+
+        pre {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--gray-900);
+            color: var(--gray-300);
+            padding: 28px 32px;
+            margin: 30px 0;
+            font-size: 9pt;
+            line-height: 1.6;
+            overflow-x: auto;
+            border-left: 3px solid var(--gray-600);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           ADDRESS BLOCKS
+           ═══════════════════════════════════════════════════════════════ */
+        .addr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9pt;
+            background: var(--gray-100);
+            padding: 18px 24px;
+            margin: 12px 0;
+            border-left: 3px solid var(--black);
+        }
+
+        .addr strong {
+            display: block;
+            font-family: 'Source Sans Pro', sans-serif;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-600);
+            margin-bottom: 6px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TWO COLUMNS
+           ═══════════════════════════════════════════════════════════════ */
+        .cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin: 35px 0;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FORMULA
+           ═══════════════════════════════════════════════════════════════ */
+        .formula {
+            background: var(--black);
+            color: var(--white);
+            padding: 35px 40px;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .formula-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13pt;
+            letter-spacing: 0.5px;
+        }
+
+        .formula-label {
+            font-size: 8pt;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 18px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           STEPS
+           ═══════════════════════════════════════════════════════════════ */
+        .step {
+            display: grid;
+            grid-template-columns: 50px 1fr;
+            gap: 24px;
+            margin: 28px 0;
+            align-items: start;
+        }
+
+        .step-num {
+            width: 50px;
+            height: 50px;
+            background: var(--black);
+            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            font-size: 20pt;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step h4 {
+            font-size: 11pt;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--black);
+        }
+
+        .step p {
+            margin: 0;
+            font-size: 10pt;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DIAGRAMS - SVG BASED
+           ═══════════════════════════════════════════════════════════════ */
+        .diagram {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .diagram-label {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray-500);
+            margin-bottom: 25px;
+        }
+
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           TOC
+           ═══════════════════════════════════════════════════════════════ */
+        .toc {
+            padding: 30mm 35mm;
+        }
+
+        .toc-head {
+            font-family: 'Playfair Display', serif;
+            font-size: 12pt;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 60px;
+        }
+
+        .toc-group {
+            margin-bottom: 50px;
+        }
+
+        .toc-group-title {
+            font-size: 9pt;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .toc-row {
+            display: flex;
+            align-items: baseline;
+            padding: 14px 0;
+            border-bottom: 1px dotted var(--gray-300);
+        }
+
+        .toc-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 20pt;
+            color: var(--gray-300);
+            width: 55px;
+            flex-shrink: 0;
+        }
+
+        .toc-name {
+            flex: 1;
+            font-size: 11pt;
+        }
+
+        .toc-pg {
+            font-size: 10pt;
+            color: var(--gray-500);
+            width: 30px;
+            text-align: right;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════════════ */
+        .footer {
+            position: absolute;
+            bottom: 22mm;
+            left: 32mm;
+            right: 32mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8pt;
+            color: var(--gray-500);
+            border-top: 1px solid var(--gray-200);
+            padding-top: 15px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           LISTS
+           ═══════════════════════════════════════════════════════════════ */
+        ul {
+            margin: 18px 0 18px 30px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding-left: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════════
+           DROP CAP
+           ═══════════════════════════════════════════════════════════════ */
+        .drop {
+            font-family: 'Playfair Display', serif;
+            font-size: 56pt;
+            float: left;
+            line-height: 0.85;
+            margin: 5px 18px 0 0;
+            color: var(--gray-300);
+        }
+
+        @media print {
+            .page {
+                margin: 0;
+                padding: 22mm 28mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     COVER
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page cover page-break">
+    <div class="cover-main">
+        <div class="cover-brand">
+            <img src="https://cdn.prod.website-files.com/68b5622f3f357ffe3c00e53c/6933be1ee764192fcb39104a_nonos-logo-mark-wh.svg" alt="NOX">
+            <span class="cover-brand-text">NOX Protocol</span>
+        </div>
+
+        <h1 class="cover-title">Staking<br>Protocol</h1>
+        <p class="cover-subtitle">Technical Whitepaper</p>
+
+        <div class="cover-line"></div>
+
+        <p class="cover-desc">
+            A comprehensive examination of the NOX staking architecture, reward distribution mechanics, and economic framework governing participant incentives within the NOX ecosystem.
+        </p>
+    </div>
+
+    <div class="cover-bottom">
+        <div class="cover-grid">
+            <div class="cover-item">
+                <div class="cover-label">Version</div>
+                <div class="cover-value">1.0.0</div>
+            </div>
+            <div class="cover-item">
+                <div class="cover-label">Date</div>
+                <div class="cover-value">March 2026</div>
+            </div>
+            <div class="cover-item">
+                <div class="cover-label">Network</div>
+                <div class="cover-value">Ethereum</div>
+            </div>
+            <div class="cover-item">
+                <div class="cover-label">Status</div>
+                <div class="cover-value">Production</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page toc page-break">
+    <div class="toc-head">Contents</div>
+
+    <div class="toc-group">
+        <div class="toc-group-title">Foundation</div>
+        <div class="toc-row">
+            <span class="toc-num">01</span>
+            <span class="toc-name">Executive Summary</span>
+            <span class="toc-pg">3</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">02</span>
+            <span class="toc-name">Protocol Architecture</span>
+            <span class="toc-pg">6</span>
+        </div>
+    </div>
+
+    <div class="toc-group">
+        <div class="toc-group-title">Mechanics</div>
+        <div class="toc-row">
+            <span class="toc-num">03</span>
+            <span class="toc-name">Emission Schedule</span>
+            <span class="toc-pg">9</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">04</span>
+            <span class="toc-name">Staking Operations</span>
+            <span class="toc-pg">12</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">05</span>
+            <span class="toc-name">NFT Amplification</span>
+            <span class="toc-pg">16</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">06</span>
+            <span class="toc-name">Reward Calculation</span>
+            <span class="toc-pg">20</span>
+        </div>
+    </div>
+
+    <div class="toc-group">
+        <div class="toc-group-title">Reference</div>
+        <div class="toc-row">
+            <span class="toc-num">07</span>
+            <span class="toc-name">Contract Specification</span>
+            <span class="toc-pg">24</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">08</span>
+            <span class="toc-name">Economic Analysis</span>
+            <span class="toc-pg">28</span>
+        </div>
+        <div class="toc-row">
+            <span class="toc-num">A</span>
+            <span class="toc-name">Risk Considerations</span>
+            <span class="toc-pg">32</span>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 01: EXECUTIVE SUMMARY
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">01</span>
+        <h1 class="section-title">Executive Summary</h1>
+    </div>
+
+    <p class="lead">
+        The NOX Staking Protocol is an incentive mechanism engineered to reward sustained participation and reinforce the economic foundation of the NOX ecosystem. Through time-weighted rewards combined with NFT-based multipliers, the protocol distributes forty million tokens across a twenty-four month emission period.
+    </p>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-val">40M</div>
+            <div class="stat-label">Total Rewards</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">2</div>
+            <div class="stat-label">Year Program</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">2.5×</div>
+            <div class="stat-label">Max Boost</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">5%</div>
+            <div class="stat-label">Supply Allocated</div>
+        </div>
+    </div>
+
+    <h2>Strategic Objectives</h2>
+
+    <p>
+        <span class="drop">T</span>he staking protocol addresses the challenge of aligning participant incentives with long-term protocol health. By offering yields to those who commit tokens to the staking contract, the mechanism reduces circulating supply while rewarding community members who demonstrate conviction in the project's trajectory. The proportional distribution model ensures fairness across all participation levels.
+    </p>
+
+    <p>
+        The protocol introduces an NFT amplification system providing enhanced rewards to ZeroState Pass holders. This rewards early supporters while creating enduring utility for these digital assets. The tiered multiplier structure—ranging from 1.25× for single NFT holders to 2.5× for those holding five or more—creates meaningful differentiation without excluding participants who lack NFTs.
+    </p>
+
+    <h2>Emission Structure</h2>
+
+    <p>
+        A deliberately front-loaded emission schedule distributes seventy percent of rewards during year one, with the remaining thirty percent in year two. This structure bootstraps early participation while creating natural scarcity progression as the protocol matures.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Emission</th>
+                <th>Daily Rate</th>
+                <th>Share</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Year One</td>
+                <td>28,000,000 NOX</td>
+                <td>76,712 NOX</td>
+                <td>70%</td>
+            </tr>
+            <tr>
+                <td>Year Two</td>
+                <td>12,000,000 NOX</td>
+                <td>32,877 NOX</td>
+                <td>30%</td>
+            </tr>
+            <tr>
+                <td><strong>Total</strong></td>
+                <td><strong>40,000,000 NOX</strong></td>
+                <td>—</td>
+                <td><strong>100%</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>3</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 01 CONTINUED
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+
+    <h2>Technical Foundation</h2>
+
+    <p>
+        The contract leverages OpenZeppelin's audited library with the Universal Upgradeable Proxy Standard (UUPS) enabling future improvements without requiring position migrations. The accumulator pattern ensures gas-efficient reward calculations regardless of participant count, maintaining constant-time operations even at scale.
+    </p>
+
+    <div class="cols">
+        <div>
+            <h3>Architecture</h3>
+            <ul>
+                <li>UUPS Upgradeable Proxy</li>
+                <li>OpenZeppelin Security Suite</li>
+                <li>Role-Based Access Control</li>
+                <li>Emergency Pause Capability</li>
+                <li>Reentrancy Protection</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Design Principles</h3>
+            <ul>
+                <li>Gas-Optimized Operations</li>
+                <li>Deterministic Calculations</li>
+                <li>Minimal Dependencies</li>
+                <li>Full On-Chain Transparency</li>
+                <li>Comprehensive Event Logging</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Deployed Contracts</h2>
+
+    <p>
+        All contracts are deployed to Ethereum mainnet and verified on Etherscan for complete transparency. The proxy pattern separates storage from logic, with the proxy address serving as the permanent interaction point.
+    </p>
+
+    <div class="addr">
+        <strong>Staking Contract (Proxy)</strong>
+        0xa94d6009790ba13597a1e1b7cf4e1531ea513613
+    </div>
+
+    <div class="addr">
+        <strong>Implementation</strong>
+        0x2f9d91b41172d8f0fdff30567dc1f8595c2a2d07
+    </div>
+
+    <div class="addr">
+        <strong>NOX Token</strong>
+        0x0a26c80Be4E060e688d7C23aDdB92cBb5D2C9eCA
+    </div>
+
+    <div class="addr">
+        <strong>ZeroState Pass</strong>
+        0x7b575DD8e8b111c52Ab1e872924d4Efd4DF403df
+    </div>
+
+    <div class="note">
+        <div class="note-title">Key Innovation</div>
+        <p>
+            The combination of time-weighted distribution with NFT-based amplification creates a hybrid model rewarding both capital commitment and early ecosystem participation—a meaningful evolution from conventional staking protocols.
+        </p>
+    </div>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>4</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 02: ARCHITECTURE
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">02</span>
+        <h1 class="section-title">Protocol Architecture</h1>
+    </div>
+
+    <p class="lead">
+        The NOX staking protocol operates through a unified smart contract deployed on Ethereum mainnet, interacting with two external token contracts. This section details the structural components and their interactions.
+    </p>
+
+    <h2>System Overview</h2>
+
+    <p>
+        The staking contract serves as custodian for two distinct token pools. The staked pool holds user deposits—withdrawable at any time. The reward pool contains forty million NOX allocated for distribution based on proportional stake and duration.
+    </p>
+
+    <div class="diagram">
+        <div class="diagram-label">System Architecture</div>
+        <svg width="520" height="380" viewBox="0 0 520 380">
+            <!-- Background -->
+            <rect x="20" y="20" width="480" height="340" fill="#fafafa" stroke="#e5e5e5" stroke-width="1" rx="2"/>
+
+            <!-- Title -->
+            <text x="260" y="50" font-family="Source Sans Pro" font-size="11" fill="#737373" text-anchor="middle" letter-spacing="2">ETHEREUM MAINNET</text>
+
+            <!-- NOX Token Box -->
+            <rect x="50" y="80" width="140" height="70" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+            <text x="120" y="110" font-family="Source Sans Pro" font-size="11" fill="#0a0a0a" text-anchor="middle" font-weight="600">NOX TOKEN</text>
+            <text x="120" y="130" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle">ERC-20</text>
+
+            <!-- ZeroState Pass Box -->
+            <rect x="50" y="180" width="140" height="70" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+            <text x="120" y="210" font-family="Source Sans Pro" font-size="11" fill="#0a0a0a" text-anchor="middle" font-weight="600">ZEROSTATE PASS</text>
+            <text x="120" y="230" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle">ERC-721</text>
+
+            <!-- Staking Contract Box -->
+            <rect x="280" y="80" width="190" height="170" fill="#0a0a0a" stroke="#0a0a0a" stroke-width="1.5"/>
+            <text x="375" y="108" font-family="Source Sans Pro" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="600">STAKING CONTRACT</text>
+            <text x="375" y="126" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle">UUPS Proxy</text>
+
+            <!-- Inner boxes -->
+            <rect x="300" y="145" width="150" height="40" fill="#1f1f1f" stroke="#404040" stroke-width="1"/>
+            <text x="375" y="170" font-family="Source Sans Pro" font-size="10" fill="#d4d4d4" text-anchor="middle">Reward Pool: 40M NOX</text>
+
+            <rect x="300" y="195" width="150" height="40" fill="#1f1f1f" stroke="#404040" stroke-width="1"/>
+            <text x="375" y="220" font-family="Source Sans Pro" font-size="10" fill="#d4d4d4" text-anchor="middle">Staked Pool</text>
+
+            <!-- Users Box -->
+            <rect x="280" y="290" width="190" height="55" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+            <text x="375" y="315" font-family="Source Sans Pro" font-size="11" fill="#0a0a0a" text-anchor="middle" font-weight="600">PARTICIPANTS</text>
+            <text x="375" y="332" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle">Stake · Unstake · Claim</text>
+
+            <!-- Arrows -->
+            <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L0,6 L8,3 z" fill="#0a0a0a"/>
+                </marker>
+            </defs>
+
+            <!-- Token to Contract -->
+            <line x1="190" y1="115" x2="270" y2="115" stroke="#0a0a0a" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <line x1="270" y1="115" x2="190" y2="115" stroke="#0a0a0a" stroke-width="1.5"/>
+
+            <!-- NFT to Contract -->
+            <line x1="190" y1="215" x2="270" y2="165" stroke="#0a0a0a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+            <!-- Users to Contract -->
+            <line x1="375" y1="290" x2="375" y2="260" stroke="#0a0a0a" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <line x1="375" y1="260" x2="375" y2="290" stroke="#0a0a0a" stroke-width="1.5"/>
+        </svg>
+    </div>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>6</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 02 CONTINUED
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+
+    <h2>Proxy Architecture</h2>
+
+    <p>
+        The Universal Upgradeable Proxy Standard (UUPS) separates storage from logic, enabling protocol updates without position migration. Users interact exclusively with the proxy address, which remains constant. Upgrades modify only the implementation pointer while preserving all storage state.
+    </p>
+
+    <div class="diagram">
+        <div class="diagram-label">UUPS Proxy Pattern</div>
+        <svg width="480" height="200" viewBox="0 0 480 200">
+            <!-- Proxy Box -->
+            <rect x="40" y="40" width="160" height="120" fill="#0a0a0a" stroke="#0a0a0a"/>
+            <text x="120" y="70" font-family="Source Sans Pro" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="600">PROXY</text>
+            <text x="120" y="90" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Permanent Address</text>
+            <rect x="55" y="105" width="130" height="40" fill="#1f1f1f" stroke="#404040"/>
+            <text x="120" y="130" font-family="Source Sans Pro" font-size="9" fill="#d4d4d4" text-anchor="middle">Storage State</text>
+
+            <!-- Arrow -->
+            <line x1="200" y1="100" x2="270" y2="100" stroke="#0a0a0a" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="235" y="90" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">delegatecall</text>
+
+            <!-- Implementation Box -->
+            <rect x="280" y="40" width="160" height="120" fill="#ffffff" stroke="#0a0a0a" stroke-width="1.5"/>
+            <text x="360" y="70" font-family="Source Sans Pro" font-size="11" fill="#0a0a0a" text-anchor="middle" font-weight="600">IMPLEMENTATION</text>
+            <text x="360" y="90" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Upgradeable</text>
+            <rect x="295" y="105" width="130" height="40" fill="#f5f5f5" stroke="#e5e5e5"/>
+            <text x="360" y="130" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="middle">Logic Functions</text>
+        </svg>
+    </div>
+
+    <h2>Storage Layout</h2>
+
+    <p>
+        Contract state is organized into distinct categories: token references, global staking metrics, per-user records, and temporal state. This separation enables efficient queries and maintains upgrade safety.
+    </p>
+
+    <h3>Token References</h3>
+    <p>
+        Immutable pointers to the NOX ERC-20 token and ZeroState Pass ERC-721 collection. These enable deposit operations, withdrawals, reward transfers, and NFT balance queries for boost calculation.
+    </p>
+
+    <h3>Global State</h3>
+    <p>
+        Aggregate metrics including total staked amount, total weighted stake (with NFT multipliers applied), and the accumulated reward-per-share value. These enable O(1) reward calculations regardless of participant count.
+    </p>
+
+    <h3>User Records</h3>
+    <p>
+        A mapping from addresses to stake records containing: raw staked amount, weighted amount, reward debt for accumulator math, unclaimed pending rewards, and last interaction timestamp.
+    </p>
+
+    <h3>Temporal State</h3>
+    <p>
+        Genesis timestamp marking emission start, last reward calculation time, and cumulative distributed rewards. These support emission rate determination and protocol analytics.
+    </p>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>7</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 04: STAKING OPERATIONS
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">04</span>
+        <h1 class="section-title">Staking Operations</h1>
+    </div>
+
+    <p class="lead">
+        The staking mechanism governs how participants deposit tokens, accumulate rewards, and withdraw positions. This section details each operation and the mathematical foundations underlying reward calculation.
+    </p>
+
+    <h2>Core Principle</h2>
+
+    <p>
+        Rewards distribute proportionally to weighted stake. A participant controlling ten percent of total weighted stake earns ten percent of emissions during their staking period. No privileged positions or complex tiers exist—larger stakes earn more in absolute terms, but return-per-unit remains equal for all.
+    </p>
+
+    <div class="formula">
+        <div class="formula-text">Reward = (Weighted Stake ÷ Total Weighted) × Emission × Time</div>
+        <div class="formula-label">Proportional Reward Formula</div>
+    </div>
+
+    <h2>Stake Operation Sequence</h2>
+
+    <div class="step">
+        <div class="step-num">1</div>
+        <div>
+            <h4>Global State Update</h4>
+            <p>Before processing, the contract updates the global accumulator. This ensures existing stakers receive rewards calculated to the current moment, preventing dilution from newly entering stake.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">2</div>
+        <div>
+            <h4>Token Transfer</h4>
+            <p>NOX tokens transfer from user wallet to contract via ERC-20 transferFrom. Requires prior approval. Reverts on insufficient balance or allowance.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">3</div>
+        <div>
+            <h4>NFT Balance Query</h4>
+            <p>The contract queries ZeroState Pass holdings to determine the applicable boost multiplier for this user's stake.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">4</div>
+        <div>
+            <h4>Weight Calculation</h4>
+            <p>Weighted stake computed by applying the NFT multiplier. This weighted value determines the user's share of future distributions.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <div class="step-num">5</div>
+        <div>
+            <h4>State Recording</h4>
+            <p>User record and global totals update. Reward debt set to current accumulator share, establishing the baseline for future reward measurement.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>12</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 04 CONTINUED: ACCUMULATOR
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+
+    <h2>The Accumulator Pattern</h2>
+
+    <p>
+        Efficient reward calculation at scale requires avoiding per-user iteration. The accumulator pattern achieves constant-time calculation regardless of participant count through mathematical decomposition.
+    </p>
+
+    <p>
+        The insight: decompose rewards into a global accumulator tracking total rewards-per-weighted-share, plus per-user debt values tracking each starting point. The difference between current accumulator share and debt yields pending rewards.
+    </p>
+
+    <pre>
+// Global update (on any state change)
+time_elapsed = current_time - last_update_time
+new_rewards = time_elapsed × emission_rate
+accumulator += (new_rewards × 1e18) ÷ total_weighted_stake
+last_update_time = current_time
+
+// User pending calculation
+user_share = (user_weighted × accumulator) ÷ 1e18
+user_pending = user_share - user_debt + stored_pending</pre>
+
+    <p>
+        The precision constant (10<sup>18</sup>) maintains numerical accuracy during division. Scaling before division and unscaling after prevents precision loss when dividing small rewards by large stake totals.
+    </p>
+
+    <div class="diagram">
+        <div class="diagram-label">Reward Accumulation</div>
+        <svg width="480" height="220" viewBox="0 0 480 220">
+            <!-- Axes -->
+            <line x1="60" y1="180" x2="440" y2="180" stroke="#e5e5e5" stroke-width="1"/>
+            <line x1="60" y1="180" x2="60" y2="40" stroke="#e5e5e5" stroke-width="1"/>
+
+            <!-- Y axis label -->
+            <text x="30" y="110" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle" transform="rotate(-90, 30, 110)">Rewards</text>
+
+            <!-- X axis label -->
+            <text x="250" y="210" font-family="Source Sans Pro" font-size="10" fill="#737373" text-anchor="middle">Time</text>
+
+            <!-- Accumulation line -->
+            <path d="M 60 170 L 140 145 L 220 115 L 300 80 L 380 50" stroke="#0a0a0a" stroke-width="2" fill="none"/>
+
+            <!-- Points -->
+            <circle cx="60" cy="170" r="4" fill="#0a0a0a"/>
+            <circle cx="140" cy="145" r="4" fill="#0a0a0a"/>
+            <circle cx="220" cy="115" r="4" fill="#0a0a0a"/>
+            <circle cx="300" cy="80" r="4" fill="#0a0a0a"/>
+            <circle cx="380" cy="50" r="4" fill="#0a0a0a"/>
+
+            <!-- Labels -->
+            <text x="60" y="195" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Stake</text>
+            <text x="140" y="195" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Day 1</text>
+            <text x="220" y="195" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Day 2</text>
+            <text x="300" y="195" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Day 3</text>
+            <text x="380" y="195" font-family="Source Sans Pro" font-size="9" fill="#737373" text-anchor="middle">Day 4</text>
+
+            <!-- Annotation -->
+            <text x="420" y="55" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="start">Linear growth</text>
+            <text x="420" y="70" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="start">proportional</text>
+            <text x="420" y="85" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="start">to stake share</text>
+        </svg>
+    </div>
+
+    <p>
+        Rewards accumulate continuously from stake moment. Unlike epoch-based protocols, NOX calculates per-second, eliminating cliff effects and providing real-time reward visibility.
+    </p>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>13</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 05: NFT AMPLIFICATION
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">05</span>
+        <h1 class="section-title">NFT Amplification</h1>
+    </div>
+
+    <p class="lead">
+        The ZeroState Pass collection integration creates synergy between NOX ecosystem asset classes. This section examines NFT-based reward amplification mechanics and strategic implications.
+    </p>
+
+    <h2>ZeroState Pass</h2>
+
+    <p>
+        The collection represents founding membership with a maximum supply of 374 pieces. Integration with staking transforms these from pure collectibles into yield-generating instruments with persistent utility.
+    </p>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-val">374</div>
+            <div class="stat-label">Max Supply</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">1.25×</div>
+            <div class="stat-label">Single NFT</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">2.50×</div>
+            <div class="stat-label">Maximum</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">5+</div>
+            <div class="stat-label">For Max Boost</div>
+        </div>
+    </div>
+
+    <h2>Multiplier Structure</h2>
+
+    <p>
+        The tiered structure rewards accumulation with diminishing marginal returns, encouraging distribution across holders rather than concentration. The jump from four NFTs (2.0×) to five or more (2.5×) creates an exclusive tier for the most committed participants.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>NFTs</th>
+                <th>Multiplier</th>
+                <th>Basis Points</th>
+                <th>Marginal</th>
+                <th>100K NOX →</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>0</td>
+                <td>1.00×</td>
+                <td>10,000</td>
+                <td>—</td>
+                <td>100,000</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>1.25×</td>
+                <td>12,500</td>
+                <td>+25%</td>
+                <td>125,000</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>1.50×</td>
+                <td>15,000</td>
+                <td>+20%</td>
+                <td>150,000</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>1.75×</td>
+                <td>17,500</td>
+                <td>+17%</td>
+                <td>175,000</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>2.00×</td>
+                <td>20,000</td>
+                <td>+14%</td>
+                <td>200,000</td>
+            </tr>
+            <tr>
+                <td>5+</td>
+                <td>2.50×</td>
+                <td>25,000</td>
+                <td>+25%</td>
+                <td>250,000</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>16</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 05 CONTINUED
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+
+    <h2>Yield Comparison</h2>
+
+    <p>
+        Practical impact becomes clear through concrete scenarios. Analysis assumes 10M NOX total staked at base 1.0× boost with Year One emissions.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Stake</th>
+                <th>NFTs</th>
+                <th>Weighted</th>
+                <th>Daily</th>
+                <th>Annual</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>100,000</td>
+                <td>0</td>
+                <td>100,000</td>
+                <td>767</td>
+                <td>280,000</td>
+            </tr>
+            <tr>
+                <td>100,000</td>
+                <td>1</td>
+                <td>125,000</td>
+                <td>959</td>
+                <td>350,000</td>
+            </tr>
+            <tr>
+                <td>100,000</td>
+                <td>2</td>
+                <td>150,000</td>
+                <td>1,151</td>
+                <td>420,000</td>
+            </tr>
+            <tr>
+                <td>100,000</td>
+                <td>3</td>
+                <td>175,000</td>
+                <td>1,342</td>
+                <td>490,000</td>
+            </tr>
+            <tr>
+                <td>100,000</td>
+                <td>4</td>
+                <td>200,000</td>
+                <td>1,534</td>
+                <td>560,000</td>
+            </tr>
+            <tr>
+                <td>100,000</td>
+                <td>5+</td>
+                <td>250,000</td>
+                <td>1,918</td>
+                <td>700,000</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        <div class="note-title">Strategic Insight</div>
+        <p>
+            A holder with five NFTs and 100,000 staked NOX earns what a non-NFT holder would require 250,000 staked to achieve. This creates significant incentive to acquire ZeroState Pass, supporting secondary market liquidity.
+        </p>
+    </div>
+
+    <h2>Boost Refresh Mechanics</h2>
+
+    <p>
+        Multipliers calculate at stake, unstake, or explicit refresh calls. NFT transfers don't auto-update weights—users must trigger refresh to realize changes. The <code>refreshBoost</code> function is permissionless, callable by any address for any user.
+    </p>
+
+    <pre>
+function refreshBoost(address user) external {
+    _updateRewards(user);
+
+    UserStake storage s = stakes[user];
+    if (s.amount == 0) return;
+
+    uint256 newWeighted = calculateWeightedAmount(user, s.amount);
+
+    if (newWeighted != s.weightedAmount) {
+        totalWeightedStake -= s.weightedAmount;
+        totalWeightedStake += newWeighted;
+        s.weightedAmount = newWeighted;
+        s.rewardDebt = (newWeighted * accRewardPerShare) / 1e18;
+
+        emit BoostUpdated(user, newWeighted);
+    }
+}</pre>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>17</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 08: ECONOMIC ANALYSIS
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">08</span>
+        <h1 class="section-title">Economic Analysis</h1>
+    </div>
+
+    <p class="lead">
+        Understanding protocol economics enables informed participation decisions. This section examines yield projections, inflation impact, and effects on token dynamics.
+    </p>
+
+    <h2>APY Projections</h2>
+
+    <p>
+        Yields vary inversely with participation—more staked tokens means fixed emissions divide among more participants. Tables project APY across total value locked scenarios.
+    </p>
+
+    <h3>Year One (28M NOX)</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Total Staked</th>
+                <th>Base APY</th>
+                <th>Max APY (2.5×)</th>
+                <th>Utilization</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10,000,000</td>
+                <td>280%</td>
+                <td>700%</td>
+                <td>1.25%</td>
+            </tr>
+            <tr>
+                <td>25,000,000</td>
+                <td>112%</td>
+                <td>280%</td>
+                <td>3.13%</td>
+            </tr>
+            <tr>
+                <td>50,000,000</td>
+                <td>56%</td>
+                <td>140%</td>
+                <td>6.25%</td>
+            </tr>
+            <tr>
+                <td>100,000,000</td>
+                <td>28%</td>
+                <td>70%</td>
+                <td>12.50%</td>
+            </tr>
+            <tr>
+                <td>200,000,000</td>
+                <td>14%</td>
+                <td>35%</td>
+                <td>25.00%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Year Two (12M NOX)</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Total Staked</th>
+                <th>Base APY</th>
+                <th>Max APY (2.5×)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10,000,000</td>
+                <td>120%</td>
+                <td>300%</td>
+            </tr>
+            <tr>
+                <td>50,000,000</td>
+                <td>24%</td>
+                <td>60%</td>
+            </tr>
+            <tr>
+                <td>100,000,000</td>
+                <td>12%</td>
+                <td>30%</td>
+            </tr>
+            <tr>
+                <td>200,000,000</td>
+                <td>6%</td>
+                <td>15%</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>28</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 08 CONTINUED
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+
+    <h2>Inflation Analysis</h2>
+
+    <p>
+        Staking introduces controlled inflation through reward emissions. The total represents five percent of supply over two years, with inflation accruing entirely to active stakers.
+    </p>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-val">3.5%</div>
+            <div class="stat-label">Year One</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">1.5%</div>
+            <div class="stat-label">Year Two</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">5.0%</div>
+            <div class="stat-label">Total</div>
+        </div>
+        <div class="stat">
+            <div class="stat-val">0%</div>
+            <div class="stat-label">Year Three+</div>
+        </div>
+    </div>
+
+    <p>
+        Non-stakers experience dilution while active participants may achieve returns significantly exceeding the inflation rate, resulting in net positive outcomes for engaged community members.
+    </p>
+
+    <h2>Supply Dynamics</h2>
+
+    <p>
+        Staking removes tokens from active circulation. With 800M total supply, meaningful participation can substantially reduce liquid supply available for trading.
+    </p>
+
+    <div class="diagram">
+        <div class="diagram-label">Circulating Supply Impact</div>
+        <svg width="480" height="180" viewBox="0 0 480 180">
+            <!-- Scenario A -->
+            <text x="40" y="30" font-family="Source Sans Pro" font-size="10" fill="#0a0a0a" font-weight="600">25% Participation</text>
+            <rect x="40" y="40" width="400" height="24" fill="#f5f5f5" stroke="#e5e5e5"/>
+            <rect x="40" y="40" width="100" height="24" fill="#0a0a0a"/>
+            <text x="90" y="56" font-family="Source Sans Pro" font-size="9" fill="#ffffff" text-anchor="middle">Staked</text>
+            <text x="240" y="56" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="middle">Circulating: 600M</text>
+
+            <!-- Scenario B -->
+            <text x="40" y="100" font-family="Source Sans Pro" font-size="10" fill="#0a0a0a" font-weight="600">50% Participation</text>
+            <rect x="40" y="110" width="400" height="24" fill="#f5f5f5" stroke="#e5e5e5"/>
+            <rect x="40" y="110" width="200" height="24" fill="#0a0a0a"/>
+            <text x="140" y="126" font-family="Source Sans Pro" font-size="9" fill="#ffffff" text-anchor="middle">Staked</text>
+            <text x="340" y="126" font-family="Source Sans Pro" font-size="9" fill="#595959" text-anchor="middle">Circulating: 400M</text>
+
+            <!-- Legend -->
+            <text x="40" y="165" font-family="Source Sans Pro" font-size="9" fill="#737373">Total Supply: 800,000,000 NOX</text>
+        </svg>
+    </div>
+
+    <div class="note">
+        <div class="note-title">Economic Note</div>
+        <p>
+            Reduced circulation may support price stability by limiting available supply for sale. However, staked tokens remain unstakable at any time, making supply reduction dynamic rather than permanent. Token value ultimately derives from ecosystem utility and adoption.
+        </p>
+    </div>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>29</span>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     APPENDIX: RISKS
+     ══════════════════════════════════════════════════════════════════════════ -->
+<div class="page page-break">
+    <div class="section-head">
+        <span class="section-num">A</span>
+        <h1 class="section-title">Risk Considerations</h1>
+    </div>
+
+    <p class="lead">
+        Participation involves risks that prospective stakers should evaluate before committing funds. This section provides an overview of known risk factors.
+    </p>
+
+    <h2>Smart Contract Risk</h2>
+
+    <p>
+        Despite rigorous development and audited OpenZeppelin components, contracts may contain undiscovered vulnerabilities potentially resulting in partial or complete fund loss. Upgradeability provides bug-fix capability but introduces its own process risks.
+    </p>
+
+    <h2>Economic Risk</h2>
+
+    <p>
+        NOX token value may fluctuate significantly. Staking rewards, while numerically meaningful, may represent reduced purchasing power if prices decline. The fixed emission schedule cannot adapt to market conditions.
+    </p>
+
+    <h2>Regulatory Risk</h2>
+
+    <p>
+        Cryptocurrency staking treatment varies across jurisdictions and may change. Participants bear responsibility for compliance with applicable laws. Future regulatory changes could impact protocol operation or reward value.
+    </p>
+
+    <h2>Technical Risk</h2>
+
+    <p>
+        The protocol operates on Ethereum and inherits network-level risks including congestion, gas volatility, and potential protocol changes. Operations may become difficult during network stress periods.
+    </p>
+
+    <div class="note">
+        <div class="note-title">Important Notice</div>
+        <p>
+            This document provides information only and does not constitute financial, legal, or investment advice. Cryptocurrency investments carry substantial loss risk. Conduct independent research and consult qualified professionals before making decisions. Past performance does not guarantee future results.
+        </p>
+    </div>
+
+    <div style="margin-top: 70px; padding-top: 50px; border-top: 1px solid #e5e5e5; text-align: center;">
+        <p style="font-size: 9pt; color: #737373; margin-bottom: 15px;">
+            NOX STAKING PROTOCOL<br>
+            Technical Documentation v1.0.0
+        </p>
+        <p style="font-size: 9pt; color: #a3a3a3;">
+            © 2026 NOX Protocol. All rights reserved.
+        </p>
+    </div>
+
+    <div class="footer">
+        <span>NOX Staking Protocol</span>
+        <span>32</span>
+    </div>
+</div>
+
+</body>
+</html>

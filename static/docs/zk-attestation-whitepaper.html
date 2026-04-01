@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZK Hardware Attestation | NØNOS Technical Specification</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--fg:#111;--gray:#666;--light:#f8f8f8;--border:#e0e0e0;--accent:#000}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font:17px/1.8 'Inter',system-ui,sans-serif;color:var(--fg);background:var(--bg)}
+.cover{min-height:100vh;background:#000;color:#fff;padding:80px;display:flex;flex-direction:column;justify-content:space-between}
+.cover h1{font:400 64px/1.1 'Playfair Display',serif;margin-bottom:32px;max-width:700px}
+.cover .subtitle{font:300 20px/1.6 'Inter',sans-serif;color:#999;max-width:560px}
+.cover-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:40px;padding-top:48px;border-top:1px solid #333;margin-top:auto}
+.cover-grid dt{font:500 10px/1 'Inter',sans-serif;letter-spacing:2px;text-transform:uppercase;color:#666;margin-bottom:8px}
+.cover-grid dd{font:400 14px/1.4 'JetBrains Mono',monospace}
+nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--border);z-index:100}
+nav ul{max-width:1100px;margin:0 auto;padding:0 60px;display:flex;list-style:none}
+nav a{display:block;padding:18px 0;margin-right:40px;font:500 11px/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:2px solid transparent;cursor:pointer}
+nav a:hover,nav a.active{color:var(--fg);border-color:var(--fg)}
+main{max-width:1100px;margin:0 auto;padding:80px 60px}
+.panel{display:none}
+.panel.active{display:block}
+article{margin-bottom:80px}
+article>header{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+article>header h2{font:400 42px/1.2 'Playfair Display',serif}
+article>header p{font:300 16px/1.6 'Inter',sans-serif;color:var(--gray);margin-top:16px;max-width:600px}
+h3{font:500 24px/1.3 'Inter',sans-serif;margin:48px 0 20px}
+h4{font:600 11px/1 'Inter',sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin:40px 0 16px}
+p{margin-bottom:20px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin:32px 0}
+pre{background:#0d0d0d;color:#e0e0e0;padding:24px 28px;font:400 13px/1.7 'JetBrains Mono',monospace;overflow-x:auto;margin:20px 0}
+.path{font:400 11px/1 'JetBrains Mono',monospace;color:var(--gray);margin-bottom:6px}
+table{width:100%;border-collapse:collapse;margin:24px 0;font-size:14px}
+th{background:#111;color:#fff;font:600 10px/1 'Inter',sans-serif;letter-spacing:1px;text-transform:uppercase;text-align:left;padding:12px 16px}
+td{padding:12px 16px;border-bottom:1px solid var(--border)}
+tr:nth-child(even){background:var(--light)}
+.diagram-container{background:var(--light);border:1px solid var(--border);padding:40px;margin:32px 0;display:flex;justify-content:center}
+.diagram-container svg{max-width:100%;height:auto}
+.data-block{background:#000;color:#fff;padding:28px;margin:20px 0}
+.data-block .label{display:block;font:600 9px/1 'Inter',sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:#666;margin-bottom:10px}
+.data-block code{font:400 13px/1.6 'JetBrains Mono',monospace;word-break:break-all}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--border);gap:1px;margin:32px 0}
+.stats>div{background:#fff;padding:28px;text-align:center}
+.stats>div strong{display:block;font:500 28px/1 'JetBrains Mono',monospace;margin-bottom:8px}
+.stats>div span{font:600 9px/1 'Inter',sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray)}
+.equation{background:#f4f4f4;padding:20px 28px;margin:20px 0;font:400 16px/1.6 'JetBrains Mono',monospace;text-align:center}
+footer{text-align:center;padding:60px;border-top:1px solid var(--border)}
+footer p{font:500 10px/1 'Inter',sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--gray)}
+@media(max-width:900px){.cover{padding:40px}.cover h1{font-size:36px}main{padding:40px 24px}.cols{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.cover-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="cover">
+<div>
+<h1>Zero-Knowledge Hardware Attestation</h1>
+<p class="subtitle">A cryptographic protocol for proving boot integrity and hardware security without revealing machine identity, software configuration, or platform measurements.</p>
+</div>
+<dl class="cover-grid">
+<div><dt>Proving System</dt><dd>Groth16 / BLS12-381</dd></div>
+<div><dt>Proof Size</dt><dd>192 bytes</dd></div>
+<div><dt>Verifying Key</dt><dd>872 bytes</dd></div>
+<div><dt>Version</dt><dd>1.0.0 / March 2026</dd></div>
+</dl>
+</div>
+
+<nav>
+<ul>
+<li><a class="active" onclick="show('vision')">Vision</a></li>
+<li><a onclick="show('state')">Current State</a></li>
+<li><a onclick="show('arch')">Architecture</a></li>
+<li><a onclick="show('circuit')">Circuit</a></li>
+<li><a onclick="show('ceremony')">Ceremony</a></li>
+<li><a onclick="show('artifacts')">Artifacts</a></li>
+</ul>
+</nav>
+
+<main>
+
+<!-- VISION -->
+<div id="vision" class="panel active">
+
+<article>
+<header>
+<h2>The Problem With Remote Attestation</h2>
+<p>Current attestation protocols sacrifice privacy for security. We propose a different approach.</p>
+</header>
+
+<p>When a machine proves it runs authorized software, today's protocols force complete disclosure. The verifier receives exact firmware versions, bootloader configurations, kernel hashes, and TPM measurements. Each attestation quote carries a permanent hardware identifier that links every session to the same physical device.</p>
+
+<p>This creates surveillance infrastructure disguised as security. Attestation services accumulate detailed histories of what software runs where, when configurations change, and how machines behave over time. A feature designed to establish trust instead enables tracking.</p>
+
+<div class="cols">
+<div>
+<h4>What Gets Disclosed</h4>
+<p>Platform Configuration Registers encode a hash chain of every software component loaded during boot. The sequence of firmware, bootloader, kernel modules, and configuration files produces a unique fingerprint. TPM endorsement keys serve as permanent identifiers. Attestation quotes bind these together into complete machine profiles.</p>
+</div>
+<div>
+<h4>The Resulting Threat</h4>
+<p>Verifiers accumulate boot histories. They correlate activity across sessions, identify configuration changes, and build detailed profiles of infrastructure. What begins as security verification becomes comprehensive surveillance. The attestation relationship inverts from authentication to tracking.</p>
+</div>
+</div>
+
+<h3>Our Approach</h3>
+
+<p>We separate proof from disclosure. Zero-knowledge proofs allow a machine to demonstrate satisfaction of security requirements without revealing any private information. The verifier learns exactly one bit: whether the attestation is valid.</p>
+
+<p>The prover demonstrates knowledge of valid PCR measurements, hardware attestation credentials, and kernel identity. The proof reveals nothing about what those values actually are. Two machines running identical proofs cannot be distinguished. Two proofs from the same machine cannot be linked.</p>
+
+<p>This preserves the security guarantees of remote attestation while eliminating the privacy costs. Verifiers confirm that machines meet requirements. They learn nothing else.</p>
+
+<h3>Privacy Guarantees</h3>
+
+<p>The zero-knowledge property provides information-theoretic hiding. Even an unbounded adversary with unlimited computational power cannot extract private witness values from a valid proof. The proof system reveals only that a valid witness exists, not what that witness contains.</p>
+
+<p>Machine identifiers never leave the proving environment. The machine_id field binds the attestation to specific hardware through a 32-byte identifier derived from TPM endorsement credentials. This identifier appears as a public input to enable revocation and audit, but the underlying hardware identity remains hidden behind a one-way derivation. No verifier can reverse the derivation to recover the original TPM endorsement key.</p>
+
+<p>Boot measurements stay private. The pcr_preimage field contains the raw TPM Platform Configuration Register values, a 64-byte concatenation of PCR readings that encode the complete boot sequence. The circuit verifies entropy requirements and validity constraints on these measurements without exposing them. Verifiers confirm the measurements satisfy policy without learning what software actually booted.</p>
+
+</article>
+
+<article>
+<header>
+<h2>Target Properties</h2>
+<p>What we aim to achieve with this system.</p>
+</header>
+
+<table>
+<thead><tr><th>Property</th><th>Description</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Kernel Binding</td><td>Proof cryptographically bound to specific kernel binary hash</td><td>Implemented</td></tr>
+<tr><td>Hardware Verification</td><td>Demonstrate TPM presence and attestation capability without revealing endorsement key</td><td>Implemented</td></tr>
+<tr><td>PCR Privacy</td><td>Platform measurements verified within circuit but never disclosed to verifier</td><td>Implemented</td></tr>
+<tr><td>Replay Prevention</td><td>Fresh nonce per boot session prevents proof reuse</td><td>Implemented</td></tr>
+<tr><td>Machine ID Attestation</td><td>Hardware-bound identifier for revocation without revealing TPM EK</td><td>Implemented</td></tr>
+<tr><td>Threshold Signing</td><td>Key distribution across multiple parties using FROST protocol</td><td>Implemented</td></tr>
+<tr><td>Build Provenance</td><td>Reproducible build verification through source and toolchain hashes</td><td>Implemented</td></tr>
+<tr><td>Capsule Commitment</td><td>Application-specific data binding for workload attestation</td><td>Implemented</td></tr>
+<tr><td>Set Membership</td><td>Prove kernel belongs to authorized set without revealing which one</td><td>Planned</td></tr>
+<tr><td>Recursive Composition</td><td>Chain multiple attestation proofs into single succinct proof</td><td>Planned</td></tr>
+</tbody>
+</table>
+
+<h3>What Makes This Different</h3>
+
+<p>Traditional attestation requires disclosure. Intel SGX remote attestation reveals the enclave identity and signer. AMD SEV attestation exposes the measurement of the guest image. ARM TrustZone attestation transmits device certificates containing hardware identifiers. Every major platform ties security verification to identity disclosure.</p>
+
+<p>Our approach breaks this coupling. The attestation proves security properties hold without revealing which specific values satisfy them. A machine can attest repeatedly without creating a linkable trail. Multiple machines can provide indistinguishable attestations. The security guarantee transfers without the tracking capability.</p>
+
+</article>
+
+</div>
+
+<!-- CURRENT STATE -->
+<div id="state" class="panel">
+
+<article>
+<header>
+<h2>Implementation Status</h2>
+<p>Core infrastructure operational. Production artifacts generated.</p>
+</header>
+
+<p>The attestation circuit, key generation infrastructure, proof embedding system, and bootloader verification logic are complete and tested. The system produces valid proofs that verify correctly on target hardware. All cryptographic primitives use audited implementations from the arkworks ecosystem.</p>
+
+<div class="stats">
+<div><strong>192</strong><span>Proof Bytes</span></div>
+<div><strong>872</strong><span>VK Bytes</span></div>
+<div><strong>1.68M</strong><span>PK Bytes</span></div>
+<div><strong>10</strong><span>Public Inputs</span></div>
+</div>
+
+<h3>Completed Components</h3>
+
+<div class="cols">
+<div>
+<h4>Circuit Implementation</h4>
+<p>R1CS constraint system encoding kernel hash verification, PCR entropy requirements, hardware attestation level checks, and program identity binding. The circuit operates over the BLS12-381 scalar field with approximately 15,000 constraints. Constraint generation uses arkworks for R1CS synthesis with optimized variable allocation.</p>
+
+<h4>Key Generation</h4>
+<p>Deterministic key derivation from structured seed material using the nonos-attestation-v1 seed. The proving key enables proof generation and weighs 1,681,008 bytes. The verifying key is embedded in the bootloader for runtime verification at 872 bytes. Both keys derived from the same ceremony output with reproducible generation.</p>
+</div>
+<div>
+<h4>Proof Generation</h4>
+<p>Groth16 prover generating constant-size 192-byte proofs regardless of circuit complexity. The proof consists of three curve points: A in G1 (48 bytes compressed), B in G2 (96 bytes compressed), and C in G1 (48 bytes compressed). Proofs embed in kernel images alongside Ed25519 signatures and structured public inputs.</p>
+
+<h4>Bootloader Verification</h4>
+<p>Runtime verification using arkworks BLS12-381 implementation with constant-time pairing operations. Verification checks signature validity, proof correctness, and hash binding in sequence. Failure at any stage aborts boot. The verifying key fingerprint is checked against a compile-time constant before use.</p>
+</div>
+</div>
+
+<h3>Production Build Artifacts</h3>
+
+<p>The following cryptographic material was generated on March 29, 2026. The verifying key BLAKE3 fingerprint provides a compact identifier for the key material. The SHA-256 hash enables cross-verification with systems that use different hash functions. Both values are computed over the canonical 872-byte serialization.</p>
+
+<div class="data-block">
+<span class="label">Verifying Key BLAKE3 Fingerprint</span>
+<code>09625c791382369f6f444922fe8d8ad0c2c1a39b4a366dd67d81a2b7a3ed7afe</code>
+</div>
+
+<div class="data-block">
+<span class="label">Verifying Key SHA-256</span>
+<code>5796b8d175336f709c8903c37f41fcb025ae082f5430e01879dee53ced4921e9</code>
+</div>
+
+<div class="data-block">
+<span class="label">Build Metadata</span>
+<code>Tool: nonos-attestation-circuit 1.0.0
+Seed: nonos-attestation-v1
+Commit: d69afa2fc4d625cee3256fe02662f4c37c86d7ae
+Compiler: rustc 1.91.1 (ed61e7d7e 2025-11-07)
+Generated: 2026-03-29T21:45:04.576456+00:00</code>
+</div>
+
+</article>
+
+<article>
+<header>
+<h2>Toolchain</h2>
+<p>Command-line utilities for the attestation workflow.</p>
+</header>
+
+<p>The attestation system comprises six command-line tools that handle different stages of the workflow. Key generation runs once to produce the proving and verifying keys. Proof generation runs for each kernel build. Embedding combines the kernel binary with its cryptographic attestation. The signing tools support both single-party and threshold key management.</p>
+
+<table>
+<thead><tr><th>Tool</th><th>Location</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>generate-keys</td><td>nonos-attestation-circuit/</td><td>Proving and verifying key generation from seed</td></tr>
+<tr><td>generate-proof</td><td>nonos-attestation-circuit/</td><td>Groth16 proof generation from witness</td></tr>
+<tr><td>embed-zk-proof</td><td>embed-zk-proof/</td><td>Proof embedding in kernel binary images</td></tr>
+<tr><td>sign-kernel</td><td>sign-kernel/</td><td>Ed25519 signature generation</td></tr>
+<tr><td>threshold-sign</td><td>threshold-sign/</td><td>FROST distributed key generation and signing</td></tr>
+<tr><td>zk-ceremony</td><td>zk-ceremony/</td><td>Multi-party trusted setup coordination</td></tr>
+</tbody>
+</table>
+
+<h3>Build Integration</h3>
+
+<p>The toolchain integrates with the standard build process. After compiling the kernel binary, the build system invokes generate-proof with the kernel hash, boot nonce, machine identifier, and PCR preimage. The resulting proof passes to embed-zk-proof which appends the ZK block and footer. Finally, sign-kernel applies the Ed25519 signature over the complete package.</p>
+
+<p>For production deployments, threshold-sign replaces sign-kernel. The signing key is split across multiple parties using FROST key generation. Producing a signature requires t-of-n parties to participate in a two-round signing protocol. No single party ever possesses the complete signing key.</p>
+
+</article>
+
+</div>
+
+<!-- ARCHITECTURE -->
+<div id="arch" class="panel">
+
+<article>
+<header>
+<h2>System Architecture</h2>
+<p>How components interact at build time and boot time.</p>
+</header>
+
+<p>The attestation system operates in two distinct phases with different security requirements. Build time happens in a controlled environment with access to private keys and witness data. Boot time happens on potentially hostile hardware where only public verification material is available. The architecture ensures that private data never crosses from build to boot.</p>
+
+<h3>Build Phase</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+<path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+</marker>
+</defs>
+<rect x="40" y="40" width="160" height="100" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="120" y="75" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Key Generation</text>
+<text x="120" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">PK: 1.68 MB</text>
+<text x="120" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">VK: 872 B</text>
+<rect x="240" y="40" width="160" height="100" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="320" y="75" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Proof Generation</text>
+<text x="320" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">Groth16</text>
+<text x="320" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">192 bytes</text>
+<rect x="440" y="40" width="160" height="100" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="520" y="75" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Kernel Signing</text>
+<text x="520" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">Ed25519</text>
+<text x="520" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">64 bytes</text>
+<rect x="640" y="40" width="120" height="100" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="700" y="75" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Embedding</text>
+<text x="700" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">ZK Block</text>
+<text x="700" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">+ Footer</text>
+<line x1="200" y1="90" x2="238" y2="90" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="400" y1="90" x2="438" y2="90" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="600" y1="90" x2="638" y2="90" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="280" y="180" width="240" height="70" fill="#111" stroke="#111" stroke-width="2"/>
+<text x="400" y="210" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Attested Kernel Image</text>
+<text x="400" y="232" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#888">kernel + signature + proof + footer</text>
+<line x1="700" y1="140" x2="700" y2="165" stroke="#333" stroke-width="2"/>
+<line x1="700" y1="165" x2="520" y2="165" stroke="#333" stroke-width="2"/>
+<line x1="520" y1="165" x2="520" y2="178" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>
+</div>
+
+<p>Key generation produces the proving key used during proof creation and the verifying key embedded in the bootloader. This step runs once during initial setup or when upgrading the attestation circuit. The proving key must remain confidential to prevent unauthorized proof generation. The verifying key is public and distributed with the bootloader.</p>
+
+<p>Proof generation takes the proving key and private witness data to produce a constant-size proof. The witness includes the PCR preimage, hardware attestation level, and other sensitive values. These values never appear in the output. The proof demonstrates knowledge of valid witnesses without revealing them.</p>
+
+<p>The kernel signer applies an Ed25519 signature over the kernel binary. This provides authentication independent of the ZK proof. A valid boot requires both a valid signature and a valid proof. The signature confirms the kernel comes from an authorized source. The proof confirms the kernel satisfies attestation requirements.</p>
+
+<p>Finally, the embedding tool combines the kernel, signature, proof, and structured metadata into a single bootable image. The output format places components at deterministic offsets for efficient bootloader parsing.</p>
+
+<h3>Boot Phase</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+<rect x="40" y="40" width="720" height="240" fill="#f8f8f8" stroke="#333" stroke-width="2"/>
+<text x="60" y="70" font-family="Inter" font-size="14" font-weight="600">BOOTLOADER</text>
+<rect x="80" y="100" width="140" height="60" fill="#fff" stroke="#333" stroke-width="1.5"/>
+<text x="150" y="125" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Load Image</text>
+<text x="150" y="143" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">parse footer</text>
+<rect x="250" y="100" width="140" height="60" fill="#fff" stroke="#333" stroke-width="1.5"/>
+<text x="320" y="125" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Verify Signature</text>
+<text x="320" y="143" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">Ed25519</text>
+<rect x="420" y="100" width="140" height="60" fill="#fff" stroke="#333" stroke-width="1.5"/>
+<text x="490" y="125" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Verify Proof</text>
+<text x="490" y="143" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">Groth16</text>
+<rect x="590" y="100" width="140" height="60" fill="#fff" stroke="#333" stroke-width="1.5"/>
+<text x="660" y="125" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Verify Hash</text>
+<text x="660" y="143" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">BLAKE3</text>
+<line x1="220" y1="130" x2="248" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390" y1="130" x2="418" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="560" y1="130" x2="588" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="350" y="200" width="180" height="50" fill="#111" stroke="#111"/>
+<text x="440" y="230" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Jump to Kernel</text>
+<line x1="660" y1="160" x2="660" y2="185" stroke="#333" stroke-width="1.5"/>
+<line x1="660" y1="185" x2="530" y2="185" stroke="#333" stroke-width="1.5"/>
+<line x1="530" y1="185" x2="530" y2="198" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+</svg>
+</div>
+
+<p>The bootloader performs four verification steps before transferring control to the kernel. Each step must pass for boot to proceed. Failure at any stage halts the boot process and displays an error code.</p>
+
+<p>Image loading parses the footer to locate component boundaries. The footer appears at a fixed 64-byte offset from the end of the image, containing magic bytes, version information, and size fields for each component. Invalid magic bytes or inconsistent sizes abort loading.</p>
+
+<p>Signature verification checks the Ed25519 signature over the kernel binary using the embedded public key. This confirms the kernel was signed by an authorized party. The public key is compiled into the bootloader and cannot be changed at runtime.</p>
+
+<p>Proof verification performs the Groth16 pairing check using the embedded verifying key. This confirms the proof was generated by someone with access to the proving key and valid witness data. The verification equation requires three pairing operations regardless of circuit size.</p>
+
+<p>Hash verification computes the BLAKE3 hash of the kernel binary and confirms it matches the public input in the ZK block. This binds the proof to the specific kernel being loaded. A proof generated for one kernel cannot be used to boot a different kernel.</p>
+
+</article>
+
+<article>
+<header>
+<h2>Cryptographic Primitives</h2>
+<p>The mathematical foundations underlying the protocol.</p>
+</header>
+
+<p>The system combines multiple cryptographic primitives to achieve its security goals. Each primitive addresses a specific requirement. The combination provides layered security where failure of one component does not compromise the others.</p>
+
+<table>
+<thead><tr><th>Component</th><th>Algorithm</th><th>Size</th><th>Security</th></tr></thead>
+<tbody>
+<tr><td>Zero-knowledge proof</td><td>Groth16</td><td>192 bytes</td><td>Knowledge soundness</td></tr>
+<tr><td>Pairing curve</td><td>BLS12-381</td><td>~381 bits</td><td>~128-bit discrete log</td></tr>
+<tr><td>Digital signature</td><td>Ed25519</td><td>64 bytes</td><td>~128-bit ECC</td></tr>
+<tr><td>Cryptographic hash</td><td>BLAKE3</td><td>32 bytes</td><td>Collision resistant</td></tr>
+<tr><td>Threshold signatures</td><td>FROST</td><td>64 bytes</td><td>t-of-n security</td></tr>
+</tbody>
+</table>
+
+<h3>Groth16 Verification Equation</h3>
+
+<p>Groth16 is a pairing-based SNARK with the shortest known proofs for R1CS constraint systems. The proof consists of three group elements: A and C in G1, B in G2. Verification checks a single equation involving bilinear pairings.</p>
+
+<p>Given a proof (A, B, C) and public inputs x1 through xl, verification computes:</p>
+
+<div class="equation">e(A, B) = e(α, β) · e(Σᵢ xᵢ·γᵢ, γ) · e(C, δ)</div>
+
+<p>The left side evaluates the pairing of the proof elements A and B. The right side combines three pairings: a constant term from the verifying key, a public input commitment, and the proof element C. Equality holds if and only if the proof is valid for the given public inputs.</p>
+
+<p>Verification requires exactly three pairing computations regardless of the original circuit size. This constant verification cost makes Groth16 attractive for resource-constrained environments like bootloaders. The tradeoff is a trusted setup requirement addressed through multi-party ceremonies.</p>
+
+<h3>BLS12-381 Curve Parameters</h3>
+
+<p>BLS12-381 is a pairing-friendly elliptic curve designed for use with BLS signatures and zkSNARKs. The curve provides approximately 128 bits of security against discrete logarithm attacks. The embedding degree of 12 balances efficient pairing computation against security requirements.</p>
+
+<div class="data-block">
+<span class="label">Field Modulus p (381 bits)</span>
+<code>0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab</code>
+</div>
+
+<div class="data-block">
+<span class="label">Scalar Order r (255 bits)</span>
+<code>0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001</code>
+</div>
+
+<p>G1 elements serialize to 48 bytes in compressed form. G2 elements serialize to 96 bytes compressed. The scalar field has order r, a 255-bit prime with efficient arithmetic due to its special form. Field operations use Montgomery multiplication for constant-time execution.</p>
+
+</article>
+
+<article>
+<header>
+<h2>Binary Format</h2>
+<p>Structure of an attested kernel image.</p>
+</header>
+
+<p>The attested kernel image concatenates four components: the kernel binary, Ed25519 signature, ZK block, and footer. The footer appears at a fixed offset from the end, allowing the bootloader to locate components without scanning the entire image.</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+<rect x="100" y="20" width="500" height="60" fill="#e8e8e8" stroke="#333" stroke-width="2"/>
+<text x="350" y="45" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600">Kernel Binary</text>
+<text x="350" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">N bytes (variable)</text>
+<rect x="100" y="80" width="500" height="50" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="350" y="100" text-anchor="middle" font-family="Inter" font-size="13" font-weight="500">Ed25519 Signature</text>
+<text x="350" y="118" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#666">64 bytes: R (32) + S (32)</text>
+<rect x="100" y="130" width="500" height="180" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="350" y="155" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600">ZK Block</text>
+<line x1="120" y1="170" x2="580" y2="170" stroke="#ddd" stroke-width="1"/>
+<text x="140" y="190" font-family="JetBrains Mono" font-size="11" fill="#333">Magic: 0x4E 0xC3 0x5A 0x50</text>
+<text x="480" y="190" font-family="JetBrains Mono" font-size="10" fill="#888">4 bytes</text>
+<text x="140" y="210" font-family="JetBrains Mono" font-size="11" fill="#333">Version: 2</text>
+<text x="480" y="210" font-family="JetBrains Mono" font-size="10" fill="#888">4 bytes</text>
+<text x="140" y="230" font-family="JetBrains Mono" font-size="11" fill="#333">Program Hash, Capsule, Kernel, Nonce, Machine</text>
+<text x="480" y="230" font-family="JetBrains Mono" font-size="10" fill="#888">160 bytes</text>
+<text x="140" y="250" font-family="JetBrains Mono" font-size="11" fill="#333">Public Inputs</text>
+<text x="480" y="250" font-family="JetBrains Mono" font-size="10" fill="#888">variable</text>
+<text x="140" y="270" font-family="JetBrains Mono" font-size="11" fill="#333">Groth16 Proof: A (G1), B (G2), C (G1)</text>
+<text x="480" y="270" font-family="JetBrains Mono" font-size="10" fill="#888">192 bytes</text>
+<rect x="100" y="310" width="500" height="70" fill="#111" stroke="#111"/>
+<text x="350" y="335" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600" fill="#fff">Footer</text>
+<text x="350" y="355" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#888">64 bytes: magic, version, flags, sizes, offsets</text>
+<text x="620" y="50" font-family="JetBrains Mono" font-size="10" fill="#888">offset 0</text>
+<text x="620" y="108" font-family="JetBrains Mono" font-size="10" fill="#888">offset N</text>
+<text x="620" y="220" font-family="JetBrains Mono" font-size="10" fill="#888">offset N+64</text>
+<text x="620" y="345" font-family="JetBrains Mono" font-size="10" fill="#888">end-64</text>
+</svg>
+</div>
+
+<p>The ZK block uses magic bytes 0x4E 0xC3 0x5A 0x50 (chosen to not appear in typical binary executables) followed by a version number. Version 2 is the current format. The block contains five 32-byte hashes: program hash, capsule commitment, kernel hash, boot nonce, and machine identifier. These serve as public inputs to the proof.</p>
+
+<p>The footer uses magic bytes "NONOSIMG" (8 bytes) for format identification. It contains version information, flags for optional features, algorithm identifiers, and byte counts for each component. The bootloader reads the footer first, validates its structure, then uses the size fields to locate other components.</p>
+
+</article>
+
+</div>
+
+<!-- CIRCUIT -->
+<div id="circuit" class="panel">
+
+<article>
+<header>
+<h2>Circuit Design</h2>
+<p>The constraint system that defines valid attestations.</p>
+</header>
+
+<p>The attestation circuit encodes security requirements as R1CS constraints. A valid proof demonstrates that the prover possesses private witness values satisfying all constraints, without revealing those values. The circuit separates inputs into public values visible to verifiers and private witnesses known only to the prover.</p>
+
+<h3>Input Structure</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+<rect x="40" y="30" width="280" height="140" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="180" y="55" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Public Inputs</text>
+<text x="180" y="75" text-anchor="middle" font-family="Inter" font-size="11" fill="#666">visible to verifier</text>
+<line x1="60" y1="90" x2="300" y2="90" stroke="#ddd"/>
+<text x="70" y="110" font-family="JetBrains Mono" font-size="11">kernel_hash</text>
+<text x="250" y="110" font-family="JetBrains Mono" font-size="10" fill="#888">32 B</text>
+<text x="70" y="128" font-family="JetBrains Mono" font-size="11">boot_nonce</text>
+<text x="250" y="128" font-family="JetBrains Mono" font-size="10" fill="#888">32 B</text>
+<text x="70" y="146" font-family="JetBrains Mono" font-size="11">machine_id</text>
+<text x="250" y="146" font-family="JetBrains Mono" font-size="10" fill="#888">32 B</text>
+<text x="70" y="164" font-family="JetBrains Mono" font-size="11">capsule_commitment, program_hash</text>
+<rect x="380" y="30" width="280" height="140" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+<text x="520" y="55" text-anchor="middle" font-family="Inter" font-size="13" font-weight="600">Private Witnesses</text>
+<text x="520" y="75" text-anchor="middle" font-family="Inter" font-size="11" fill="#666">known only to prover</text>
+<line x1="400" y1="90" x2="640" y2="90" stroke="#ddd"/>
+<text x="410" y="115" font-family="JetBrains Mono" font-size="11">pcr_preimage</text>
+<text x="590" y="115" font-family="JetBrains Mono" font-size="10" fill="#888">64 B</text>
+<text x="410" y="140" font-family="JetBrains Mono" font-size="11">hardware_attestation</text>
+<text x="590" y="140" font-family="JetBrains Mono" font-size="10" fill="#888">8 B</text>
+</svg>
+</div>
+
+<h4>Public Input Details</h4>
+
+<p>The kernel_hash field contains the BLAKE3 hash of the kernel binary. This binds the attestation to a specific executable. The bootloader computes this hash at load time and compares it against the public input. Any modification to the kernel invalidates the proof.</p>
+
+<p>The boot_nonce field provides freshness. Each boot session generates a new 32-byte random value. Including the nonce as a public input prevents replay attacks where an old proof might be presented for a new boot. The nonce appears in the ZK block and can be verified externally.</p>
+
+<p>The machine_id field identifies the hardware without revealing the underlying TPM endorsement key. The identifier derives from the TPM EK through a one-way function, preserving unlinkability while enabling revocation. A compromised machine can be blocked by its machine_id without exposing the EK.</p>
+
+<p>The capsule_commitment field supports application-specific attestation. Applications can bind additional data into the proof through this commitment. The circuit verifies the commitment against witness data without revealing the committed values. This enables workload-specific attestation beyond base boot integrity.</p>
+
+<p>The program_hash field identifies the attestation circuit itself. This prevents attacks where a malicious prover might use a modified circuit with weakened constraints. The verifier checks that the program hash matches the expected value for the legitimate attestation program.</p>
+
+<h4>Private Witness Details</h4>
+
+<p>The pcr_preimage field contains raw TPM Platform Configuration Register values. These 64 bytes encode the complete boot measurement chain. The circuit verifies entropy and structural requirements on these values without exposing them. Verifiers learn that the measurements satisfy policy without learning what actually booted.</p>
+
+<p>The hardware_attestation field encodes the hardware security level as a 64-bit integer. Higher values indicate stronger security features. The circuit enforces a minimum threshold, proving the hardware meets requirements without revealing the exact capability level.</p>
+
+<h3>Constraint Categories</h3>
+
+<h4>Program Identity Verification</h4>
+
+<p>The circuit enforces that the program hash matches a compile-time constant. This binds the proof to a specific version of the attestation program, preventing substitution attacks where an adversary might attempt to use a modified circuit that accepts invalid witnesses. The expected hash derives from the program identifier string using domain-separated BLAKE3.</p>
+
+<p class="path">constants.rs:101-105</p>
+<pre>pub fn expected_program_hash_bytes() -> [u8; 32] {
+    let mut h = blake3::Hasher::new_derive_key("NONOS:ZK:PROGRAM:v1");
+    h.update(b"zkmod-attestation-program-v1");
+    *h.finalize().as_bytes()
+}</pre>
+
+<h4>Non-Zero Hash Enforcement</h4>
+
+<p>Critical hashes must contain at least one non-zero byte. This prevents trivial attacks where all-zero values might bypass verification logic or indicate uninitialized data. The constraint counts non-zero bytes across the hash and requires the sum to be positive. This applies to kernel_hash, boot_nonce, machine_id, and capsule_commitment.</p>
+
+<h4>PCR Entropy Requirements</h4>
+
+<p>The PCR preimage must contain sufficient entropy to indicate a genuine boot measurement rather than a fabricated value. The circuit counts non-zero bytes in the measurement and enforces a minimum threshold of 32 non-zero bytes (from the 64-byte preimage). This prevents attestation with zeroed or low-entropy PCR values that might indicate measurement bypass or trivial forgery.</p>
+
+<h4>Hardware Attestation Level</h4>
+
+<p>The attested hardware security level must exceed a minimum threshold. The circuit defines four levels with increasing security requirements. The minimum threshold is 0x1000, requiring at least TPM 2.0 presence. Higher levels indicate additional security features.</p>
+
+<table>
+<thead><tr><th>Level</th><th>Value</th><th>Requirements</th></tr></thead>
+<tbody>
+<tr><td>Base</td><td>0x1000</td><td>TPM 2.0 present and functional</td></tr>
+<tr><td>Verified Boot</td><td>0x2000</td><td>Secure boot chain verified by TPM</td></tr>
+<tr><td>Enclave</td><td>0x4000</td><td>Trusted execution environment available</td></tr>
+<tr><td>Hardware Root</td><td>0x8000</td><td>Hardware root of trust with remote attestation</td></tr>
+</tbody>
+</table>
+
+</article>
+
+<article>
+<header>
+<h2>Build Provenance</h2>
+<p>Reproducible build verification through cryptographic commitments.</p>
+</header>
+
+<p>The attestation system optionally supports build provenance verification. This extends the attestation from "this kernel is authorized" to "this kernel was built from this source with this toolchain." Build provenance enables supply chain verification without requiring access to build infrastructure.</p>
+
+<p>Provenance encodes four components: source tree hash, dependency lock hash, compiler version hash, and build configuration hash. Each component uses domain-separated BLAKE3 to prevent cross-component collisions.</p>
+
+<table>
+<thead><tr><th>Component</th><th>Domain</th><th>Inputs</th></tr></thead>
+<tbody>
+<tr><td>Source Tree</td><td>NONOS:BUILD:SOURCE_TREE:v1</td><td>Git commit hash + tree hash</td></tr>
+<tr><td>Cargo Lock</td><td>NONOS:BUILD:CARGO_LOCK:v1</td><td>Complete Cargo.lock contents</td></tr>
+<tr><td>Rustc Version</td><td>NONOS:BUILD:RUSTC_VERSION:v1</td><td>Version string + compiler commit</td></tr>
+<tr><td>Build Config</td><td>NONOS:BUILD:CONFIG:v1</td><td>Cargo.toml + .cargo/config.toml</td></tr>
+</tbody>
+</table>
+
+<p>The four component hashes combine into a single 32-byte composite hash using the NONOS:BUILD:PROVENANCE:v1 domain. This composite can serve as a public input for provenance-aware attestation circuits, binding the proof to specific build conditions.</p>
+
+</article>
+
+<article>
+<header>
+<h2>Domain Separation</h2>
+<p>Preventing cross-protocol attacks through cryptographic isolation.</p>
+</header>
+
+<p>All BLAKE3 hash operations use domain separation strings. This ensures that hashes computed for one purpose cannot be reinterpreted as valid hashes for a different purpose. Each domain string follows the format NONOS:CATEGORY:PURPOSE:version, providing clear namespacing and version control.</p>
+
+<p class="path">constants.rs:17-29</p>
+<pre>pub const DS_PROGRAM: &str           = "NONOS:ZK:PROGRAM:v1";
+pub const DS_COMMITMENT: &str        = "NONOS:CAPSULE:COMMITMENT:v1";
+pub const DS_SOURCE_TREE: &str       = "NONOS:BUILD:SOURCE_TREE:v1";
+pub const DS_CARGO_LOCK: &str        = "NONOS:BUILD:CARGO_LOCK:v1";
+pub const DS_RUSTC_VERSION: &str     = "NONOS:BUILD:RUSTC_VERSION:v1";
+pub const DS_BUILD_CONFIG: &str      = "NONOS:BUILD:CONFIG:v1";
+pub const DS_BUILD_PROVENANCE: &str  = "NONOS:BUILD:PROVENANCE:v1";</pre>
+
+<p>The domain separation approach prevents an attacker from taking a hash computed in one context and presenting it as valid in another. Even if two different inputs happen to produce the same raw hash, the domain-separated versions will differ. This is essential when the same underlying data might appear in multiple protocol contexts.</p>
+
+<p>BLAKE3's keyed derivation mode incorporates the domain string into the hash function's initial state. This provides stronger separation than simply prepending the domain to the input, as it modifies the compression function's behavior rather than just the input data.</p>
+
+</article>
+
+</div>
+
+<!-- CEREMONY -->
+<div id="ceremony" class="panel">
+
+<article>
+<header>
+<h2>Trusted Setup</h2>
+<p>Distributing trust across multiple independent parties.</p>
+</header>
+
+<p>Groth16 proofs require a structured reference string generated during a setup phase. This reference string contains encodings of secret field elements tau, alpha, and beta. If any party recovers these secrets, they can forge proofs for arbitrary statements. The multi-party ceremony ensures that as long as one participant honestly destroys their randomness, the combined secret remains unrecoverable.</p>
+
+<p>The security guarantee is strong: recovery requires obtaining the secret randomness from every single participant. With n participants, an attacker must compromise all n to forge proofs. A single honest participant who genuinely destroys their contribution makes forgery computationally infeasible.</p>
+
+<h3>Ceremony Structure</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+<rect x="280" y="20" width="140" height="50" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="350" y="50" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Initialize</text>
+<line x1="350" y1="70" x2="350" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="80" y="110" width="120" height="70" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="140" y="138" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Party 1</text>
+<text x="140" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">tau1, alpha1, beta1</text>
+<text x="140" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#999">destroy</text>
+<rect x="240" y="110" width="120" height="70" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="300" y="138" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Party 2</text>
+<text x="300" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">tau2, alpha2, beta2</text>
+<text x="300" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#999">destroy</text>
+<rect x="400" y="110" width="120" height="70" fill="#fff" stroke="#333" stroke-width="2"/>
+<text x="460" y="138" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500">Party 3</text>
+<text x="460" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#666">tau3, alpha3, beta3</text>
+<text x="460" y="175" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#999">destroy</text>
+<text x="570" y="145" text-anchor="middle" font-family="Inter" font-size="24" fill="#666">...</text>
+<line x1="140" y1="180" x2="140" y2="210" stroke="#333" stroke-width="1.5"/>
+<line x1="300" y1="180" x2="300" y2="210" stroke="#333" stroke-width="1.5"/>
+<line x1="460" y1="180" x2="460" y2="210" stroke="#333" stroke-width="1.5"/>
+<line x1="140" y1="210" x2="460" y2="210" stroke="#333" stroke-width="1.5"/>
+<line x1="300" y1="210" x2="300" y2="230" stroke="#333" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="220" y="240" width="160" height="50" fill="#111" stroke="#111"/>
+<text x="300" y="262" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#fff">Final Parameters</text>
+<text x="300" y="280" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#888">tau = product(taui)</text>
+</svg>
+</div>
+
+<p>Each participant generates fresh randomness, applies it to transform the existing parameters, and destroys their contribution. The final parameters incorporate all contributions multiplicatively. The combined secret equals the product of all individual secrets. Recovering this product requires knowing every factor.</p>
+
+<h3>Powers of Tau Transformation</h3>
+
+<p>The ceremony applies each participant's randomness to the structured reference string elements. The transformation computes powers of the participant's tau value and multiplies them into the corresponding elements of the proving key. Alpha and beta values modify the verification key components through scalar multiplication.</p>
+
+<p>Each transformation preserves the algebraic relationships required for proof verification while incorporating fresh randomness. The circuit-specific setup takes the universal powers-of-tau output and specializes it for the attestation circuit's constraint system.</p>
+
+<div class="stats">
+<div><strong>5+</strong><span>Participants</span></div>
+<div><strong>1</strong><span>Honest Required</span></div>
+<div><strong>unlimited</strong><span>Maximum</span></div>
+<div><strong>Yes</strong><span>Destruction Attestation</span></div>
+</div>
+
+<h3>Contribution Records</h3>
+
+<p>Each participant produces a signed record documenting their contribution. The record includes hashes of the parameters before and after their transformation, a commitment to their randomness source, and an optional destruction attestation describing how they eliminated their secret values. These records form an auditable chain from initialization to final parameters.</p>
+
+<p>The destruction attestation documents the method used to destroy randomness. Common methods include physical destruction of the machine used for computation, cryptographic erasure of storage, and witnessed destruction ceremonies with video documentation. The attestation provides evidence for security audits without requiring trust in any single participant.</p>
+
+<p class="path">ceremony.rs:74-85</p>
+<pre>pub struct ContributionRecord {
+    pub round: u32,
+    pub contributor_id: String,
+    pub contributor_contact: String,
+    pub location: String,
+    pub randomness_source: String,
+    pub previous_params_hash: [u8; 32],
+    pub new_params_hash: [u8; 32],
+    pub randomness_commitment: [u8; 32],
+    pub contribution_timestamp: u64,
+    pub destruction_attestation: Option<DestructionAttestation>,
+}</pre>
+
+</article>
+
+<article>
+<header>
+<h2>Threshold Signatures</h2>
+<p>Distributing signing authority across multiple parties.</p>
+</header>
+
+<p>FROST (Flexible Round-Optimized Schnorr Threshold) enables t-of-n signing where any t parties can collaborate to produce a valid signature, but fewer than t parties learn nothing about the key. The protocol operates over the Ristretto255 group and produces signatures compatible with Ed25519 verification.</p>
+
+<p>Threshold signing addresses operational concerns around key management. A single signing key represents a single point of failure. If compromised, all future kernels can be maliciously signed. If lost, no more kernels can be signed. Threshold distribution eliminates both failure modes. Compromise requires breaching t parties. Recovery requires only t surviving parties.</p>
+
+<h3>Key Generation</h3>
+
+<p>Distributed key generation produces shares for each signer and a combined public key. The public key corresponds to a secret that no single party possesses. Each party's share allows them to participate in signing without ever reconstructing the complete secret.</p>
+
+<p>The protocol uses Shamir secret sharing with threshold t. A random polynomial of degree t-1 encodes the group secret as its constant term. Each party receives an evaluation of this polynomial at a unique point. Any t evaluations suffice to recover the polynomial via Lagrange interpolation, but t-1 evaluations reveal nothing about the constant term.</p>
+
+<p>The public key derives from the constant term through scalar multiplication with the group generator. This public key is identical to what a single-party key generation would produce. Verifiers cannot distinguish threshold keys from single-party keys.</p>
+
+<h3>Signature Generation</h3>
+
+<p>Signing proceeds in two rounds. In the first round, each participating signer generates a commitment and broadcasts it to the group. In the second round, each signer computes their partial signature using the aggregated commitments, their secret share, and the message. The coordinator combines partial signatures into the final signature.</p>
+
+<p>The resulting signature is indistinguishable from a single-party Ed25519 signature. Verifiers cannot determine that threshold signing was used or how many parties participated. This provides operational flexibility without revealing the signing infrastructure to potential attackers.</p>
+
+<p>For the attestation system, threshold signing protects the kernel signing key. The key is generated and distributed during initial setup. Signing a new kernel release requires participation from t parties. This prevents any single party from unilaterally signing malicious kernels while ensuring the signing capability survives individual party compromise or unavailability.</p>
+
+</article>
+
+</div>
+
+<!-- ARTIFACTS -->
+<div id="artifacts" class="panel">
+
+<article>
+<header>
+<h2>Generated Artifacts</h2>
+<p>Production cryptographic material from the current build.</p>
+</header>
+
+<p>The following artifacts were generated on March 29, 2026 from seed nonos-attestation-v1 at commit d69afa2fc4d625cee3256fe02662f4c37c86d7ae. These values can be independently verified by repeating the deterministic key generation process with the same inputs. The generation process is reproducible given the same seed, circuit definition, and toolchain version.</p>
+
+<div class="stats">
+<div><strong>1,681,008</strong><span>Proving Key Bytes</span></div>
+<div><strong>872</strong><span>Verifying Key Bytes</span></div>
+<div><strong>10</strong><span>Public Inputs</span></div>
+<div><strong>192</strong><span>Proof Bytes</span></div>
+</div>
+
+<h3>Verifying Key</h3>
+
+<p>The verifying key is embedded in the bootloader binary and used for runtime proof verification. Its integrity is critical to system security. Compromise of the verifying key would allow acceptance of invalid proofs. The key is compiled into the bootloader as a constant, preventing runtime modification.</p>
+
+<p>Multiple hash algorithms provide defense in depth. The BLAKE3 fingerprint uses domain-separated keyed derivation for collision resistance. The SHA-256 hash enables cross-verification with systems using different hash functions. Both values are computed over the canonical 872-byte serialization.</p>
+
+<div class="data-block">
+<span class="label">First 64 Bytes (hex)</span>
+<code>8633 3e42 377c 9d81 f763 2ed6 25c3 3bcd 154f 8795 a133 70f6 86d6 51cc 8af5 0add e837 261a b211 1b47 8904 05d4 7901 2cbd 8c93 5efb 1297 7172 e518 69d5 2b45 bdf0</code>
+</div>
+
+<div class="cols">
+<div>
+<div class="data-block">
+<span class="label">BLAKE3 Fingerprint</span>
+<code>09625c791382369f6f444922fe8d8ad0c2c1a39b4a366dd67d81a2b7a3ed7afe</code>
+</div>
+</div>
+<div>
+<div class="data-block">
+<span class="label">SHA-256</span>
+<code>5796b8d175336f709c8903c37f41fcb025ae082f5430e01879dee53ced4921e9</code>
+</div>
+</div>
+</div>
+
+<h3>Build Metadata</h3>
+
+<p>Complete provenance information for the generated keys. This metadata enables reproducibility verification. Given the same tool version, compiler, and seed, key generation produces identical outputs. The commit hash identifies the exact source code version used.</p>
+
+<pre>{
+  "tool": "nonos-attestation-circuit",
+  "tool_version": "1.0.0",
+  "rustc_version": "rustc 1.91.1 (ed61e7d7e 2025-11-07) (Homebrew)",
+  "cargo_version": "cargo 1.91.1 (Homebrew)",
+  "commit": "d69afa2fc4d625cee3256fe02662f4c37c86d7ae",
+  "seed": "nonos-attestation-v1",
+  "vk_blake3": "09625c791382369f6f444922fe8d8ad0c2c1a39b4a366dd67d81a2b7a3ed7afe",
+  "public_inputs_expected": 10,
+  "canonical_vk_len": 872,
+  "generated_at_utc": "2026-03-29T21:45:04.576456+00:00"
+}</pre>
+
+</article>
+
+<article>
+<header>
+<h2>Fingerprint Computation</h2>
+<p>Verifying key identity across deployments.</p>
+</header>
+
+<p>The verifying key fingerprint uses BLAKE3 in keyed derivation mode with domain separation. This fingerprint identifies the key material independently of serialization format. Bootloaders embed the fingerprint as a compile-time constant and verify it matches the loaded verifying key at runtime. This prevents attacks where a modified verifying key might be substituted.</p>
+
+<p>The domain string NONOS:VK:FINGERPRINT:v1 ensures the fingerprint cannot collide with other BLAKE3 hashes in the system. Version tagging allows fingerprint format evolution without breaking existing deployments.</p>
+
+<p class="path">examples/compute_fingerprint.rs</p>
+<pre>use std::fs;
+
+fn main() {
+    let vk_bytes = fs::read("new_keys/attestation_verifying_key.bin").unwrap();
+    let mut h = blake3::Hasher::new_derive_key("NONOS:VK:FINGERPRINT:v1");
+    h.update(&vk_bytes);
+    let fp = h.finalize();
+    print!("pub const VK_FINGERPRINT_BOOT_AUTHORITY: [u8; 32] = [\n    ");
+    for (i, b) in fp.as_bytes().iter().enumerate() {
+        print!("0x{:02x}, ", b);
+        if (i + 1) % 16 == 0 && i < 31 {
+            print!("\n    ");
+        }
+    }
+    println!("];\n");
+}</pre>
+
+<p>Running this utility produces a Rust constant suitable for direct inclusion in bootloader source code. The output format matches the bootloader's expected constant definition. During compilation, this fingerprint becomes a fixed reference point. At runtime, the bootloader hashes the loaded verifying key and compares against this constant before using the key for proof verification.</p>
+
+</article>
+
+</div>
+
+</main>
+
+<footer>
+<p>NØNOS ZK Hardware Attestation v1.0.0</p>
+<p>March 2026</p>
+</footer>
+
+<script>
+function show(id){
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
