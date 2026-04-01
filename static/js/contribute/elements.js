@@ -1,0 +1,47 @@
+var NoxContribute = window.NoxContribute || {};
+
+NoxContribute.cacheElements = function() {
+  var el = NoxContribute.el;
+  el.poolBalance = document.getElementById('poolBalance');
+  el.totalContributors = document.getElementById('totalContributors');
+  el.totalDistributed = document.getElementById('totalDistributed');
+  el.repoStars = document.getElementById('repoStars');
+  el.claimsToday = document.getElementById('claimsToday');
+  el.claimRate = document.getElementById('claimRate');
+  el.contractStatus = document.getElementById('contractStatus');
+  el.connectState = document.getElementById('connectState');
+  el.connectWalletBtn = document.getElementById('connectWalletBtn');
+  el.connectedState = document.getElementById('connectedState');
+  el.connectedAddress = document.getElementById('connectedAddress');
+  el.disconnectBtn = document.getElementById('disconnectBtn');
+  el.availableRewards = document.getElementById('availableRewards');
+  el.totalEarned = document.getElementById('totalEarned');
+  el.contributionCount = document.getElementById('contributionCount');
+  el.githubStatus = document.getElementById('githubStatus');
+  el.githubConnectState = document.getElementById('githubConnectState');
+  el.githubConnectedState = document.getElementById('githubConnectedState');
+  el.githubUsername = document.getElementById('githubUsername');
+  el.verifyGithubBtn = document.getElementById('verifyGithubBtn');
+  el.githubAvatar = document.getElementById('githubAvatar');
+  el.githubDisplayName = document.getElementById('githubDisplayName');
+  el.githubLinkedUsername = document.getElementById('githubLinkedUsername');
+  el.unlinkGithubBtn = document.getElementById('unlinkGithubBtn');
+  el.checkStar = document.getElementById('checkStar');
+  el.starStatus = document.getElementById('starStatus');
+  el.checkIssues = document.getElementById('checkIssues');
+  el.issueStatus = document.getElementById('issueStatus');
+  el.issueReward = document.getElementById('issueReward');
+  el.checkPRs = document.getElementById('checkPRs');
+  el.prStatus = document.getElementById('prStatus');
+  el.prReward = document.getElementById('prReward');
+  el.claimActions = document.getElementById('claimActions');
+  el.claimableAmount = document.getElementById('claimableAmount');
+  el.claimRewardsBtn = document.getElementById('claimRewardsBtn');
+  el.pendingSection = document.getElementById('pendingSection');
+  el.pendingList = document.getElementById('pendingList');
+  el.approvedSection = document.getElementById('approvedSection');
+  el.approvedList = document.getElementById('approvedList');
+  el.toast = document.getElementById('toast');
+};
+
+window.NoxContribute = NoxContribute;
