@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOX Rewards Admin</title>
+  <style>
+    :root { --bg: #0a0a0a; --surface: #111; --border: #222; --text: #fff; --muted: #888; --accent: #0ff; --success: #0f0; --warning: #ff0; --error: #f00; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { color: var(--accent); margin-bottom: 30px; font-size: 24px; }
+    .auth-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .auth-section input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 15px; width: 300px; margin-right: 10px; }
+    .auth-section button { background: var(--accent); color: var(--bg); border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .stat { background: var(--surface); border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; }
+    .stat-value { font-size: 28px; color: var(--accent); font-weight: bold; }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    .section-title { color: var(--accent); font-size: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .item { display: grid; grid-template-columns: 100px 1fr 100px 150px; gap: 15px; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
+    .item:last-child { border-bottom: none; }
+    .item-user { color: var(--accent); }
+    .item-title { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-actions { display: flex; gap: 8px; }
+    .btn { padding: 6px 12px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-approve { background: var(--success); color: var(--bg); }
+    .btn-reject { background: var(--error); color: var(--bg); }
+    .btn-refresh { background: var(--border); color: var(--text); }
+    .empty { color: var(--muted); text-align: center; padding: 30px; }
+    .approve-form { display: flex; gap: 10px; padding: 15px; background: var(--bg); border-radius: 8px; margin-top: 15px; }
+    .approve-form input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; }
+    .approve-form input[type="number"] { width: 120px; flex: none; }
+    .hidden { display: none; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); padding: 15px 25px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--error); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>// NOX REWARDS ADMIN</h1>
+    <div class="auth-section" id="authSection">
+      <input type="password" id="adminKey" placeholder="Admin API Key">
+      <button onclick="authenticate()">Authenticate</button>
+    </div>
+    <div id="dashboard" class="hidden">
+      <div class="stats" id="stats"></div>
+      <div class="section">
+        <div class="section-title">
+          <span>Pending Approvals</span>
+          <button class="btn btn-refresh" onclick="loadPending()">Refresh</button>
+        </div>
+        <div id="pendingList"></div>
+      </div>
+      <div class="section">
+        <div class="section-title">Quick Approve</div>
+        <div class="approve-form">
+          <select id="approveType">
+            <option value="issue">Issue</option>
+            <option value="pr">PR</option>
+          </select>
+          <input type="text" id="approveUsername" placeholder="GitHub username">
+          <input type="number" id="approveNumber" placeholder="Issue/PR #">
+          <input type="text" id="approveTitle" placeholder="Title (optional)">
+          <input type="number" id="approveReward" placeholder="Reward (NOX)">
+          <button class="btn btn-approve" onclick="quickApprove()">Approve</button>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">
+          <span>Approved (Unclaimed)</span>
+          <button class="btn btn-refresh" onclick="loadApproved()">Refresh</button>
+        </div>
+        <div id="approvedList"></div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="admin.js"></script>
+</body>
+</html>
