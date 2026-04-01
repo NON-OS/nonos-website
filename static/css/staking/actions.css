@@ -1,0 +1,97 @@
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.action-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: var(--space-lg);
+}
+
+.action-card h3 {
+  margin: 0 0 var(--space-md);
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.input-group {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.input-group input {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--accent-dim);
+}
+
+.input-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.max-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.max-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
+.balance-row {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-md);
+  font-family: var(--font-mono);
+}
+
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.claim-card .claim-amount {
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.claim-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  text-shadow: 0 0 20px rgba(102, 255, 255, 0.3);
+}
+
+.claim-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+}
+
+@media (max-width: 900px) {
+  .action-cards {
+    grid-template-columns: 1fr;
+  }
+}

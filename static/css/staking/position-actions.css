@@ -1,0 +1,40 @@
+.position-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.position-btn {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.position-btn-unstake {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg-primary);
+}
+
+.position-btn-unstake:hover {
+  background: var(--accent-bright, #88ffff);
+}
+
+.position-btn-early {
+  background: transparent;
+  border-color: var(--warning, #f5a623);
+  color: var(--warning, #f5a623);
+}
+
+.position-btn-early:hover {
+  background: rgba(245, 166, 35, 0.1);
+}
+
+.position-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

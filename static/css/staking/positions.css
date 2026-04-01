@@ -1,0 +1,121 @@
+.positions-section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border);
+}
+
+.positions-section h3 {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0 0 var(--space-md);
+}
+
+.positions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.no-positions {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-xl);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.position-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: var(--space-lg);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.position-card:hover {
+  border-color: var(--accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(102, 255, 255, 0.1);
+}
+
+.position-card-v2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim));
+}
+
+.position-badge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.position-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.position-id {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.position-lock {
+  font-size: 0.7rem;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.position-amount {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  margin-bottom: var(--space-xs);
+}
+
+.position-countdown {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8rem;
+  color: var(--warning, #f5a623);
+  margin-bottom: var(--space-md);
+}
+
+.position-countdown .lock-icon {
+  font-size: 0.9rem;
+}
+
+.position-unlocked {
+  font-size: 0.8rem;
+  color: var(--success);
+  margin-bottom: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .positions-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,45 @@
+.contract-addresses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+}
+
+.address-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 120px;
+}
+
+.address-value {
+  flex: 1;
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.address-link {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 600px) {
+  .address-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .address-value {
+    word-break: break-all;
+  }
+}

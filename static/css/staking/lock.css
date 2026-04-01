@@ -1,0 +1,82 @@
+.lock-status {
+  background: linear-gradient(135deg, rgba(102, 255, 255, 0.1) 0%, rgba(102, 255, 255, 0.05) 100%);
+  border: 1px solid var(--accent-dim);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.lock-status-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.lock-icon {
+  font-size: 1.5rem;
+}
+
+.lock-details {
+  flex: 1;
+}
+
+.lock-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.lock-countdown {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.lock-boost-badge {
+  background: var(--accent);
+  color: var(--bg-primary);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lock-selector {
+  margin-bottom: var(--space-md);
+}
+
+.lock-selector label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.lock-selector select {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.lock-selector select:focus {
+  border-color: var(--accent-dim);
+}
+
+.lock-boost-preview {
+  color: var(--accent);
+  font-weight: 600;
+  margin-left: var(--space-xs);
+}
+
+@media (max-width: 600px) {
+  .lock-status-inner {
+    flex-wrap: wrap;
+  }
+}

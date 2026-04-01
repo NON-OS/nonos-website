@@ -1,0 +1,56 @@
+.nft-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+
+.nft-opensea-link {
+  display: inline-block;
+  margin-top: var(--space-md);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.nft-opensea-link:hover {
+  color: var(--accent);
+}
+
+.nft-gallery-loading,
+.nft-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-xl);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.nft-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-xl);
+}
+
+.nft-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-sm);
+  opacity: 0.5;
+}
+
+.nft-empty p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0 0 var(--space-md);
+}
+
+.btn-small {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.75rem;
+}

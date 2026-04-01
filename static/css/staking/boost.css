@@ -1,0 +1,85 @@
+.boost-info {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: var(--space-lg);
+}
+
+.boost-info h3 {
+  margin: 0 0 var(--space-md);
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+
+.boost-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.boost-nft-count {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.boost-multiplier {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.boost-tiers {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-sm);
+}
+
+.boost-tier {
+  text-align: center;
+  padding: var(--space-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.boost-tier span:first-child {
+  display: block;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.boost-tier span:last-child {
+  display: block;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.boost-tier.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.boost-tier.active span:last-child {
+  color: var(--accent);
+}
+
+.boost-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 900px) {
+  .boost-tiers {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .boost-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

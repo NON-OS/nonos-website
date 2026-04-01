@@ -1,0 +1,41 @@
+.connected-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.connected-label {
+  color: var(--text-muted);
+}
+
+.connected-address {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.btn-disconnect {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-disconnect:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+@media (max-width: 600px) {
+  .connected-info {
+    flex-direction: column;
+    text-align: center;
+  }
+}

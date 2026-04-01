@@ -1,0 +1,37 @@
+.boost-table {
+  margin-bottom: var(--space-xl);
+  overflow-x: auto;
+}
+
+.boost-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.boost-table th,
+.boost-table td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.boost-table th {
+  background: var(--bg-primary);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.boost-table td {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.boost-table tr:last-child td {
+  color: var(--accent);
+  font-weight: 600;
+}
