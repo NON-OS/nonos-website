@@ -1,0 +1,550 @@
+{{ define "main" }}
+<link rel="stylesheet" href="/css/contribute.bundle.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js" as="script">
+
+<section class="contribute-hero">
+  <div class="contribute-hero-inner">
+    <h1 class="contribute-title">Contribute to N<span class="accent">O</span>NOS</h1>
+    <p class="contribute-tagline">BUILD · DISCOVER · EARN</p>
+    <p class="contribute-subtitle">Earn NOX rewards for meaningful contributions to the NONOS ecosystem</p>
+    <div class="contribute-hero-actions">
+      <a href="https://github.com/NON-OS/nonos-kernel" class="btn btn-primary" target="_blank" rel="noopener">View Repository</a>
+      <a href="#claim" class="btn btn-secondary">Claim Rewards</a>
+    </div>
+  </div>
+</section>
+
+<!-- Global Stats -->
+<section class="contribute-stats">
+  <div class="contribute-stats-inner">
+    <div class="stat-card stat-card-highlight">
+      <span class="stat-label">Reward Pool</span>
+      <span class="stat-value" id="poolBalance">—</span>
+      <span class="stat-sub">NOX available</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Total Distributed</span>
+      <span class="stat-value" id="totalDistributed">—</span>
+      <span class="stat-sub">NOX claimed</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Contributors</span>
+      <span class="stat-value" id="totalContributors">—</span>
+      <span class="stat-sub">claimants</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Repository Stars</span>
+      <span class="stat-value" id="repoStars">—</span>
+      <span class="stat-sub">stargazers</span>
+    </div>
+  </div>
+</section>
+
+<!-- Live Contract Info -->
+<section class="contract-info">
+  <div class="contract-info-inner">
+    <div class="contract-badge">
+      <span class="contract-label">Verified Contract V2</span>
+      <a href="https://etherscan.io/address/0xAcb70B0F83f676ef17abEA09101B9797b6bCF95f" target="_blank" rel="noopener" class="contract-address">0xAcb70B0F83f676ef17abEA09101B9797b6bCF95f</a>
+    </div>
+    <div class="contract-stats-mini">
+      <span class="mini-stat">Claims Today: <strong id="claimsToday">—</strong></span>
+      <span class="mini-stat">Rate: <strong id="claimRate">50/hr</strong></span>
+      <span class="mini-stat">Status: <strong id="contractStatus" class="status-live">V2 LIVE</strong></span>
+    </div>
+  </div>
+</section>
+
+<section class="reward-overview" id="rewards">
+  <div class="reward-overview-inner">
+    <h2>Contributor Incentives</h2>
+    <p class="section-intro">Contributions are evaluated based on impact, quality, and value to the project. All rewards are subject to review.</p>
+
+    <div class="reward-cards">
+      <div class="reward-card">
+        <div class="reward-card-header">
+          <span class="reward-icon">&#9733;</span>
+          <span class="reward-category">Repository Support</span>
+        </div>
+        <div class="reward-amount">
+          <span class="reward-value">5,000</span>
+          <span class="reward-unit">NOX</span>
+        </div>
+        <div class="reward-action">Star the repository</div>
+        <div class="reward-details">
+          <ul>
+            <li>One-time reward per GitHub account</li>
+            <li>Star the repo and claim instantly</li>
+            <li>Verified automatically via GitHub API</li>
+          </ul>
+        </div>
+        <span class="reward-badge reward-badge-fixed">Instant Claim</span>
+      </div>
+
+      <div class="reward-card reward-card-highlight">
+        <div class="reward-card-header">
+          <span class="reward-icon">&#128270;</span>
+          <span class="reward-category">Issue Discovery</span>
+        </div>
+        <div class="reward-amount">
+          <span class="reward-value">10,000+</span>
+          <span class="reward-unit">NOX</span>
+        </div>
+        <div class="reward-action">Report valid issues</div>
+        <div class="reward-details">
+          <ul>
+            <li>Security vulnerabilities: 50K-500K NOX</li>
+            <li>Critical bugs: 25K-100K NOX</li>
+            <li>Feature suggestions: 10K-50K NOX</li>
+            <li>Documentation issues: 10K-25K NOX</li>
+          </ul>
+        </div>
+        <span class="reward-badge reward-badge-reviewed">Reviewed</span>
+      </div>
+
+      <div class="reward-card reward-card-primary">
+        <div class="reward-card-header">
+          <span class="reward-icon">&#128187;</span>
+          <span class="reward-category">Code Contributions</span>
+        </div>
+        <div class="reward-amount">
+          <span class="reward-value">Dynamic</span>
+          <span class="reward-unit">NOX</span>
+        </div>
+        <div class="reward-action">Submit pull requests</div>
+        <div class="reward-details">
+          <ul>
+            <li>Minor fixes / cleanup: 10K-50K NOX</li>
+            <li>Feature implementation: 50K-250K NOX</li>
+            <li>Subsystem development: 250K-1M NOX</li>
+            <li>Architectural work: 500K-2M+ NOX</li>
+          </ul>
+        </div>
+        <span class="reward-badge reward-badge-dynamic">Impact-Based</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Claim Dashboard Section -->
+<section class="claim-section" id="claim">
+  <div class="claim-section-inner">
+    <h2>Claim Your Rewards</h2>
+    <p class="section-intro">Connect your wallet and verify your GitHub contributions to claim NOX rewards</p>
+
+    <!-- Connect Wallet State -->
+    <div id="connectState" class="claim-connect">
+      <div class="connect-card">
+        <div class="connect-icon">&#128274;</div>
+        <h3>Connect Wallet</h3>
+        <p>Connect your Ethereum wallet to verify contributions and claim rewards</p>
+        <button id="connectWalletBtn" class="btn btn-primary btn-large">Connect Wallet</button>
+        <p class="connect-note">Supports MetaMask, WalletConnect, and other Web3 wallets</p>
+      </div>
+    </div>
+
+    <!-- Connected State -->
+    <div id="connectedState" class="claim-dashboard" style="display: none;">
+
+      <!-- User Reward Summary -->
+      <div class="user-rewards-summary">
+        <div class="user-reward-card">
+          <span class="user-reward-label">Available to Claim</span>
+          <span class="user-reward-value accent" id="availableRewards">0</span>
+          <span class="user-reward-sub">NOX</span>
+        </div>
+        <div class="user-reward-card">
+          <span class="user-reward-label">Total Earned</span>
+          <span class="user-reward-value" id="totalEarned">0</span>
+          <span class="user-reward-sub">NOX</span>
+        </div>
+        <div class="user-reward-card">
+          <span class="user-reward-label">Contributions</span>
+          <span class="user-reward-value" id="contributionCount">0</span>
+          <span class="user-reward-sub">verified</span>
+        </div>
+      </div>
+
+      <!-- GitHub Connection -->
+      <div class="github-section">
+        <div class="github-header">
+          <h3>GitHub Verification</h3>
+          <span class="github-status" id="githubStatus">Not Connected</span>
+        </div>
+
+        <!-- Not Connected to GitHub -->
+        <div id="githubConnectState" class="github-connect">
+          <p>Link your GitHub account to verify your contributions and unlock rewards</p>
+          <div class="github-input-group">
+            <input type="text" id="githubUsername" placeholder="Enter your GitHub username" autocomplete="off">
+            <button id="verifyGithubBtn" class="btn btn-secondary">Verify</button>
+          </div>
+          <p class="github-note">We'll check if you've starred the repository and have any qualifying contributions</p>
+        </div>
+
+        <!-- GitHub Connected -->
+        <div id="githubConnectedState" class="github-connected" style="display: none;">
+          <div class="github-profile">
+            <img id="githubAvatar" src="" alt="" class="github-avatar">
+            <div class="github-info">
+              <span class="github-name" id="githubDisplayName">—</span>
+              <span class="github-username" id="githubLinkedUsername">@username</span>
+            </div>
+            <button id="unlinkGithubBtn" class="btn-unlink">Unlink</button>
+          </div>
+
+          <!-- Contribution Checklist -->
+          <div class="contribution-checklist">
+            <div class="checklist-item" id="checkStar">
+              <span class="checklist-icon pending">&#9711;</span>
+              <div class="checklist-content">
+                <span class="checklist-title">Repository Star</span>
+                <span class="checklist-reward">5,000 NOX</span>
+              </div>
+              <span class="checklist-status" id="starStatus">Checking...</span>
+            </div>
+            <div class="checklist-item" id="checkIssues">
+              <span class="checklist-icon pending">&#9711;</span>
+              <div class="checklist-content">
+                <span class="checklist-title">Submitted Issues</span>
+                <span class="checklist-reward" id="issueReward">—</span>
+              </div>
+              <span class="checklist-status" id="issueStatus">Checking...</span>
+            </div>
+            <div class="checklist-item" id="checkPRs">
+              <span class="checklist-icon pending">&#9711;</span>
+              <div class="checklist-content">
+                <span class="checklist-title">Merged Pull Requests</span>
+                <span class="checklist-reward" id="prReward">—</span>
+              </div>
+              <span class="checklist-status" id="prStatus">Checking...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claim Actions -->
+      <div class="claim-actions" id="claimActions" style="display: none;">
+        <div class="claim-summary">
+          <div class="claim-total">
+            <span class="claim-total-label">Ready to Claim</span>
+            <span class="claim-total-value" id="claimableAmount">0</span>
+            <span class="claim-total-unit">NOX</span>
+          </div>
+          <button id="claimRewardsBtn" class="btn btn-primary btn-large" disabled>Claim Rewards</button>
+        </div>
+        <p class="claim-note">Rewards are sent to your connected wallet address. This action cannot be undone.</p>
+      </div>
+
+      <!-- Approved Rewards Ready to Claim -->
+      <div class="approved-section" id="approvedSection" style="display: none;">
+        <h4>Ready to Claim</h4>
+        <p class="approved-note">Your approved contributions - click to claim each reward:</p>
+        <div class="approved-list" id="approvedList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Pending Contributions -->
+      <div class="pending-section" id="pendingSection" style="display: none;">
+        <h4>Pending Review</h4>
+        <p class="pending-note">These contributions are being reviewed and rewards will be available once approved:</p>
+        <div class="pending-list" id="pendingList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Connected Wallet Info -->
+      <div class="connected-info">
+        <span class="connected-label">Wallet:</span>
+        <span class="connected-address" id="connectedAddress">—</span>
+        <button id="disconnectBtn" class="btn-disconnect">Disconnect</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="contribution-priority">
+  <div class="contribution-priority-inner">
+    <h2>Contribution Value Hierarchy</h2>
+    <p class="section-intro">We prioritize contributions that advance the core mission of NONOS: building a privacy-first, cryptographically verified operating system.</p>
+
+    <div class="priority-tiers">
+      <div class="priority-tier priority-tier-highest">
+        <div class="priority-rank">Highest Value</div>
+        <div class="priority-content">
+          <h3>Core Development</h3>
+          <p>Kernel subsystems, cryptographic implementations, security hardening, driver development, microkernel services, ZK circuit work</p>
+        </div>
+        <div class="priority-multiplier">Up to 5x base rate</div>
+      </div>
+
+      <div class="priority-tier priority-tier-high">
+        <div class="priority-rank">High Value</div>
+        <div class="priority-content">
+          <h3>Security Research</h3>
+          <p>Vulnerability discovery, security audits, exploit mitigation, formal verification, cryptographic analysis</p>
+        </div>
+        <div class="priority-multiplier">Up to 4x base rate</div>
+      </div>
+
+      <div class="priority-tier priority-tier-medium">
+        <div class="priority-rank">Medium Value</div>
+        <div class="priority-content">
+          <h3>Feature Implementation</h3>
+          <p>Application development, UI/UX improvements, tooling, testing infrastructure, documentation</p>
+        </div>
+        <div class="priority-multiplier">Up to 2x base rate</div>
+      </div>
+
+      <div class="priority-tier priority-tier-base">
+        <div class="priority-rank">Base Value</div>
+        <div class="priority-content">
+          <h3>Community Support</h3>
+          <p>Repository stars, issue reporting, community engagement, spreading awareness</p>
+        </div>
+        <div class="priority-multiplier">1x base rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="how-it-works-inner">
+    <h2>How It Works</h2>
+
+    <div class="process-timeline">
+      <div class="process-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>Contribute</h3>
+          <p>Star the repository, open an issue, or submit a pull request on GitHub</p>
+        </div>
+      </div>
+
+      <div class="process-connector"></div>
+
+      <div class="process-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>Connect</h3>
+          <p>Connect your wallet and link your GitHub account to verify contributions</p>
+        </div>
+      </div>
+
+      <div class="process-connector"></div>
+
+      <div class="process-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>Verify</h3>
+          <p>Your contributions are automatically verified via the GitHub API</p>
+        </div>
+      </div>
+
+      <div class="process-connector"></div>
+
+      <div class="process-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h3>Review</h3>
+          <p>Issues and PRs are reviewed for quality and impact by the core team</p>
+        </div>
+      </div>
+
+      <div class="process-connector"></div>
+
+      <div class="process-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h3>Claim</h3>
+          <p>Claim your NOX rewards directly to your connected wallet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reward-rules">
+  <div class="reward-rules-inner">
+    <h2>Reward Criteria</h2>
+
+    <div class="rules-grid">
+      <div class="rule-card">
+        <h3>Stars</h3>
+        <ul>
+          <li>Fixed reward of 5,000 NOX per account</li>
+          <li>Star the repository to claim instantly</li>
+          <li>One reward per GitHub account</li>
+          <li>Verified automatically via GitHub API</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Issues</h3>
+        <ul>
+          <li>Must be valid, reproducible, and clearly documented</li>
+          <li>Duplicate issues receive no reward</li>
+          <li>Security issues may qualify for higher bounties</li>
+          <li>Reward scales with severity and impact</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>Pull Requests</h3>
+        <ul>
+          <li>Must be merged into the main branch</li>
+          <li>Code must pass all tests and reviews</li>
+          <li>Reward based on complexity, impact, and quality</li>
+          <li>Trivial changes may not qualify for rewards</li>
+        </ul>
+      </div>
+
+      <div class="rule-card">
+        <h3>General</h3>
+        <ul>
+          <li>All rewards subject to team discretion</li>
+          <li>Spam, gaming, or abuse disqualifies permanently</li>
+          <li>Program terms may be updated at any time</li>
+          <li>Rewards are non-transferable before distribution</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="trust-section">
+  <div class="trust-section-inner">
+    <h2>Program Integrity</h2>
+
+    <div class="trust-notice">
+      <div class="trust-notice-icon">&#128274;</div>
+      <div class="trust-notice-content">
+        <h4>Anti-Abuse Policy</h4>
+        <p>This program is designed to reward genuine contributors who add real value to NONOS. We actively monitor for and reject:</p>
+        <ul>
+          <li><strong>Spam contributions</strong> - Low-effort issues, trivial PRs, or generated content</li>
+          <li><strong>Multi-accounting</strong> - Multiple accounts controlled by the same person</li>
+          <li><strong>Duplicate submissions</strong> - Issues already reported or known issues</li>
+          <li><strong>Gaming behavior</strong> - Any attempt to manipulate the reward system</li>
+          <li><strong>Bot activity</strong> - Automated or scripted contributions</li>
+        </ul>
+        <p class="trust-notice-action">Accounts found violating these policies are permanently disqualified from all rewards.</p>
+      </div>
+    </div>
+
+    <div class="trust-points">
+      <div class="trust-point">
+        <span class="trust-check">&#10003;</span>
+        <span>All contributions reviewed manually by core team</span>
+      </div>
+      <div class="trust-point">
+        <span class="trust-check">&#10003;</span>
+        <span>Reward amounts determined by actual contribution value</span>
+      </div>
+      <div class="trust-point">
+        <span class="trust-check">&#10003;</span>
+        <span>Transparent criteria publicly documented</span>
+      </div>
+      <div class="trust-point">
+        <span class="trust-check">&#10003;</span>
+        <span>Program updates communicated in advance</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="faq-section-inner">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h3>How do I qualify for rewards?</h3>
+        <p>Star the repository, submit a valid issue, or open a pull request. Then connect your wallet and link your GitHub account to verify your contributions. Star rewards are instant; issues and PRs are reviewed before approval.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Are all issues rewarded?</h3>
+        <p>No. Only valid, original, and useful issues qualify for rewards. Duplicate issues, low-quality reports, or issues that cannot be reproduced do not qualify. The reward amount depends on severity and impact.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>How are PR rewards calculated?</h3>
+        <p>Pull request rewards are based on code complexity, impact on the project, quality of implementation, test coverage, and documentation. Larger architectural contributions receive higher rewards than minor fixes.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>When are rewards distributed?</h3>
+        <p>Star rewards can be claimed immediately after verification. Issue and PR rewards are processed after review, typically within 1-2 weeks of approval. You can claim all available rewards at once.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Can rewards be denied?</h3>
+        <p>Yes. The team reserves the right to deny rewards for any contribution that does not meet quality standards, violates the anti-abuse policy, or does not provide genuine value to the project.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What counts as abuse or spam?</h3>
+        <p>Abuse includes multi-accounting, bot activity, trivial changes submitted solely for rewards, duplicate issues, false vulnerability reports, and any attempt to game or manipulate the reward system.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Can the program change?</h3>
+        <p>Yes. Reward amounts, criteria, and program terms may be updated at any time. Changes will be communicated publicly. Contributions made before changes are evaluated under the terms in effect at submission time.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What wallet do I need?</h3>
+        <p>You need an Ethereum-compatible wallet (MetaMask, WalletConnect, etc.) to receive NOX rewards. Make sure you control the private keys and can add custom tokens to view your NOX balance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-section-inner">
+    <h2>Start Contributing</h2>
+    <p>Join the NONOS community and help build the future of privacy-first computing</p>
+
+    <div class="cta-actions">
+      <a href="https://github.com/NON-OS/nonos-kernel" class="btn btn-primary" target="_blank" rel="noopener">
+        <span class="btn-icon">&#9733;</span>
+        Star on GitHub
+      </a>
+      <a href="https://github.com/NON-OS/nonos-kernel/issues/new" class="btn btn-secondary" target="_blank" rel="noopener">
+        <span class="btn-icon">&#128270;</span>
+        Open an Issue
+      </a>
+      <a href="https://github.com/NON-OS/nonos-kernel/fork" class="btn btn-secondary" target="_blank" rel="noopener">
+        <span class="btn-icon">&#128187;</span>
+        Fork and Contribute
+      </a>
+    </div>
+
+    <div class="cta-resources">
+      <h3>Resources</h3>
+      <div class="resource-links">
+        <a href="/docs/">Documentation</a>
+        <a href="/docs/development/build-manual/">Build Manual</a>
+        <a href="/roadmap/">Roadmap</a>
+        <a href="https://github.com/NON-OS/nonos-kernel/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribution Guidelines</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="legal-notice">
+  <div class="legal-notice-inner">
+    <p><strong>Notice:</strong> NOX rewards are provided as contributor incentives for supporting NONOS development. They do not constitute an investment, security, or financial instrument. Reward amounts are determined at the sole discretion of the NONOS team based on contribution value. This program may be modified or discontinued at any time. By participating, you acknowledge that rewards are not guaranteed and depend on contribution quality and review outcomes.</p>
+  </div>
+</section>
+
+<!-- Status Toast -->
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+<script src="/js/walletconnect.bundle.js"></script>
+<script src="/js/contribute.bundle.js"></script>
+{{ end }}
