@@ -6,8 +6,8 @@ weight: 5
 
 # NØNOS Alpha Technical Specification
 
-**Version 0.8.0-alpha**
-**Document Revision: 2026-03-03**
+**Version 0.8.2.2-alpha**
+**Document Revision: 2026-03-14**
 
 
 ## 1. Abstract
@@ -1253,7 +1253,7 @@ This section defines mathematical notation used throughout this document.
 
 ## Document Conclusion
 
-This specification describes NØNOS version 0.8.0-alpha in comprehensive technical detail. The system provides the most advanced privacy-focused computing environment available, combining architectural innovations with state-of-the-art cryptography and comprehensive security mechanisms.
+This specification describes NØNOS version 0.8.2.2-alpha in comprehensive technical detail. The system provides the most advanced privacy-focused computing environment available, combining architectural innovations with state-of-the-art cryptography and comprehensive security mechanisms.
 
 The ZeroState architecture ensures that default operation leaves no forensic trace. No swap files, no temporary files, no caches, no logs persist beyond session termination. Users gain strong privacy assurance through structural guarantees rather than trusting encryption alone.
 

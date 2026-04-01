@@ -5,21 +5,21 @@ description: "Download NØNOS operating system images"
 
 ## Current Release
 
-**NØNOS 0.8.1-alpha** (March 7, 2026)
+**NØNOS 0.8.3.6-alpha** (March 28, 2026)
 
-Hardware compatibility improvements, ExitBootServices stability fixes, and virtio driver support.
+New UI components, animation system, and desktop improvements.
 
 | File | Size | Format |
 |------|------|--------|
-| [nonos-0.8.1-alpha.iso](/iso/nonos-0.8.1-alpha.iso) | 377 MB | Bootable ISO (optical/VM) |
-| [nonos-0.8.1-alpha.img](/iso/nonos-0.8.1-alpha.img) | 445 MB | Raw disk image (USB) |
+| [nonos-0.8.3.6-alpha.iso](/iso/nonos-0.8.3.6-alpha.iso) | 235 MB | Bootable ISO (optical/VM) |
+| [nonos-0.8.3.6-alpha.img](/iso/nonos-0.8.3.6-alpha.img) | 302 MB | Raw disk image (USB) |
 
 ### Integrity Verification
 
 **SHA256 Checksums:**
 ```
-cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351  nonos-0.8.1-alpha.iso
-a9610a760c7660cca54290570834f250271591d59f1cdae53943d163fb1fb9ca  nonos-0.8.1-alpha.img
+89e5c22e98ec2db286163ad8ff6b8b38c95d73e370f1bda04074c5a14df917ca  nonos-0.8.3.6-alpha.iso
+9aed97c518e2df294d957b5f200d9f6eaa9d17e10269c4cf1b65f31539937f2f  nonos-0.8.3.6-alpha.img
 ```
 
 ### Cryptographic Attestation
@@ -30,7 +30,7 @@ Every NØNOS release includes zero-knowledge attestation binding the kernel to i
 |-----------|-------|
 | Program Hash | `fa02d10e8804169a47233e34a6ff3566248958adff55e1248d50304aff4ab230` |
 | Capsule Commitment | `2e0884e37c600272a090d1a90ffbf6e6a367fed38bd912a3dd2062f39c1eff9f` |
-| Signing Key (Ed25519) | `4c5a3309bc2b13c8a85e2f780f7fd714e07e8e589084fac88e37c803634e705c` |
+| Signing Key (Ed25519) | `ea16dcae85b7d995137cbc176603efa13fb1e001571a1369b644e1d44206d236` |
 | Proof System | Groth16 over BLS12-381 |
 | Signature Algorithm | Ed25519 |
 | Integrity Hash | BLAKE3-256 |
@@ -39,9 +39,9 @@ Every NØNOS release includes zero-knowledge attestation binding the kernel to i
 
 | Component | Details |
 |-----------|---------|
-| Kernel Binary | 394,668,080 bytes |
-| Signed Kernel | 394,668,144 bytes (+64 bytes Ed25519 signature) |
-| Attested Kernel | 394,668,544 bytes (+400 bytes ZK proof block) |
+| Kernel Binary | 244,052,904 bytes |
+| Signed Kernel | 244,052,968 bytes (+64 bytes Ed25519 signature) |
+| Attested Kernel | 244,053,368 bytes (+400 bytes ZK proof block) |
 | Toolchain | rustc nightly-2026-01-16 |
 | Target | x86_64-nonos (custom freestanding) |
 
@@ -67,7 +67,7 @@ sha256sum -c SHA256SUMS
 lsblk
 
 # Write (replace sdX with your device)
-sudo dd if=nonos-0.8.1-alpha.iso of=/dev/sdX bs=4M status=progress conv=fsync
+sudo dd if=nonos-0.8.3.6-alpha.iso of=/dev/sdX bs=4M status=progress conv=fsync
 sync
 ```
 
@@ -78,7 +78,7 @@ diskutil list
 
 # Unmount and write (replace N with disk number)
 diskutil unmountDisk /dev/diskN
-sudo dd if=nonos-0.8.1-alpha.iso of=/dev/rdiskN bs=4m
+sudo dd if=nonos-0.8.3.6-alpha.iso of=/dev/rdiskN bs=4m
 diskutil eject /dev/diskN
 ```
 
@@ -144,6 +144,60 @@ See [Build Manual](/docs/development/build-manual/) for full instructions.
 
 ## Previous Releases
 
+### 0.8.3.5-alpha (March 27, 2026)
+
+Native Git client for self-hosted development, network stack optimizations, and desktop environment enhancements.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.3.5-alpha.iso](/iso/nonos-0.8.3.5-alpha.iso) | 235 MB |
+| [nonos-0.8.3.5-alpha.img](/iso/nonos-0.8.3.5-alpha.img) | 302 MB |
+
+### 0.8.3-alpha (March 26, 2026)
+
+NOSH command shell, native NOX staking, ZK wallet proofs, zkSync Era L2, AI agents framework, and application marketplace.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.3-alpha.iso](/iso/nonos-0.8.3-alpha.iso) | 234 MB |
+| [nonos-0.8.3-alpha.img](/iso/nonos-0.8.3-alpha.img) | 301 MB |
+
+### 0.8.2.2-alpha (March 14, 2026)
+
+Alpha Stage Hardening Phase — comprehensive kernel stabilization and security hardening across nearly every layer of the system.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.2.2-alpha.iso](/iso/nonos-0.8.2.2-alpha.iso) | 245 MB |
+| [nonos-0.8.2.2-alpha.img](/iso/nonos-0.8.2.2-alpha.img) | 301 MB |
+
+### 0.8.2-alpha (March 11, 2026)
+
+Native Ethereum wallet with BIP-39/BIP-32 support, secp256k1 signatures, and JSON-RPC integration.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.2-alpha.iso](/iso/nonos-0.8.2-alpha.iso) | 233 MB |
+| [nonos-0.8.2-alpha.img](/iso/nonos-0.8.2-alpha.img) | 301 MB |
+
+### 0.8.1.3-alpha (March 10, 2026)
+
+Security hardening addressing timing side-channels, browser architecture, and ZK engine modularization.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.1.3-alpha.iso](/iso/nonos-0.8.1.3-alpha.iso) | 233 MB |
+| [nonos-0.8.1.3-alpha.img](/iso/nonos-0.8.1.3-alpha.img) | 300 MB |
+
+### 0.8.1-alpha (March 7, 2026)
+
+Hardware compatibility improvements, ExitBootServices stability fixes, and virtio driver support.
+
+| File | Size |
+|------|------|
+| [nonos-0.8.1-alpha.iso](/iso/nonos-0.8.1-alpha.iso) | 377 MB |
+| [nonos-0.8.1-alpha.img](/iso/nonos-0.8.1-alpha.img) | 445 MB |
+
 ### 0.8.0-alpha (March 5, 2026)
 
 First public release with wallet security fixes.
@@ -152,19 +206,6 @@ First public release with wallet security fixes.
 |------|------|
 | [nonos-0.8.0-alpha.iso](/iso/nonos-0.8.0-alpha.iso) | 377 MB |
 | [nonos-0.8.0-alpha.img](/iso/nonos-0.8.0-alpha.img) | 445 MB |
-
-**SHA256:**
-```
-41c2f64ea4b268db9fab94e20f8300a0f9cc0eb8bae02a02038155aeeb849e11  nonos-0.8.0-alpha.iso
-c0537130e4a11f259d47c5d3df26d8a6e7fa52707952315eb2768c5dc9707c7f  nonos-0.8.0-alpha.img
-```
-
-**ZK Attestation:**
-```
-Program Hash: fa02d10e8804169a47233e34a6ff3566248958adff55e1248d50304aff4ab230
-Proof Hash:   6be8b4e5052dcb89daf178f94892ebc5b5d0e975a813ac9ca0d861d36b66aca4
-VK Hash:      a84d203acbb1ad2b6dcaed6054b992d8d3380d677e9b36db8fa900f2a5ebd0f2
-```
 
 ---
 

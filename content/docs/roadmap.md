@@ -8,26 +8,37 @@ weight: 100
 
 **The Path to the Most Secure Privacy-First Operating System**
 
-**Version 0.8.0-alpha to 1.0.0-beta** | March–July 2026
+**Version 0.8.2.2-alpha to 1.0.0-beta** | March–July 2026
 
 
 ## Mission Statement
 
 NØNOS exists to deliver an operating system where privacy is not a feature but an architectural guarantee. Every byte of user data remains under user control. No telemetry. No cloud dependencies. No trust assumptions beyond verified cryptographic proofs. The kernel enforces isolation not through policy but through mathematical certainty.
 
-This roadmap defines the 16-week journey from alpha to beta. Upon completion, NØNOS will stand as the most secure general-purpose operating system available to individuals who refuse compromise on privacy.
+This roadmap defines the 16-week journey from alpha to beta.
 
 
-## Current State: Alpha (0.8.0)
+## Current State: Alpha (0.8.2.2)
 
-The alpha release demonstrates core architecture viability. The kernel boots, schedules processes, manages memory, and provides cryptographic primitives. ZK proof generation and verification function. The capability system enforces basic access control. Storage and network drivers operate in controlled environments.
+The alpha release is a fully functional operating system with a complete feature set:
 
-Alpha limitations:
-- Filesystem support limited to RAM-based storage
-- No persistent encrypted storage
-- Network stack lacks onion routing integration
-- Hardware compatibility narrow
-- Documentation incomplete
+**What's Working:**
+- Full graphical desktop environment with 8 built-in applications
+- 100+ shell commands (ls, grep, vi, curl, ssh, wallet, etc.)
+- Complete TCP/IP network stack with integrated onion routing
+- 20+ device drivers (AHCI, NVMe, e1000, RTL8139/8168, WiFi, xHCI, audio)
+- RAM filesystem with CryptoFS (ChaCha20-Poly1305 + Merkle tree integrity)
+- Post-quantum cryptography (ML-KEM-768, ML-DSA-3)
+- Ed25519 + Groth16 ZK boot verification
+- 10-type capability-based security system
+- TPM 2.0 integration (basic)
+- ext4/FAT32 read/write for external media
+
+**Alpha Limitations:**
+- All processes execute in ring 0 (user-space isolation for beta)
+- Some WiFi chipsets untested
+- No formal security audit yet
+- Documentation being completed
 - No formal security audit
 
 

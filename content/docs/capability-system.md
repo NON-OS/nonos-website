@@ -6,7 +6,7 @@ weight: 13
 
 # NØNOS Capability System
 
-**Version 0.8.1-alpha** | March 2026
+**Version 0.8.2.2-alpha** | March 2026
 
 NØNOS uses a capability-based security model instead of traditional user/group permissions. Every privileged operation requires holding the appropriate capability. This document explains how capabilities work, what they control, and how they are managed.
 

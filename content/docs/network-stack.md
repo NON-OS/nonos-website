@@ -6,7 +6,7 @@ weight: 17
 
 # NØNOS Network Stack
 
-**Version 0.8.1-alpha** | March 2026
+**Version 0.8.2.2-alpha** | March 2026
 
 NØNOS implements a complete network stack from device drivers through transport protocols to application interfaces. Privacy is built into every layer—onion routing is a first-class transport option, DNS queries go through encrypted channels, and MAC addresses randomize per session.
 

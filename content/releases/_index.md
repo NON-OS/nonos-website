@@ -5,16 +5,16 @@ description: "NØNOS release history and downloads"
 
 # Releases
 
-## Current: 0.8.1-alpha (2026-03-07)
+## Current: 0.8.3.6-alpha (2026-03-28)
 
-Hardware compatibility and stability improvements. This release resolves ExitBootServices hangs on various Intel-based hardware and adds comprehensive virtio driver support for virtual machine deployments.
+New UI components, animation system, and desktop improvements.
 
 ### Download
 
 | File | Size | SHA256 |
 |------|------|--------|
-| [nonos-0.8.1-alpha.iso](/iso/nonos-0.8.1-alpha.iso) | 377 MB | `cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351` |
-| [nonos-0.8.1-alpha.img](/iso/nonos-0.8.1-alpha.img) | 445 MB | `a9610a760c7660cca54290570834f250271591d59f1cdae53943d163fb1fb9ca` |
+| [nonos-0.8.3.6-alpha.iso](/iso/nonos-0.8.3.6-alpha.iso) | 235 MB | `89e5c22e98ec2db286163ad8ff6b8b38c95d73e370f1bda04074c5a14df917ca` |
+| [nonos-0.8.3.6-alpha.img](/iso/nonos-0.8.3.6-alpha.img) | 302 MB | `9aed97c518e2df294d957b5f200d9f6eaa9d17e10269c4cf1b65f31539937f2f` |
 
 ### Cryptographic Attestation
 
@@ -24,40 +24,15 @@ Every NØNOS kernel binary is signed with Ed25519 and carries a Groth16 zero-kno
 |-----------|-------|
 | Program Hash | `fa02d10e8804169a47233e34a6ff3566248958adff55e1248d50304aff4ab230` |
 | Capsule Commitment | `2e0884e37c600272a090d1a90ffbf6e6a367fed38bd912a3dd2062f39c1eff9f` |
-| Signing Key | `4c5a3309bc2b13c8a85e2f780f7fd714e07e8e589084fac88e37c803634e705c` |
-
-### Changes from 0.8.0
-
-**Bug Fixes:**
-- Resolved ExitBootServices hang affecting Intel Core i5-11400H, various Acer and HP systems
-- Fixed cursor disappearing in Settings application under Proxmox virtualization
-- Corrected memory map handling for systems with fragmented UEFI memory regions
-
-**New Drivers:**
-- virtio-rng-pci: Hardware random number generator for virtual machines
-- virtio-net: Primary network driver for QEMU/KVM environments
-
-**Improvements:**
-- Reduced boot time by optimizing UEFI protocol enumeration
-- Enhanced serial console output for debugging
-
-### Codebase Statistics
-
-| Component | Value |
-|-----------|-------|
-| Kernel Source | 355,000 lines of Rust |
-| Bootloader Source | 30,684 lines of Rust |
-| Total Rust Code | 385,684 lines |
-| Source Files | 3,353 |
-| Kernel Subsystems | 34 |
+| Signing Key | `ea16dcae85b7d995137cbc176603efa13fb1e001571a1369b644e1d44206d236` |
 
 ### Build Information
 
 | Parameter | Value |
 |-----------|-------|
-| Kernel Binary | 394,668,080 bytes |
-| Signed Kernel | 394,668,144 bytes |
-| Attested Kernel | 394,668,544 bytes |
+| Kernel Binary | 244,052,904 bytes |
+| Signed Kernel | 244,052,968 bytes |
+| Attested Kernel | 244,053,368 bytes |
 | Toolchain | rustc nightly-2026-01-16 |
 | Target | x86_64-nonos |
 
@@ -143,6 +118,60 @@ Every NØNOS kernel binary is signed with Ed25519 and carries a Groth16 zero-kno
 ---
 
 ## Release History
+
+### 0.8.3.5-alpha (2026-03-27)
+
+Native Git client for self-hosted development, network stack optimizations, and desktop environment enhancements.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| [nonos-0.8.3.5-alpha.iso](/iso/nonos-0.8.3.5-alpha.iso) | 235 MB | `81957fb0766366ef953b7a16a589afe595e73b136edab772f65d2c242f95978f` |
+| [nonos-0.8.3.5-alpha.img](/iso/nonos-0.8.3.5-alpha.img) | 302 MB | `1957b108a36f6d3f48092b7ad88a7578207fa68028eb9b2d7eb36a13125dedd7` |
+
+### 0.8.3-alpha (2026-03-26)
+
+NOSH command shell, native NOX staking, ZK wallet proofs, zkSync Era L2, AI agents framework, and application marketplace.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| [nonos-0.8.3-alpha.iso](/iso/nonos-0.8.3-alpha.iso) | 234 MB | `df5a9db7802ccef942e1410c50e9a140b48ca614631a55b126894e8b814690e0` |
+| [nonos-0.8.3-alpha.img](/iso/nonos-0.8.3-alpha.img) | 301 MB | `05317cb0e00681e834a824bebb64943fb5c5830e91e8909e1c69dddd692d5177` |
+
+### 0.8.2.2-alpha (2026-03-14)
+
+Alpha Stage Hardening Phase — comprehensive kernel stabilization and security hardening.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| [nonos-0.8.2.2-alpha.iso](/iso/nonos-0.8.2.2-alpha.iso) | 245 MB | `a39730250070a9d6099fe7e0c1e6d159287ac3e099ab61cc27dbf76a2cb1cfa3` |
+| [nonos-0.8.2.2-alpha.img](/iso/nonos-0.8.2.2-alpha.img) | 301 MB | `8226e29228cde74862e9f2002d6727ff0973ba78aee999b69acd48860de698f0` |
+
+### 0.8.2-alpha (2026-03-11)
+
+Native Ethereum wallet with BIP-39/BIP-32 support, secp256k1 signatures, and JSON-RPC integration.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| nonos-0.8.2-alpha.iso | 233 MB | See SHA256SUMS |
+| nonos-0.8.2-alpha.img | 301 MB | See SHA256SUMS |
+
+### 0.8.1.3-alpha (2026-03-10)
+
+Security hardening addressing timing side-channels, browser architecture, and ZK engine modularization.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| nonos-0.8.1.3-alpha.iso | 233 MB | See SHA256SUMS |
+| nonos-0.8.1.3-alpha.img | 300 MB | See SHA256SUMS |
+
+### 0.8.1-alpha (2026-03-07)
+
+Hardware compatibility improvements, ExitBootServices stability fixes, and virtio driver support.
+
+| File | Size | SHA256 |
+|------|------|--------|
+| nonos-0.8.1-alpha.iso | 377 MB | `cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351` |
+| nonos-0.8.1-alpha.img | 445 MB | `a9610a760c7660cca54290570834f250271591d59f1cdae53943d163fb1fb9ca` |
 
 ### 0.8.0-alpha (2026-03-05)
 

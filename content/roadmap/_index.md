@@ -5,7 +5,7 @@ description: "NØNOS Alpha to Beta Development Roadmap"
 
 # Alpha → Beta Roadmap
 
-**Version 0.8.1-alpha → 1.0.0-beta** | March–July 2026
+**Version 0.8.2.2-alpha → 1.0.0-beta** | March–July 2026
 
 
 ## Mission Statement
@@ -15,7 +15,7 @@ NØNOS exists to deliver an operating system where privacy is not a feature but 
 This roadmap defines the 16-week journey from alpha to beta.
 
 
-## Current State: Alpha (0.8.1)
+## Current State: Alpha (0.8.2.2)
 
 The alpha release is a fully functional operating system with a complete feature set:
 

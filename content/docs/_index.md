@@ -5,7 +5,7 @@ description: "NØNOS Technical Documentation"
 
 # Documentation
 
-Complete technical documentation for NØNOS 0.8.1-alpha.
+Complete technical documentation for NØNOS 0.8.2.2-alpha.
 
 
 ## Getting Started
@@ -51,6 +51,14 @@ Kernel internals and interfaces.
 Building and contributing to NØNOS.
 
 - [**Build Manual**](/docs/development/build-manual/) — Complete build instructions
+
+
+## Whitepapers
+
+In-depth technical specifications.
+
+- [**ZK Hardware Attestation**](/docs/zk-attestation-whitepaper.html) — Zero-knowledge boot integrity proofs
+- [**NOX Staking**](/docs/nox-staking-whitepaper.html) — Staking protocol specification
 
 
 ## Quick Links
