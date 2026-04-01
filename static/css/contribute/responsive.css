@@ -1,0 +1,46 @@
+@media (max-width: 1000px) {
+  .reward-cards { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+  .rules-grid { grid-template-columns: repeat(2, 1fr); }
+  .priority-tier { grid-template-columns: 1fr; gap: var(--space-sm); }
+  .priority-multiplier { text-align: left; }
+  .process-timeline { flex-direction: column; align-items: center; }
+  .process-step { max-width: 300px; }
+  .process-connector { width: 2px; height: 24px; flex: 0 0 24px; margin-top: 0; }
+}
+
+@media (max-width: 900px) {
+  .contribute-stats-inner { grid-template-columns: repeat(2, 1fr); }
+  .user-rewards-summary { grid-template-columns: 1fr; }
+  .claim-summary { flex-direction: column; text-align: center; }
+  .claim-total { flex-direction: column; align-items: center; }
+}
+
+@media (max-width: 768px) {
+  .contribute-title { font-size: 2rem; }
+  .rules-grid { grid-template-columns: 1fr; }
+  .faq-grid { grid-template-columns: 1fr; }
+  .trust-notice { flex-direction: column; gap: var(--space-md); }
+  .trust-notice-content ul { grid-template-columns: 1fr; }
+  .trust-points { grid-template-columns: 1fr; }
+  .cta-actions { flex-direction: column; align-items: center; }
+  .cta-actions .btn { width: 100%; max-width: 300px; }
+  .resource-links { flex-direction: column; gap: var(--space-sm); }
+}
+
+@media (max-width: 600px) {
+  .contribute-stats-inner { grid-template-columns: 1fr; }
+  .github-input-group { flex-direction: column; }
+  .github-profile { flex-direction: column; text-align: center; }
+  .checklist-item { flex-wrap: wrap; }
+  .checklist-status { width: 100%; text-align: center; margin-top: var(--space-xs); }
+  .connected-info { flex-direction: column; text-align: center; }
+  .toast { left: var(--space-md); right: var(--space-md); max-width: none; }
+}
+
+@media (max-width: 500px) {
+  .contribute-hero { padding: var(--space-xl) 0; }
+  .contribute-title { font-size: 1.75rem; letter-spacing: 2px; }
+  .contribute-tagline { letter-spacing: 2px; }
+  .reward-value { font-size: 1.75rem; }
+  .step-number { width: 40px; height: 40px; font-size: 1rem; }
+}

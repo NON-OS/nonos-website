@@ -1,0 +1,80 @@
+.contribute-stats {
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+
+.contribute-stats-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+.contribute-stats .stat-card {
+  text-align: center;
+  padding: var(--space-lg);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent-dim);
+}
+
+.contribute-stats .stat-label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: var(--space-sm); }
+.contribute-stats .stat-value { display: block; font-size: 1.8rem; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+.contribute-stats .stat-sub { display: block; font-size: 0.75rem; color: var(--text-muted); margin-top: var(--space-xs); }
+
+.contribute-stats .stat-card-highlight {
+  border-top: 2px solid var(--accent);
+  background: linear-gradient(180deg, rgba(102, 255, 255, 0.03) 0%, var(--bg-primary) 100%);
+}
+
+.contribute-stats .stat-card-highlight .stat-value { color: var(--accent); }
+
+.contract-info { padding: var(--space-md) 0; background: var(--bg-primary); border-bottom: 1px solid var(--border); }
+
+.contract-info-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.contract-badge { display: flex; align-items: center; gap: var(--space-sm); }
+.contract-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); padding: var(--space-xs) var(--space-sm); background: var(--bg-secondary); border: 1px solid var(--border); }
+
+.contract-address {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-dim);
+  transition: all 0.2s ease;
+}
+
+.contract-address:hover { background: rgba(102, 255, 255, 0.1); border-color: var(--accent); }
+.contract-stats-mini { display: flex; gap: var(--space-lg); flex-wrap: wrap; }
+.mini-stat { font-size: 0.75rem; color: var(--text-muted); }
+.mini-stat strong { color: var(--text-primary); font-family: var(--font-mono); }
+.status-live { color: #4ade80 !important; animation: pulse-live 2s infinite; }
+
+.user-rewards-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+
+.user-reward-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.user-reward-label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: var(--space-sm); }
+.user-reward-value { display: block; font-size: 1.75rem; font-weight: 600; color: var(--text-primary); font-family: var(--font-mono); }
+.user-reward-value.accent { color: var(--accent); text-shadow: 0 0 20px rgba(102, 255, 255, 0.3); }
+.user-reward-sub { display: block; font-size: 0.7rem; color: var(--text-muted); }

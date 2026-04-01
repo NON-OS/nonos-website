@@ -1,0 +1,30 @@
+@keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.contribution-priority { padding: var(--space-2xl) 0; border-bottom: 1px solid var(--border); }
+.contribution-priority-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-lg); }
+.contribution-priority h2 { text-align: center; font-size: 1.5rem; margin-bottom: var(--space-md); color: var(--text-primary); }
+.priority-tiers { display: flex; flex-direction: column; gap: var(--space-md); max-width: 900px; margin: 0 auto; }
+.priority-tier { display: grid; grid-template-columns: 140px 1fr 120px; gap: var(--space-lg); align-items: center; padding: var(--space-lg); background: var(--bg-secondary); border: 1px solid var(--border); transition: all 0.2s ease; }
+.priority-tier:hover { border-color: var(--accent-dim); }
+.priority-tier-highest { border-left: 4px solid var(--accent); background: linear-gradient(90deg, rgba(102, 255, 255, 0.08) 0%, var(--bg-secondary) 100%); }
+.priority-tier-high { border-left: 4px solid var(--accent-dim); }
+.priority-tier-medium { border-left: 4px solid var(--border-light, #333); }
+.priority-tier-base { border-left: 4px solid var(--border); }
+.priority-rank { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 600; }
+.priority-tier-high .priority-rank { color: var(--accent-dim); }
+.priority-tier-medium .priority-rank, .priority-tier-base .priority-rank { color: var(--text-muted); }
+.priority-content h3 { font-size: 1rem; margin: 0 0 var(--space-xs); color: var(--text-primary); }
+.priority-content p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.priority-multiplier { font-size: 0.9rem; font-weight: 600; color: var(--accent); font-family: var(--font-mono); text-align: right; }
+.priority-tier-medium .priority-multiplier, .priority-tier-base .priority-multiplier { color: var(--text-secondary); }
+.reward-rules { padding: var(--space-2xl) 0; border-bottom: 1px solid var(--border); }
+.reward-rules-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-lg); }
+.reward-rules h2 { text-align: center; font-size: 1.5rem; margin-bottom: var(--space-xl); color: var(--text-primary); }
+.rules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+.rule-card { background: var(--bg-secondary); border: 1px solid var(--border); border-top: 2px solid var(--accent-dim); padding: var(--space-lg); }
+.rule-card h3 { font-size: 0.9rem; margin: 0 0 var(--space-md); color: var(--accent); }
+.rule-card ul { list-style: none; padding: 0; margin: 0; }
+.rule-card li { font-size: 0.8rem; color: var(--text-secondary); padding: var(--space-xs) 0 var(--space-xs) var(--space-md); position: relative; line-height: 1.5; border-bottom: 1px solid var(--border); }
+.rule-card li:last-child { border-bottom: none; }
+.rule-card li::before { content: ''; position: absolute; left: 0; top: 0.8em; width: 4px; height: 4px; background: var(--accent-dim); }
