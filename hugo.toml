@@ -63,21 +63,34 @@ disableKinds = ["taxonomy", "term", "RSS"]
 [params]
   description = "Sovereignty From Ø — Documentation and Downloads"
   author = "NØNOS Operating System"
-  version = "0.8.1-alpha"
+  version = "0.8.3.6-alpha"
   disableExternalJS = true
   disableExternalCSS = true
   disableAnalytics = true
   disableFonts = true
   onionAddress = "6g7cvpp3ajxl4u4golj522b4meiz3sua2eufafwjd3usu4g6n2enqmyd.anon"
-  currentRelease = "0.8.1-alpha"
-  releaseDate = "2026-03-07"
-  isoSize = "377 MB"
-  imgSize = "445 MB"
-  isoSHA256 = "cf0e0dc3f05b2cc059cefa95fab13c969e52a3a3db3b5de81b36904d3327a351"
+  currentRelease = "0.8.3.6-alpha"
+  releaseDate = "2026-03-28"
+  isoSize = "235 MB"
+  imgSize = "302 MB"
+  isoSHA256 = "89e5c22e98ec2db286163ad8ff6b8b38c95d73e370f1bda04074c5a14df917ca"
+  imgSHA256 = "9aed97c518e2df294d957b5f200d9f6eaa9d17e10269c4cf1b65f31539937f2f"
   isoBLAKE3 = ""
   disableCSP = true
 
 [menus]
+  [[menus.main]]
+    name = "ZK NONOS"
+    url = "/docs/zk-attestation-whitepaper.html"
+    weight = 2
+  [[menus.main]]
+    name = "Staking"
+    pageRef = "/staking"
+    weight = 3
+  [[menus.main]]
+    name = "Contribute"
+    pageRef = "/contribute"
+    weight = 4
   [[menus.main]]
     name = "News"
     pageRef = "/news"

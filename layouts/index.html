@@ -15,8 +15,9 @@
   <div class="features-inner">
     <h2>Latest News</h2>
     <ul class="news-list">
-      <li><span class="news-date">2026-03-07</span> <a href="/news/#2026-03-07--nønos-081-alpha-released">NØNOS 0.8.1-alpha Released</a></li>
-      <li><span class="news-date">2026-03-05</span> <a href="/news/#2026-03-05--nønos-080-alpha-first-public-release">First Public Release</a></li>
+      <li><span class="news-date">2026-03-31</span> <a href="/news/v084-release/">NØNOS 0.8.4-alpha: First Complete Microkernel Desktop</a></li>
+      <li><span class="news-date">2026-03-28</span> <a href="/news/v0836-release/">NØNOS 0.8.3.6-alpha Released</a></li>
+      <li><span class="news-date">2026-03-27</span> <a href="/news/v0835-release/">NØNOS 0.8.3.5-alpha Released</a></li>
     </ul>
     <p><a href="/news/">All news...</a></p>
   </div>
@@ -55,24 +56,31 @@
 
 <section class="features">
   <div class="features-inner">
-    <h2>Alpha Release 0.8.1</h2>
-    <p>A complete operating system that boots on real hardware. Full graphical desktop with 8 applications, 100+ shell commands, integrated onion routing, and post-quantum cryptography.</p>
+    <h2>Alpha Release 0.8.4 — Microkernel Architecture</h2>
+    <p>The first release where the complete graphical desktop runs on fully isolated userspace services. Twelve services communicating via synchronous IPC, each in its own virtual address space. A vulnerability in the network stack cannot compromise the filesystem. A bug in the display compositor cannot leak cryptographic keys.</p>
 
-    <h3>What You Get</h3>
+    <h3>Architectural Highlights</h3>
     <ul>
-      <li><strong>Desktop Environment</strong> — Window compositor, dock, menu bar, and 8 built-in applications</li>
-      <li><strong>Terminal</strong> — Full shell with 100+ commands including ls, grep, sed, vi, curl, ssh</li>
-      <li><strong>Applications</strong> — File Manager, Text Editor, Web Browser, Wallet, Calculator, Settings, Process Manager</li>
-      <li><strong>Networking</strong> — Full TCP/IP stack with onion routing, DoH/DoT, MAC randomization</li>
-      <li><strong>Drivers</strong> — 20+ drivers for storage (AHCI, NVMe), network (e1000, RTL, WiFi), USB, audio</li>
-      <li><strong>Cryptography</strong> — 25+ algorithms including ML-KEM, ML-DSA, Groth16 ZK proofs</li>
-      <li><strong>Filesystem</strong> — RAM filesystem, CryptoFS with ChaCha20-Poly1305, ext4/FAT32 for external media</li>
+      <li><strong>12 Isolated Services</strong> — VFS, display, input, network, crypto, ZK, audio, GPU, apps, agents, shell, desktop</li>
+      <li><strong>~15,000 Line Kernel</strong> — Memory management, scheduling, IPC, capability tokens. Nothing else.</li>
+      <li><strong>Three-Stage Boot Verification</strong> — Ed25519 signature, BLAKE3 hash attestation, Groth16 ZK proof</li>
+      <li><strong>Capability-Gated Filesystem</strong> — No ambient authority. Applications get explicit path capabilities.</li>
+      <li><strong>Isolated Cryptography</strong> — Private keys exist only in crypto_service. Applications receive signatures, never key material.</li>
+      <li><strong>4K Desktop</strong> — Double-buffered compositor with dirty region tracking, PNG wallpapers, 100Hz refresh</li>
+    </ul>
+
+    <h3>What's New in v0.8.4</h3>
+    <ul>
+      <li><strong>Fixed PNG Decompression</strong> — Resolved initialization ordering deadlock during boot</li>
+      <li><strong>Fixed IntelliMouse Protocol</strong> — Proper 4-byte packet handling for scroll wheel support</li>
+      <li><strong>Boot Progress Logging</strong> — Serial output at each stage for debugging hangs</li>
+      <li><strong>Non-Blocking VFS Init</strong> — Eliminated potential deadlock in service startup</li>
     </ul>
 
     <h3>Current Limitations</h3>
     <ul>
-      <li>All processes execute in ring 0 (user-space isolation coming in beta)</li>
-      <li>Volatile storage only—by design. External media support works for intentional persistence</li>
+      <li>Single-core only (SMP support coming in v0.9)</li>
+      <li>Volatile storage by design—external media support for intentional persistence</li>
     </ul>
 
     <h3>Tested Hardware</h3>
