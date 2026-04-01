@@ -34,3 +34,7 @@ __pycache__/
 *.bak
 *.tmp
 *.temp
+
+rewards-api/contracts/out/
+rewards-api/contracts/cache/
+rewards-api/contracts/lib/
