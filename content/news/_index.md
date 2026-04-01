@@ -7,6 +7,71 @@ description: "NØNOS announcements and releases"
 
 ---
 
+## 2026-03-14 — NØNOS 0.8.2.2-alpha Released
+
+This security-focused release expanded from routine verification into a comprehensive audit across nearly every layer of the system.
+
+### Key Improvements
+
+**IPC Infrastructure Validation** — Validated usercopy interface for all kernel-userspace transfers with memory access validation through usercopy API.
+
+**Filesystem Hardening** — Atomic filesystem operations eliminating race conditions. Clipboard path validation and filesystem-aware name limits.
+
+**Syscall Security** — Integer overflow protection with checked arithmetic throughout.
+
+**GUI Improvements** — Enhanced clipboard handling and path validation.
+
+**Code Quality** — 170+ modules refactored for improved maintainability and security.
+
+### Download
+
+| File | Size | SHA256 |
+|------|------|--------|
+| [nonos-0.8.2.2-alpha.iso](/iso/nonos-0.8.2.2-alpha.iso) | 245 MB | `a39730250070a9d6099fe7e0c1e6d159287ac3e099ab61cc27dbf76a2cb1cfa3` |
+| [nonos-0.8.2.2-alpha.img](/iso/nonos-0.8.2.2-alpha.img) | 301 MB | `8226e29228cde74862e9f2002d6727ff0973ba78aee999b69acd48860de698f0` |
+
+---
+
+## 2026-03-11 — NØNOS 0.8.2-alpha Released
+
+Introduced the first functional Ethereum wallet running natively in the NØNOS kernel.
+
+### Wallet Features
+
+- BIP-39 mnemonic generation
+- BIP-32 hierarchical deterministic key derivation
+- secp256k1 ECDSA signatures
+- JSON-RPC integration with Ethereum nodes
+
+### Important Limitations
+
+- No persistent storage (by design)
+- No hardware wallet integration yet
+- x86_64 only
+- Experimental alpha software — not suitable for significant funds
+
+### Download
+
+| File | Size |
+|------|------|
+| [nonos-0.8.2-alpha.iso](/iso/nonos-0.8.2-alpha.iso) | 233 MB |
+| [nonos-0.8.2-alpha.img](/iso/nonos-0.8.2-alpha.img) | 301 MB |
+
+---
+
+## 2026-03-10 — NØNOS 0.8.1.3-alpha Released
+
+Security hardening addressing timing side-channels, browser architecture, and zero-knowledge engine modularization.
+
+### Security Improvements
+
+- Constant-time TLS comparisons
+- Asynchronous HTTPS requests
+- DMA memory barriers in drivers
+- Reorganized zero-knowledge modules for improved auditability
+
+---
+
 ## 2026-03-07 — NØNOS 0.8.1-alpha Released
 
 Two days after the initial launch, we are shipping 0.8.1-alpha with critical hardware compatibility fixes and new virtualization support. If 0.8.0 hung on your machine, this release should boot.
