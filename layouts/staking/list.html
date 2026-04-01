@@ -1,0 +1,342 @@
+{{ define "main" }}
+<link rel="stylesheet" href="/css/staking.bundle.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js" as="script">
+
+<section class="staking-hero">
+  <div class="staking-hero-inner">
+    <h1 class="staking-title">N<span class="accent">Ø</span>X Staking</h1>
+    <p class="staking-tagline">STAKE · EARN · AMPLIFY</p>
+    <p class="staking-subtitle">Earn NOX rewards with up to 6.25× boost from NFTs + Lock Periods</p>
+    <div class="network-badge">
+      <span class="network-dot"></span>
+      <span>Ethereum Mainnet</span>
+    </div>
+  </div>
+</section>
+
+<section class="staking-stats">
+  <div class="staking-stats-inner">
+    <div class="stat-card">
+      <span class="stat-label">Total Staked</span>
+      <span class="stat-value" id="totalStaked">—</span>
+      <span class="stat-sub">NOX</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">APY (Base)</span>
+      <span class="stat-value" id="baseApy">—</span>
+      <span class="stat-sub">%</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">APY (Max Boost)</span>
+      <span class="stat-value" id="maxApy">—</span>
+      <span class="stat-sub">%</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Total Distributed</span>
+      <span class="stat-value" id="totalDistributed">—</span>
+      <span class="stat-sub">NOX</span>
+    </div>
+  </div>
+</section>
+
+<section class="lock-stats">
+  <div class="lock-stats-inner">
+    <h3>Lock Distribution</h3>
+    <div class="lock-stats-grid">
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">No Lock</span>
+        <span class="lock-stat-amount" id="lockStat0">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">30 Days</span>
+        <span class="lock-stat-amount" id="lockStat30">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">60 Days</span>
+        <span class="lock-stat-amount" id="lockStat60">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">90 Days</span>
+        <span class="lock-stat-amount" id="lockStat90">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">180 Days</span>
+        <span class="lock-stat-amount" id="lockStat180">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+      <div class="lock-stat-item">
+        <span class="lock-stat-period">365 Days</span>
+        <span class="lock-stat-amount" id="lockStat365">—</span>
+        <span class="lock-stat-sub">NOX</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="staking-main">
+  <div class="staking-main-inner">
+
+    <!-- Connect Wallet State -->
+    <div id="connectState" class="staking-connect">
+      <div class="connect-card">
+        <h2>Connect Wallet</h2>
+        <p>Connect your Ethereum wallet to stake NOX tokens and view your rewards.</p>
+        <button id="connectBtn" class="btn btn-primary btn-large">Connect Wallet</button>
+        <p class="connect-note">Supports MetaMask, WalletConnect, and other Web3 wallets</p>
+      </div>
+    </div>
+
+    <!-- Connected State -->
+    <div id="connectedState" class="staking-dashboard" style="display: none;">
+
+      <!-- User Stats -->
+      <div class="user-stats">
+        <div class="user-stat">
+          <span class="user-stat-label">Your Stake</span>
+          <span class="user-stat-value" id="userStake">0</span>
+          <span class="user-stat-sub">NOX</span>
+        </div>
+        <div class="user-stat">
+          <span class="user-stat-label">Weighted Stake</span>
+          <span class="user-stat-value" id="userWeighted">0</span>
+          <span class="user-stat-sub">NOX</span>
+        </div>
+        <div class="user-stat">
+          <span class="user-stat-label">Pending Rewards</span>
+          <span class="user-stat-value accent" id="userPending">0</span>
+          <span class="user-stat-sub">NOX</span>
+        </div>
+        <div class="user-stat">
+          <span class="user-stat-label">Your Boost</span>
+          <span class="user-stat-value" id="userBoost">1.00</span>
+          <span class="user-stat-sub">×</span>
+        </div>
+      </div>
+
+      <!-- Lock Status -->
+      <div class="lock-status" id="lockStatus" style="display: none;">
+        <div class="lock-status-inner">
+          <span class="lock-icon">&#128274;</span>
+          <div class="lock-details">
+            <span class="lock-label">Stake Locked</span>
+            <span class="lock-countdown" id="lockCountdown">—</span>
+          </div>
+          <span class="lock-boost-badge" id="lockBoostBadge">+0%</span>
+        </div>
+      </div>
+
+      <!-- Your ZeroState Pass NFTs -->
+      <div class="nft-gallery-section" id="nftGallerySection" style="display: none;">
+        <div class="nft-gallery-header">
+          <h3>Your ZeroState Pass NFTs</h3>
+          <span class="nft-gallery-count"><span id="nftGalleryCount">0</span> owned</span>
+        </div>
+        <div class="nft-gallery" id="nftGallery">
+          <div class="nft-gallery-loading">Loading NFTs...</div>
+        </div>
+      </div>
+
+      <!-- Boost Info -->
+      <div class="boost-info-grid">
+        <div class="boost-info">
+          <h3>ZeroState Pass Boost</h3>
+          <div class="boost-display">
+            <span class="boost-nft-count"><span id="nftCount">0</span> NFTs</span>
+            <span class="boost-multiplier"><span id="boostMultiplier">1.00</span>×</span>
+          </div>
+          <div class="boost-tiers">
+            <div class="boost-tier" data-tier="0"><span>0</span><span>1.00×</span></div>
+            <div class="boost-tier" data-tier="1"><span>1</span><span>1.25×</span></div>
+            <div class="boost-tier" data-tier="2"><span>2</span><span>1.50×</span></div>
+            <div class="boost-tier" data-tier="3"><span>3</span><span>1.75×</span></div>
+            <div class="boost-tier" data-tier="4"><span>4</span><span>2.00×</span></div>
+            <div class="boost-tier" data-tier="5"><span>5+</span><span>2.50×</span></div>
+          </div>
+        </div>
+        <div class="boost-info">
+          <h3>Lock Period Boost</h3>
+          <div class="boost-display">
+            <span class="boost-nft-count" id="lockDaysDisplay">No Lock</span>
+            <span class="boost-multiplier"><span id="lockMultiplier">1.00</span>×</span>
+          </div>
+          <div class="boost-tiers">
+            <div class="boost-tier" data-lock="0"><span>None</span><span>1.00×</span></div>
+            <div class="boost-tier" data-lock="30"><span>30d</span><span>1.20×</span></div>
+            <div class="boost-tier" data-lock="60"><span>60d</span><span>1.40×</span></div>
+            <div class="boost-tier" data-lock="90"><span>90d</span><span>1.60×</span></div>
+            <div class="boost-tier" data-lock="180"><span>180d</span><span>1.80×</span></div>
+            <div class="boost-tier" data-lock="365"><span>365d</span><span>2.50×</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Cards -->
+      <div class="action-cards">
+
+        <!-- Stake Card -->
+        <div class="action-card">
+          <h3>Stake NOX</h3>
+          <div class="input-group">
+            <input type="text" id="stakeAmount" placeholder="0.0" autocomplete="off">
+            <button class="max-btn" id="stakeMaxBtn">MAX</button>
+          </div>
+          <div class="balance-row">
+            <span>Balance:</span>
+            <span id="walletBalance">0</span>
+            <span>NOX</span>
+          </div>
+          <div class="lock-selector">
+            <label>Lock Period <span class="lock-boost-preview" id="lockBoostPreview"></span></label>
+            <select id="lockPeriod">
+              <option value="0">No Lock (1.0×)</option>
+              <option value="2592000">30 Days (1.2×)</option>
+              <option value="5184000">60 Days (1.4×)</option>
+              <option value="7776000">90 Days (1.6×)</option>
+              <option value="15552000">180 Days (1.8×)</option>
+              <option value="31536000">365 Days (2.5×)</option>
+            </select>
+          </div>
+          <button id="stakeBtn" class="btn btn-primary btn-full">Stake</button>
+        </div>
+
+        <!-- Unstake Card -->
+        <div class="action-card">
+          <h3>Unstake NOX</h3>
+          <div class="input-group">
+            <input type="text" id="unstakeAmount" placeholder="0.0" autocomplete="off">
+            <button class="max-btn" id="unstakeMaxBtn">MAX</button>
+          </div>
+          <div class="balance-row">
+            <span>Staked:</span>
+            <span id="stakedBalance">0</span>
+            <span>NOX</span>
+          </div>
+          <button id="unstakeBtn" class="btn btn-secondary btn-full">Unstake</button>
+        </div>
+
+        <!-- Claim Card -->
+        <div class="action-card claim-card">
+          <h3>Claim Rewards</h3>
+          <div class="claim-amount">
+            <span class="claim-value" id="claimableRewards">0.00</span>
+            <span class="claim-label">NOX</span>
+          </div>
+          <button id="claimBtn" class="btn btn-primary btn-full">Claim Rewards</button>
+        </div>
+
+      </div>
+
+      <!-- Your Positions (V3) -->
+      <div class="positions-section">
+        <h3>Your Positions</h3>
+        <div id="positionsContainer" class="positions-grid">
+          <div class="no-positions">Connect wallet to view positions</div>
+        </div>
+      </div>
+
+      <!-- Connected Address -->
+      <div class="connected-info">
+        <span class="connected-label">Connected:</span>
+        <span class="connected-address" id="connectedAddress">—</span>
+        <button id="disconnectBtn" class="btn-disconnect">Disconnect</button>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="staking-info">
+  <div class="staking-info-inner">
+    <h2>Staking V3 Update</h2>
+    <div class="v2-notice">
+      <div class="v2-notice-icon">&#9889;</div>
+      <div class="v2-notice-content">
+        <h4>Multi-Position Staking + Early Unlock</h4>
+        <p>Create up to <strong>10 separate stake positions</strong> with different lock periods. New <strong>early unlock</strong> feature lets you exit locked positions with a penalty fee.</p>
+        <p class="v2-notice-action">Existing stakers: Your stake is automatically migrated when you interact with the contract.</p>
+      </div>
+    </div>
+
+    <div class="penalty-banner" id="penaltyBanner">
+      <div class="penalty-banner-inner">
+        <span class="penalty-label">Early Unlock Penalty:</span>
+        <span class="penalty-value" id="penaltyValue">5%</span>
+        <span class="penalty-status active">ACTIVE - 5% burned on early exit</span>
+      </div>
+    </div>
+
+    <h2>Boost Multipliers</h2>
+    <div class="boost-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Lock Period</th>
+            <th>Lock Boost</th>
+            <th>+ 5 NFTs (2.5×)</th>
+            <th>Total Max</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>No Lock</td><td>1.00×</td><td>2.50×</td><td>2.50×</td></tr>
+          <tr><td>30 Days</td><td>1.20×</td><td>2.50×</td><td>3.00×</td></tr>
+          <tr><td>60 Days</td><td>1.40×</td><td>2.50×</td><td>3.50×</td></tr>
+          <tr><td>90 Days</td><td>1.60×</td><td>2.50×</td><td>4.00×</td></tr>
+          <tr><td>180 Days</td><td>1.80×</td><td>2.50×</td><td>4.50×</td></tr>
+          <tr><td>365 Days</td><td>2.50×</td><td>2.50×</td><td>6.25×</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Documentation</h2>
+    <div class="whitepaper-download">
+      <p>Learn about the NOX staking protocol mechanics, emission schedule, NFT amplification system, and economic analysis in our technical whitepaper.</p>
+      <a href="/docs/nox-staking-whitepaper.html" class="btn btn-secondary" target="_blank" rel="noopener">Read Whitepaper</a>
+    </div>
+
+    <h2>Emission Schedule</h2>
+    <div class="emission-cards">
+      <div class="emission-card">
+        <span class="emission-year">Year 1</span>
+        <span class="emission-amount">28,000,000 NOX</span>
+        <span class="emission-daily">~76,712 NOX/day</span>
+      </div>
+      <div class="emission-card">
+        <span class="emission-year">Year 2</span>
+        <span class="emission-amount">12,000,000 NOX</span>
+        <span class="emission-daily">~32,877 NOX/day</span>
+      </div>
+    </div>
+
+    <h2>Contract Addresses</h2>
+    <div class="contract-addresses">
+      <div class="address-row">
+        <span class="address-label">Staking Contract</span>
+        <code class="address-value">0xa94d6009790ba13597a1e1b7cf4e1531ea513613</code>
+        <a href="https://etherscan.io/address/0xa94d6009790ba13597a1e1b7cf4e1531ea513613" target="_blank" rel="noopener" class="address-link">View</a>
+      </div>
+      <div class="address-row">
+        <span class="address-label">NOX Token</span>
+        <code class="address-value">0x0a26c80Be4E060e688d7C23aDdB92cBb5D2C9eCA</code>
+        <a href="https://etherscan.io/address/0x0a26c80Be4E060e688d7C23aDdB92cBb5D2C9eCA" target="_blank" rel="noopener" class="address-link">View</a>
+      </div>
+      <div class="address-row">
+        <span class="address-label">ZeroState Pass</span>
+        <code class="address-value">0x7b575DD8e8b111c52Ab1e872924d4Efd4DF403df</code>
+        <a href="https://etherscan.io/address/0x7b575DD8e8b111c52Ab1e872924d4Efd4DF403df" target="_blank" rel="noopener" class="address-link">View</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Status Toast -->
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+<script src="/js/walletconnect.bundle.js"></script>
+<script src="/js/staking.bundle.js"></script>
+{{ end }}
