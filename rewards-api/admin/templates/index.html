@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NONOS Rewards Admin</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #222;
+      --text: #e6edf3;
+      --text-dim: #8b949e;
+      --accent: #66FFFF;
+      --success: #22c55e;
+      --warning: #f5a623;
+      --error: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+    }
+
+    h1 { margin: 0 0 2rem; color: var(--accent); }
+    h2 { margin: 2rem 0 1rem; font-size: 1.2rem; }
+    h3 { margin: 1rem 0 0.5rem; font-size: 1rem; color: var(--text-dim); }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+      font-family: monospace;
+    }
+
+    .login-form {
+      max-width: 400px;
+      margin: 4rem auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+    }
+
+    .login-form h2 { margin-top: 0; }
+
+    input, textarea, button, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--bg);
+      color: var(--text-dim);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:hover { background: rgba(102, 255, 255, 0.03); }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      border-radius: 2px;
+    }
+
+    .badge-open { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+    .badge-closed { background: rgba(239, 68, 68, 0.2); color: var(--error); }
+    .badge-merged { background: rgba(102, 255, 255, 0.2); color: var(--accent); }
+
+    .actions { display: flex; gap: 0.5rem; }
+    .actions button { width: auto; margin: 0; padding: 0.5rem 1rem; font-size: 0.8rem; }
+
+    .merkle-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .reward-entry {
+      display: grid;
+      grid-template-columns: 1fr 150px 100px 80px;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+
+    .reward-entry input { margin: 0; }
+    .reward-entry button { width: auto; }
+
+    .output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+      margin-top: 1rem;
+    }
+
+    .hidden { display: none; }
+
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.5rem;
+      transform: translateY(150%);
+      transition: transform 0.3s;
+    }
+
+    .toast.show { transform: translateY(0); }
+    .toast.error { border-left-color: var(--error); }
+    .toast.success { border-left-color: var(--success); }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin: 0;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+  <!-- Login -->
+  <div id="loginView">
+    <div class="login-form">
+      <h2>Admin Login</h2>
+      <p style="color: var(--text-dim); font-size: 0.9rem;">Enter the admin API key to access the dashboard.</p>
+      <input type="password" id="apiKey" placeholder="API Key">
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboardView" class="hidden">
+    <div class="header">
+      <h1>NONOS Rewards Admin</h1>
+      <button class="btn-secondary" onclick="logout()" style="width: auto;">Logout</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Repo Stars</div>
+        <div class="stat-value" id="statStars">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Open Issues</div>
+        <div class="stat-value" id="statIssues">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Contributors</div>
+        <div class="stat-value" id="statContributors">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">NOX Distributed</div>
+        <div class="stat-value" id="statDistributed">—</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('issues')">Issues</button>
+      <button class="tab" onclick="showTab('prs')">Pull Requests</button>
+      <button class="tab" onclick="showTab('merkle')">Merkle Rewards</button>
+    </div>
+
+    <!-- Issues Tab -->
+    <div id="issuesTab" class="tab-content active">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>State</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="issuesTable">
+            <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRs Tab -->
+    <div id="prsTab" class="tab-content">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>State</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="prsTable">
+            <tr><td colspan="6" style="text-align: center; color: var(--text-dim);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Merkle Tab -->
+    <div id="merkleTab" class="tab-content">
+      <div class="merkle-section">
+        <h3>Batch Reward Allocation</h3>
+        <p style="color: var(--text-dim); font-size: 0.9rem;">
+          Add wallet addresses and reward amounts. Generate Merkle root to update the contract.
+        </p>
+
+        <div id="rewardsList">
+          <div class="reward-entry">
+            <input type="text" placeholder="Wallet Address (0x...)" class="reward-wallet">
+            <input type="number" placeholder="Amount" class="reward-amount">
+            <select class="reward-type">
+              <option value="issue">Issue</option>
+              <option value="pr">PR</option>
+              <option value="other">Other</option>
+            </select>
+            <button class="btn-secondary" onclick="removeRewardEntry(this)">Remove</button>
+          </div>
+        </div>
+
+        <button class="btn-secondary" onclick="addRewardEntry()" style="margin-top: 1rem;">+ Add Entry</button>
+
+        <div style="margin-top: 2rem;">
+          <button onclick="generateMerkle()">Generate Merkle Root</button>
+        </div>
+
+        <div id="merkleOutput" class="output hidden">
+          <strong>Merkle Root:</strong>
+          <div id="merkleRoot" style="margin-top: 0.5rem; color: var(--accent);"></div>
+          <div style="margin-top: 1rem;">
+            <strong>Leaves (for verification):</strong>
+            <pre id="merkleLeaves" style="margin-top: 0.5rem; font-size: 0.8rem; overflow-x: auto;"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+  <script>
+    const API_URL = 'http://localhost:8000';
+    let authToken = '';
+
+    // ============================================
+    // AUTH
+    // ============================================
+
+    function login() {
+      const key = document.getElementById('apiKey').value;
+      if (!key) {
+        showToast('Enter API key', 'error');
+        return;
+      }
+
+      // Generate HMAC token (matches backend)
+      authToken = key; // In production, hash this properly
+
+      // Test auth with API
+      fetch(`${API_URL}/admin/pending`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      })
+      .then(res => {
+        if (res.status === 401) throw new Error('Invalid API key');
+        return res.json();
+      })
+      .then(() => {
+        document.getElementById('loginView').classList.add('hidden');
+        document.getElementById('dashboardView').classList.remove('hidden');
+        loadStats();
+        loadPending();
+        showToast('Logged in', 'success');
+      })
+      .catch(err => {
+        showToast(err.message, 'error');
+      });
+    }
+
+    function logout() {
+      authToken = '';
+      document.getElementById('loginView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('apiKey').value = '';
+    }
+
+    // ============================================
+    // DATA LOADING
+    // ============================================
+
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_URL}/stats`);
+        const data = await res.json();
+
+        document.getElementById('statStars').textContent = data.repo_stars.toLocaleString();
+        document.getElementById('statIssues').textContent = data.open_issues.toLocaleString();
+        document.getElementById('statContributors').textContent = data.contributors || '—';
+        document.getElementById('statDistributed').textContent = '—';
+      } catch (e) {
+        console.error('Failed to load stats:', e);
+      }
+    }
+
+    async function loadPending() {
+      try {
+        const res = await fetch(`${API_URL}/admin/pending`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        const data = await res.json();
+
+        // Render issues
+        const issuesTable = document.getElementById('issuesTable');
+        if (data.issues.length === 0) {
+          issuesTable.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No issues found</td></tr>';
+        } else {
+          issuesTable.innerHTML = data.issues.map(i => `
+            <tr>
+              <td>#${i.number}</td>
+              <td><a href="${i.url}" target="_blank" style="color: var(--text);">${escapeHtml(i.title)}</a></td>
+              <td>${i.user}</td>
+              <td><span class="badge badge-${i.state}">${i.state}</span></td>
+              <td>${new Date(i.created_at).toLocaleDateString()}</td>
+              <td class="actions">
+                <button class="btn-secondary" onclick="addToRewards('${i.user}', 'issue')">Add Reward</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Render PRs
+        const prsTable = document.getElementById('prsTable');
+        if (data.pull_requests.length === 0) {
+          prsTable.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-dim);">No PRs found</td></tr>';
+        } else {
+          prsTable.innerHTML = data.pull_requests.map(pr => `
+            <tr>
+              <td>#${pr.number}</td>
+              <td><a href="${pr.url}" target="_blank" style="color: var(--text);">${escapeHtml(pr.title)}</a></td>
+              <td>${pr.user}</td>
+              <td><span class="badge ${pr.merged ? 'badge-merged' : 'badge-' + pr.state}">${pr.merged ? 'merged' : pr.state}</span></td>
+              <td>${new Date(pr.created_at).toLocaleDateString()}</td>
+              <td class="actions">
+                <button class="btn-secondary" onclick="addToRewards('${pr.user}', 'pr')">Add Reward</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('Failed to load pending:', e);
+        showToast('Failed to load data', 'error');
+      }
+    }
+
+    // ============================================
+    // TABS
+    // ============================================
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      document.querySelector(`.tab[onclick="showTab('${tab}')"]`).classList.add('active');
+      document.getElementById(`${tab}Tab`).classList.add('active');
+    }
+
+    // ============================================
+    // MERKLE
+    // ============================================
+
+    function addRewardEntry() {
+      const list = document.getElementById('rewardsList');
+      const entry = document.createElement('div');
+      entry.className = 'reward-entry';
+      entry.innerHTML = `
+        <input type="text" placeholder="Wallet Address (0x...)" class="reward-wallet">
+        <input type="number" placeholder="Amount" class="reward-amount">
+        <select class="reward-type">
+          <option value="issue">Issue</option>
+          <option value="pr">PR</option>
+          <option value="other">Other</option>
+        </select>
+        <button class="btn-secondary" onclick="removeRewardEntry(this)">Remove</button>
+      `;
+      list.appendChild(entry);
+    }
+
+    function removeRewardEntry(btn) {
+      const entries = document.querySelectorAll('.reward-entry');
+      if (entries.length > 1) {
+        btn.parentElement.remove();
+      }
+    }
+
+    function addToRewards(user, type) {
+      showTab('merkle');
+      addRewardEntry();
+      const entries = document.querySelectorAll('.reward-entry');
+      const last = entries[entries.length - 1];
+      last.querySelector('.reward-wallet').placeholder = `Wallet for @${user}`;
+      last.querySelector('.reward-type').value = type;
+      showToast(`Add wallet for @${user}`, 'success');
+    }
+
+    async function generateMerkle() {
+      const entries = document.querySelectorAll('.reward-entry');
+      const leaves = [];
+
+      for (const entry of entries) {
+        const wallet = entry.querySelector('.reward-wallet').value.trim();
+        const amount = parseInt(entry.querySelector('.reward-amount').value) || 0;
+
+        if (!wallet || !amount) continue;
+
+        try {
+          const checksumWallet = ethers.getAddress(wallet);
+          const amountWei = ethers.parseEther(amount.toString());
+
+          // Create leaf: keccak256(abi.encodePacked(address, amount))
+          const leaf = ethers.solidityPackedKeccak256(
+            ['address', 'uint256'],
+            [checksumWallet, amountWei]
+          );
+
+          leaves.push({
+            wallet: checksumWallet,
+            amount: amount,
+            amountWei: amountWei.toString(),
+            leaf: leaf
+          });
+        } catch (e) {
+          showToast(`Invalid wallet: ${wallet}`, 'error');
+          return;
+        }
+      }
+
+      if (leaves.length === 0) {
+        showToast('Add at least one valid entry', 'error');
+        return;
+      }
+
+      // Simple Merkle root calculation (for demo - use proper library in production)
+      // Sort leaves for deterministic tree
+      leaves.sort((a, b) => a.leaf.localeCompare(b.leaf));
+
+      let layer = leaves.map(l => l.leaf);
+      while (layer.length > 1) {
+        const newLayer = [];
+        for (let i = 0; i < layer.length; i += 2) {
+          if (i + 1 < layer.length) {
+            // Sort pair for consistent ordering
+            const pair = [layer[i], layer[i + 1]].sort();
+            newLayer.push(ethers.solidityPackedKeccak256(['bytes32', 'bytes32'], pair));
+          } else {
+            newLayer.push(layer[i]);
+          }
+        }
+        layer = newLayer;
+      }
+
+      const merkleRoot = layer[0];
+
+      document.getElementById('merkleOutput').classList.remove('hidden');
+      document.getElementById('merkleRoot').textContent = merkleRoot;
+      document.getElementById('merkleLeaves').textContent = JSON.stringify(leaves, null, 2);
+
+      showToast('Merkle root generated', 'success');
+    }
+
+    // ============================================
+    // UTILS
+    // ============================================
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
