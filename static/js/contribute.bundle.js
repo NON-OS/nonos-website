@@ -531,13 +531,40 @@ NoxContribute.init = function() {
   NoxContribute.handleOAuthCallback();
 };
 
+NoxContribute.claimNextReward = function() {
+  var state = NoxContribute.state;
+  if (!state.walletAddress || !state.dashboard) {
+    NoxContribute.showToast('Connect wallet and verify GitHub first', 'error');
+    return;
+  }
+  var d = state.dashboard;
+  // Claim star first if eligible
+  if (d.star.eligible) {
+    NoxContribute.claimStarReward();
+    return;
+  }
+  // Then claim first unclaimed issue
+  var issue = d.issues.approved_list.find(function(i) { return !i.claimed; });
+  if (issue) {
+    NoxContribute.claimItem('issue', issue.issue_number);
+    return;
+  }
+  // Then claim first unclaimed PR
+  var pr = d.prs.approved_list.find(function(p) { return !p.claimed; });
+  if (pr) {
+    NoxContribute.claimItem('pr', pr.pr_number);
+    return;
+  }
+  NoxContribute.showToast('No rewards available to claim', 'info');
+};
+
 NoxContribute.bindEvents = function() {
   var el = NoxContribute.el;
   if (el.connectWalletBtn) el.connectWalletBtn.addEventListener('click', NoxContribute.connectWallet);
   if (el.disconnectBtn) el.disconnectBtn.addEventListener('click', NoxContribute.disconnectWallet);
   if (el.verifyGithubBtn) el.verifyGithubBtn.addEventListener('click', NoxContribute.startGitHubOAuth);
   if (el.unlinkGithubBtn) el.unlinkGithubBtn.addEventListener('click', NoxContribute.unlinkGitHub);
-  if (el.claimRewardsBtn) el.claimRewardsBtn.addEventListener('click', NoxContribute.claimStarReward);
+  if (el.claimRewardsBtn) el.claimRewardsBtn.addEventListener('click', NoxContribute.claimNextReward);
 };
 
 NoxContribute.loadStats = function() {
