@@ -5,7 +5,8 @@ from models import ClaimRequest, ClaimResponse, VerifyResponse
 from github import get_github_user, check_star_status, check_star_status_with_token, get_user_issues, get_user_prs
 from signing import github_hash, generate_nonce, sign_star_claim, sign_issue_claim, sign_pr_claim
 from rate_limiter import rate_limiter
-from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs
+from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs, record_star_claim, record_star_tx, record_issue_tx, record_pr_tx
+from contract import check_star_claimed_onchain, check_issue_claimed_onchain, check_pr_claimed_onchain
 
 router = APIRouter()
 
@@ -47,10 +48,14 @@ async def get_user_dashboard(github_token: str):
     approved_prs = get_approved_prs(username)
     pending_issues = get_user_pending_issues(username)
     pending_prs = get_user_pending_prs(username)
+    # Check on-chain if star already claimed
+    gh_hash = github_hash(username)
+    star_already_claimed = check_star_claimed_onchain(gh_hash)
+    star_eligible = has_starred and not star_already_claimed
     return {
         "username": username,
-        "github_hash": github_hash(username),
-        "star": {"eligible": has_starred, "reward": STAR_REWARD // 10**18},
+        "github_hash": gh_hash,
+        "star": {"eligible": star_eligible, "claimed": star_already_claimed, "reward": STAR_REWARD // 10**18},
         "issues": {"submitted": len(issues), "approved": len(approved_issues), "pending": len(pending_issues), "approved_list": approved_issues},
         "prs": {"submitted": len(merged_prs), "approved": len(approved_prs), "pending": len(pending_prs), "approved_list": approved_prs},
         "rewards": {"star": STAR_REWARD // 10**18, "issue": ISSUE_REWARD // 10**18, "pr_default": DEFAULT_PR_REWARD // 10**18}
@@ -70,6 +75,9 @@ async def claim_star_reward(request: ClaimRequest):
     if not has_starred:
         raise HTTPException(400, "Star the repository to claim your 5,000 NOX reward")
     gh_hash = github_hash(username)
+    # Check if already claimed on-chain
+    if check_star_claimed_onchain(gh_hash):
+        raise HTTPException(400, "Star reward already claimed")
     can_claim, message = rate_limiter.can_claim(gh_hash)
     if not can_claim:
         raise HTTPException(429, message)
@@ -79,6 +87,7 @@ async def claim_star_reward(request: ClaimRequest):
     except Exception as e:
         raise HTTPException(500, f"Failed to sign claim: {str(e)}")
     rate_limiter.record_claim(gh_hash)
+    record_star_claim(username, wallet)
     return ClaimResponse(success=True, amount=str(STAR_REWARD), nonce=nonce, github_hash=gh_hash, signature=signature, message="Star claim ready. Submit to contract.")
 
 @router.post("/claim/issue/{issue_id}", response_model=ClaimResponse)
@@ -94,8 +103,11 @@ async def claim_issue_reward(issue_id: int, request: ClaimRequest):
     if not issue:
         raise HTTPException(400, "Issue not approved or already claimed")
     gh_hash = github_hash(username)
+    # Check if already claimed on-chain
+    if check_issue_claimed_onchain(gh_hash, issue_id):
+        raise HTTPException(400, "Issue reward already claimed on-chain")
     nonce = generate_nonce()
-    amount = issue.get("reward", ISSUE_REWARD)
+    amount = int(issue.get("reward", ISSUE_REWARD))  # Ensure int for web3
     try:
         signature = sign_issue_claim(wallet, amount, nonce, gh_hash, issue_id)
     except Exception as e:
@@ -116,11 +128,39 @@ async def claim_pr_reward(pr_id: int, request: ClaimRequest):
     if not pr:
         raise HTTPException(400, "PR not approved or already claimed")
     gh_hash = github_hash(username)
+    # Check if already claimed on-chain
+    if check_pr_claimed_onchain(gh_hash, pr_id):
+        raise HTTPException(400, "PR reward already claimed on-chain")
     nonce = generate_nonce()
-    amount = pr.get("reward", DEFAULT_PR_REWARD)
+    amount = int(pr.get("reward", DEFAULT_PR_REWARD))  # Ensure int for web3
     try:
         signature = sign_pr_claim(wallet, amount, nonce, gh_hash, pr_id)
     except Exception as e:
         raise HTTPException(500, f"Failed to sign: {str(e)}")
     mark_pr_claimed(username, pr_id)
     return ClaimResponse(success=True, amount=str(amount), nonce=nonce, github_hash=gh_hash, signature=signature, message=f"PR #{pr_id} claim ready.", pr_id=pr_id)
+
+@router.post("/report-tx")
+async def report_transaction(request: dict):
+    """Report TX hash after successful on-chain claim"""
+    tx_hash = request.get("tx_hash")
+    claim_type = request.get("type")  # star, issue, pr
+    github_token = request.get("github_token")
+    item_id = request.get("id")  # issue_number or pr_number
+
+    if not tx_hash or not claim_type or not github_token:
+        raise HTTPException(400, "Missing required fields")
+
+    user = await get_github_user(github_token)
+    username = user["login"]
+
+    if claim_type == "star":
+        record_star_tx(username, tx_hash)
+    elif claim_type == "issue" and item_id:
+        record_issue_tx(username, int(item_id), tx_hash)
+    elif claim_type == "pr" and item_id:
+        record_pr_tx(username, int(item_id), tx_hash)
+    else:
+        raise HTTPException(400, "Invalid claim type")
+
+    return {"success": True, "message": "TX recorded"}
