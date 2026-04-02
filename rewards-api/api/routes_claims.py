@@ -3,7 +3,8 @@ from web3 import Web3
 from config import STAR_REWARD, ISSUE_REWARD, DEFAULT_PR_REWARD
 from models import ClaimRequest, ClaimResponse, VerifyResponse
 from github import get_github_user, check_star_status, check_star_status_with_token, get_user_issues, get_user_prs, check_account_age, MIN_ACCOUNT_AGE_DAYS
-from signing import github_hash, generate_nonce, sign_star_claim, sign_issue_claim, sign_pr_claim
+from signing import github_hash, github_hash_legacy, get_github_hash, generate_nonce, sign_star_claim, sign_issue_claim, sign_pr_claim
+from config import USE_V3_CONTRACT
 from rate_limiter import rate_limiter
 from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs, record_star_claim, record_star_tx, record_issue_tx, record_pr_tx, has_user_id_claimed_star
 from contract import check_star_claimed_onchain, check_issue_claimed_onchain, check_pr_claimed_onchain
@@ -39,6 +40,7 @@ async def verify_contributions(request: ClaimRequest):
 async def get_user_dashboard(github_token: str):
     user = await get_github_user(github_token)
     username = user["login"]
+    user_id = user.get("id")
     has_starred = await check_star_status_with_token(github_token)
     if not has_starred:
         has_starred = await check_star_status(username)
@@ -48,17 +50,28 @@ async def get_user_dashboard(github_token: str):
     approved_prs = get_approved_prs(username)
     pending_issues = get_user_pending_issues(username)
     pending_prs = get_user_pending_prs(username)
-    # Check on-chain status
-    gh_hash = github_hash(username)
+    # Check on-chain status (V3 uses user_id hash)
+    gh_hash = github_hash(user_id)
     star_already_claimed = check_star_claimed_onchain(gh_hash)
+    # Also check V2 contract with legacy username hash
+    if not star_already_claimed:
+        star_already_claimed = check_star_claimed_onchain(github_hash_legacy(username))
+    # Also check DB for user_id (belt and suspenders)
+    if not star_already_claimed:
+        star_already_claimed = has_user_id_claimed_star(user_id)
     star_eligible = has_starred and not star_already_claimed
     # Verify issue/PR claimed status on-chain (override DB if TX failed)
     for issue in approved_issues:
-        issue["claimed"] = check_issue_claimed_onchain(gh_hash, issue["issue_number"])
+        claimed_v3 = check_issue_claimed_onchain(gh_hash, issue["issue_number"])
+        claimed_v2 = check_issue_claimed_onchain(github_hash_legacy(username), issue["issue_number"])
+        issue["claimed"] = claimed_v3 or claimed_v2
     for pr in approved_prs:
-        pr["claimed"] = check_pr_claimed_onchain(gh_hash, pr["pr_number"])
+        claimed_v3 = check_pr_claimed_onchain(gh_hash, pr["pr_number"])
+        claimed_v2 = check_pr_claimed_onchain(github_hash_legacy(username), pr["pr_number"])
+        pr["claimed"] = claimed_v3 or claimed_v2
     return {
         "username": username,
+        "github_user_id": user_id,
         "github_hash": gh_hash,
         "star": {"eligible": star_eligible, "claimed": star_already_claimed, "reward": STAR_REWARD // 10**18},
         "issues": {"submitted": len(issues), "approved": len(approved_issues), "pending": len(pending_issues), "approved_list": approved_issues},
@@ -87,9 +100,12 @@ async def claim_star_reward(request: ClaimRequest):
         has_starred = await check_star_status(username)
     if not has_starred:
         raise HTTPException(400, "Star the repository to claim your 5,000 NOX reward")
-    gh_hash = github_hash(username)
-    # Check if already claimed on-chain (by current username)
+    # V3: Use user_id hash (immutable)
+    gh_hash = github_hash(user_id)
+    # Check if already claimed on-chain (V3 or V2)
     if check_star_claimed_onchain(gh_hash):
+        raise HTTPException(400, "Star reward already claimed")
+    if check_star_claimed_onchain(github_hash_legacy(username)):
         raise HTTPException(400, "Star reward already claimed")
     can_claim, message = rate_limiter.can_claim(gh_hash)
     if not can_claim:
@@ -111,13 +127,17 @@ async def claim_issue_reward(issue_id: int, request: ClaimRequest):
         raise HTTPException(400, "Invalid wallet address")
     user = await get_github_user(request.github_token)
     username = user["login"]
+    user_id = user.get("id")
     approved = get_approved_issues(username)
     issue = next((i for i in approved if i["issue_number"] == issue_id and not i["claimed"]), None)
     if not issue:
         raise HTTPException(400, "Issue not approved or already claimed")
-    gh_hash = github_hash(username)
-    # Check if already claimed on-chain
+    # V3: Use user_id hash
+    gh_hash = github_hash(user_id)
+    # Check if already claimed on-chain (V3 or V2)
     if check_issue_claimed_onchain(gh_hash, issue_id):
+        raise HTTPException(400, "Issue reward already claimed on-chain")
+    if check_issue_claimed_onchain(github_hash_legacy(username), issue_id):
         raise HTTPException(400, "Issue reward already claimed on-chain")
     nonce = generate_nonce()
     amount = int(issue.get("reward", ISSUE_REWARD))  # Ensure int for web3
@@ -136,13 +156,17 @@ async def claim_pr_reward(pr_id: int, request: ClaimRequest):
         raise HTTPException(400, "Invalid wallet address")
     user = await get_github_user(request.github_token)
     username = user["login"]
+    user_id = user.get("id")
     approved = get_approved_prs(username)
     pr = next((p for p in approved if p["pr_number"] == pr_id and not p["claimed"]), None)
     if not pr:
         raise HTTPException(400, "PR not approved or already claimed")
-    gh_hash = github_hash(username)
-    # Check if already claimed on-chain
+    # V3: Use user_id hash
+    gh_hash = github_hash(user_id)
+    # Check if already claimed on-chain (V3 or V2)
     if check_pr_claimed_onchain(gh_hash, pr_id):
+        raise HTTPException(400, "PR reward already claimed on-chain")
+    if check_pr_claimed_onchain(github_hash_legacy(username), pr_id):
         raise HTTPException(400, "PR reward already claimed on-chain")
     nonce = generate_nonce()
     amount = int(pr.get("reward", DEFAULT_PR_REWARD))  # Ensure int for web3
