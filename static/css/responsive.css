@@ -16,13 +16,35 @@
   }
 }
 
+@media (max-width: 768px) {
+  .nav {
+    gap: var(--space-md);
+    font-size: 0.8rem;
+  }
+
+  .nav a {
+    font-size: 0.8rem;
+  }
+}
+
 @media (max-width: 600px) {
   .header-inner {
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
   }
 
-  .nav { gap: var(--space-md); }
+  .nav {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
+  }
+
+  .nav a {
+    font-size: 0.75rem;
+  }
+
   .hero-logo { font-size: 2rem; }
 
   .hero-actions {
