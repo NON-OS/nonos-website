@@ -108,7 +108,7 @@ async def get_repo_issues() -> list:
         if response.status_code != 200:
             return []
         issues = response.json()
-        return [{"number": i["number"], "title": i["title"], "user": i["user"]["login"], "state": i["state"]} for i in issues if "pull_request" not in i]
+        return [{"number": i["number"], "title": i["title"], "user": {"login": i["user"]["login"]}, "state": i["state"]} for i in issues if "pull_request" not in i]
 
 async def get_repo_prs() -> list:
     async with httpx.AsyncClient() as client:
@@ -121,4 +121,4 @@ async def get_repo_prs() -> list:
         if response.status_code != 200:
             return []
         prs = response.json()
-        return [{"number": p["number"], "title": p["title"], "user": p["user"]["login"], "merged": bool(p.get("merged_at"))} for p in prs]
+        return [{"number": p["number"], "title": p["title"], "user": {"login": p["user"]["login"]}, "state": p["state"], "merged_at": p.get("merged_at")} for p in prs]
