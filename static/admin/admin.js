@@ -4,6 +4,7 @@ let allIssues = [];
 let allPRs = [];
 let allContributors = [];
 let allClaims = [];
+let approvedItems = { issues: [], prs: [] };
 let currentFilters = { issues: 'open', prs: 'open', claimsType: 'all', claimsStatus: 'all' };
 
 // Auth
@@ -160,10 +161,19 @@ async function loadActivity() {
 }
 
 // GitHub Issues/PRs
+async function loadApprovedItems() {
+  try {
+    const approved = await api('/admin/approved');
+    approvedItems.issues = approved.issues.map(i => `${i.github_username.toLowerCase()}-${i.issue_number}`);
+    approvedItems.prs = approved.prs.map(p => `${p.github_username.toLowerCase()}-${p.pr_number}`);
+  } catch (e) {}
+}
+
 async function loadGitHubIssues() {
   try {
     const el = document.getElementById('githubIssues');
     el.innerHTML = '<div class="empty"><span class="loading"></span> Loading...</div>';
+    await loadApprovedItems();
     allIssues = await api('/admin/issues');
     renderGitHubIssues();
   } catch (e) { showToast('Failed to load issues', 'error'); }
@@ -185,14 +195,20 @@ function renderGitHubIssues() {
   if (currentFilters.issues !== 'all') filtered = filtered.filter(i => i.state === currentFilters.issues);
   if (search) filtered = filtered.filter(i => i.title.toLowerCase().includes(search) || i.user.login.toLowerCase().includes(search));
   if (!filtered.length) { el.innerHTML = '<div class="empty">No issues found</div>'; return; }
-  el.innerHTML = filtered.slice(0, 50).map(i => `
+  el.innerHTML = filtered.slice(0, 50).map(i => {
+    const key = `${i.user.login.toLowerCase()}-${i.number}`;
+    const isApproved = approvedItems.issues.includes(key);
+    return `
     <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
       <span style="color: ${i.state === 'open' ? 'var(--success)' : 'var(--error)'}; width: 60px; font-size: 11px;">${i.state.toUpperCase()}</span>
       <span class="item-user" style="width: 100px;">@${i.user.login}</span>
       <span class="item-title" style="flex: 1;">#${i.number}: ${i.title}</span>
-      <button class="btn btn-primary btn-sm" onclick="approveFromGH('issue', '${i.user.login}', ${i.number}, '${escape(i.title)}')">Add Reward</button>
-    </div>
-  `).join('');
+      ${isApproved
+        ? '<span style="color: var(--accent); font-size: 12px;">Approved</span>'
+        : `<button class="btn btn-primary btn-sm" onclick="approveFromGH('issue', '${i.user.login}', ${i.number}, '${escape(i.title)}')">Add Reward</button>`
+      }
+    </div>`;
+  }).join('');
 }
 
 function renderGitHubPRs() {
@@ -203,14 +219,20 @@ function renderGitHubPRs() {
   else if (currentFilters.prs === 'merged') filtered = filtered.filter(p => p.merged_at);
   if (search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || p.user.login.toLowerCase().includes(search));
   if (!filtered.length) { el.innerHTML = '<div class="empty">No PRs found</div>'; return; }
-  el.innerHTML = filtered.slice(0, 50).map(p => `
+  el.innerHTML = filtered.slice(0, 50).map(p => {
+    const key = `${p.user.login.toLowerCase()}-${p.number}`;
+    const isApproved = approvedItems.prs.includes(key);
+    return `
     <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
       <span style="color: ${p.merged_at ? 'var(--accent)' : p.state === 'open' ? 'var(--success)' : 'var(--error)'}; width: 60px; font-size: 11px;">${p.merged_at ? 'MERGED' : p.state.toUpperCase()}</span>
       <span class="item-user" style="width: 100px;">@${p.user.login}</span>
       <span class="item-title" style="flex: 1;">#${p.number}: ${p.title}</span>
-      <button class="btn btn-primary btn-sm" onclick="approveFromGH('pr', '${p.user.login}', ${p.number}, '${escape(p.title)}')">Add Reward</button>
-    </div>
-  `).join('');
+      ${isApproved
+        ? '<span style="color: var(--accent); font-size: 12px;">Approved</span>'
+        : `<button class="btn btn-primary btn-sm" onclick="approveFromGH('pr', '${p.user.login}', ${p.number}, '${escape(p.title)}')">Add Reward</button>`
+      }
+    </div>`;
+  }).join('');
 }
 
 function filterGH(btn, type) {
