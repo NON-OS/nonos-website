@@ -1,5 +1,5 @@
 from web3 import Web3
-from config import MAINNET_RPC_URL, CONTRACT_ADDRESS, CONTRACT_ADDRESS_V1, STAR_REWARD, ISSUE_REWARD, DEFAULT_PR_REWARD
+from config import MAINNET_RPC_URL, CONTRACT_ADDRESS, CONTRACT_ADDRESS_V1, STAR_REWARD, ISSUE_REWARD, DEFAULT_PR_REWARD, USE_V3_CONTRACT
 from rate_limiter import rate_limiter
 
 V1_ABI = [{
@@ -71,7 +71,7 @@ async def get_contract_stats() -> dict:
         return {
             "contract": {
                 "address": CONTRACT_ADDRESS,
-                "version": "2.0.0",
+                "version": "3.0.0" if USE_V3_CONTRACT else "2.0.0",
                 "pool_balance": v2_stats[0] // 10**18,
                 "pool_balance_raw": str(v2_stats[0]),
                 "total_distributed": v2_stats[1] // 10**18,
