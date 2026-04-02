@@ -9,8 +9,12 @@ NoxContribute.CONFIG = {
   NOX_TOKEN: '0x0a26c80Be4E060e688d7C23aDdB92cBb5D2C9eCA',
   CHAIN_ID: 1,
   CHAIN_NAME: 'Ethereum Mainnet',
-  RPC_URL: 'https://eth.llamarpc.com'
+  RPC_URL: 'https://1rpc.io/eth'
 };
+
+NoxContribute.V1_ABI = [
+  'function getStats() view returns (uint256 balance, uint256 distributed, uint256 claimants, bytes32 currentRoot)'
+];
 
 NoxContribute.V2_ABI = [
   'function claimStar(uint256 nonce, bytes32 githubHash, bytes signature) external',

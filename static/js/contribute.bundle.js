@@ -9,8 +9,12 @@ NoxContribute.CONFIG = {
   NOX_TOKEN: '0x0a26c80Be4E060e688d7C23aDdB92cBb5D2C9eCA',
   CHAIN_ID: 1,
   CHAIN_NAME: 'Ethereum Mainnet',
-  RPC_URL: 'https://eth.llamarpc.com'
+  RPC_URL: 'https://1rpc.io/eth'
 };
+
+NoxContribute.V1_ABI = [
+  'function getStats() view returns (uint256 balance, uint256 distributed, uint256 claimants, bytes32 currentRoot)'
+];
 
 NoxContribute.V2_ABI = [
   'function claimStar(uint256 nonce, bytes32 githubHash, bytes signature) external',
@@ -203,75 +207,24 @@ NoxContribute.loadContractStatsDirect = function() {
   var el = NoxContribute.el;
   try {
     var p = new ethers.JsonRpcProvider(CONFIG.RPC_URL);
-    var c = new ethers.Contract(CONFIG.REWARDS_CONTRACT, NoxContribute.V2_ABI, p);
-    c.getStats().then(function(r) {
-      if (el.poolBalance) el.poolBalance.textContent = NoxContribute.formatNumber(Number(r[0] / BigInt(10**18)));
-      if (el.totalDistributed) el.totalDistributed.textContent = NoxContribute.formatNumber(Number(r[1] / BigInt(10**18)));
-      if (el.totalContributors) el.totalContributors.textContent = Number(r[2]) + Number(r[3]) + Number(r[4]);
+    var v1 = new ethers.Contract(CONFIG.REWARDS_V1, NoxContribute.V1_ABI, p);
+    var v2 = new ethers.Contract(CONFIG.REWARDS_CONTRACT, NoxContribute.V2_ABI, p);
+    Promise.all([v1.getStats(), v2.getStats()]).then(function(results) {
+      var v1Stats = results[0];
+      var v2Stats = results[1];
+      var v1Distributed = Number(v1Stats[1] / BigInt(10**18));
+      var v1Claimants = Number(v1Stats[2]);
+      var v2Pool = Number(v2Stats[0] / BigInt(10**18));
+      var v2Distributed = Number(v2Stats[1] / BigInt(10**18));
+      var v2Claims = Number(v2Stats[2]) + Number(v2Stats[3]) + Number(v2Stats[4]);
+      if (el.poolBalance) el.poolBalance.textContent = NoxContribute.formatNumber(v2Pool);
+      if (el.totalDistributed) el.totalDistributed.textContent = NoxContribute.formatNumber(v1Distributed + v2Distributed);
+      if (el.totalContributors) el.totalContributors.textContent = v1Claimants + v2Claims;
       if (el.contractStatus) { el.contractStatus.textContent = 'V2 LIVE'; el.contractStatus.classList.add('status-live'); }
     }).catch(function() {
       if (el.contractStatus) { el.contractStatus.textContent = 'ERROR'; el.contractStatus.classList.remove('status-live'); }
     });
   } catch (e) {}
-};
-
-window.NoxContribute = NoxContribute;
-var NoxContribute = window.NoxContribute || {};
-
-NoxContribute.connectWallet = function() {
-  var state = NoxContribute.state;
-  var el = NoxContribute.el;
-  var CONFIG = NoxContribute.CONFIG;
-  NoxContribute.showLoading(el.connectWalletBtn);
-  if (!window.ethereum) {
-    NoxContribute.showToast('Install MetaMask', 'error');
-    NoxContribute.hideLoading(el.connectWalletBtn);
-    return;
-  }
-  window.ethereum.request({ method: 'eth_requestAccounts' })
-    .then(function(accounts) {
-      state.provider = new ethers.BrowserProvider(window.ethereum);
-      return state.provider.getSigner().then(function(signer) {
-        state.signer = signer;
-        state.walletAddress = accounts[0];
-        window.ethereum.on('accountsChanged', NoxContribute.handleAccountsChanged);
-        window.ethereum.on('chainChanged', function() { window.location.reload(); });
-        return NoxContribute.checkChain();
-      });
-    })
-    .then(function() {
-      NoxContribute.showConnectedState();
-      NoxContribute.updateClaimActions();
-      NoxContribute.showToast('Wallet connected', 'success');
-    })
-    .catch(function(e) {
-      NoxContribute.showToast(e.message || 'Failed', 'error');
-    })
-    .finally(function() {
-      NoxContribute.hideLoading(el.connectWalletBtn);
-    });
-};
-
-NoxContribute.checkChain = function() {
-  var state = NoxContribute.state;
-  var CONFIG = NoxContribute.CONFIG;
-  return state.provider.getNetwork().then(function(n) {
-    if (Number(n.chainId) !== CONFIG.CHAIN_ID) {
-      return window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] })
-        .catch(function() { NoxContribute.showToast('Switch to ' + CONFIG.CHAIN_NAME, 'error'); });
-    }
-  });
-};
-
-NoxContribute.handleAccountsChanged = function(accounts) {
-  if (accounts.length === 0) NoxContribute.disconnectWallet();
-  else { NoxContribute.state.walletAddress = accounts[0]; NoxContribute.updateConnectedAddress(); }
-};
-
-NoxContribute.disconnectWallet = function() {
-  NoxContribute.resetState();
-  NoxContribute.showDisconnectedState();
-  NoxContribute.showToast('Disconnected', 'success');
 };
 
 window.NoxContribute = NoxContribute;
@@ -338,73 +291,60 @@ NoxContribute.unlinkGitHub = function() {
 window.NoxContribute = NoxContribute;
 var NoxContribute = window.NoxContribute || {};
 
-NoxContribute.updateChecklist = function() {
+NoxContribute.connectWallet = function() {
   var state = NoxContribute.state;
   var el = NoxContribute.el;
-  if (!state.dashboard) return;
-  var d = state.dashboard;
-  NoxContribute.setCheckItem(el.checkStar, d.star.eligible, d.star.eligible ? 'Starred' : 'Not starred', el.starStatus);
-  NoxContribute.setCheckItem(el.checkIssues, d.issues.approved > 0, d.issues.approved + ' approved', el.issueStatus);
-  NoxContribute.setCheckItem(el.checkPRs, d.prs.approved > 0, d.prs.approved + ' approved', el.prStatus);
-  if (el.issueReward) el.issueReward.textContent = NoxContribute.formatNumber(d.rewards.issue) + ' NOX';
-  if (el.prReward) el.prReward.textContent = NoxContribute.formatNumber(d.rewards.pr_default) + '+ NOX';
-};
-
-NoxContribute.setCheckItem = function(e, done, status, sEl) {
-  if (!e) return;
-  var i = e.querySelector('.checklist-icon');
-  if (i) { i.textContent = done ? '\u2713' : '\u25CB'; i.classList.toggle('completed', done); i.classList.toggle('pending', !done); }
-  if (sEl) sEl.textContent = status;
-};
-
-NoxContribute.updateClaimActions = function() {
-  var state = NoxContribute.state;
-  var el = NoxContribute.el;
-  if (!state.dashboard) return;
-  var d = state.dashboard;
-  var total = 0;
-  if (d.star.eligible) total += d.rewards.star;
-  d.issues.approved_list.filter(function(i) { return !i.claimed; }).forEach(function(i) { total += (i.reward || d.rewards.issue * 1e18) / 1e18; });
-  d.prs.approved_list.filter(function(p) { return !p.claimed; }).forEach(function(p) { total += (p.reward || d.rewards.pr_default * 1e18) / 1e18; });
-  if (el.availableRewards) el.availableRewards.textContent = NoxContribute.formatNumber(total);
-  if (total > 0 && state.walletAddress) {
-    el.claimActions.style.display = 'block';
-    el.claimableAmount.textContent = NoxContribute.formatNumber(total);
-    el.claimRewardsBtn.disabled = false;
-  } else if (total > 0) {
-    el.claimActions.style.display = 'block';
-    el.claimableAmount.textContent = NoxContribute.formatNumber(total);
-    el.claimRewardsBtn.disabled = true;
-  } else {
-    el.claimActions.style.display = 'none';
+  var CONFIG = NoxContribute.CONFIG;
+  NoxContribute.showLoading(el.connectWalletBtn);
+  if (!window.ethereum) {
+    NoxContribute.showToast('Install MetaMask', 'error');
+    NoxContribute.hideLoading(el.connectWalletBtn);
+    return;
   }
+  window.ethereum.request({ method: 'eth_requestAccounts' })
+    .then(function(accounts) {
+      state.provider = new ethers.BrowserProvider(window.ethereum);
+      return state.provider.getSigner().then(function(signer) {
+        state.signer = signer;
+        state.walletAddress = accounts[0];
+        window.ethereum.on('accountsChanged', NoxContribute.handleAccountsChanged);
+        window.ethereum.on('chainChanged', function() { window.location.reload(); });
+        return NoxContribute.checkChain();
+      });
+    })
+    .then(function() {
+      NoxContribute.showConnectedState();
+      NoxContribute.updateClaimActions();
+      NoxContribute.showToast('Wallet connected', 'success');
+    })
+    .catch(function(e) {
+      NoxContribute.showToast(e.message || 'Failed', 'error');
+    })
+    .finally(function() {
+      NoxContribute.hideLoading(el.connectWalletBtn);
+    });
 };
 
-NoxContribute.renderApproved = function() {
+NoxContribute.checkChain = function() {
   var state = NoxContribute.state;
-  var el = NoxContribute.el;
-  if (!state.dashboard || !el.approvedList) return;
-  var d = state.dashboard;
-  el.approvedList.innerHTML = '';
-  var items = [];
-  d.issues.approved_list.filter(function(i) { return !i.claimed; }).forEach(function(i) { items.push({ type: 'issue', id: i.issue_number, title: i.issue_title, reward: i.reward / 1e18 }); });
-  d.prs.approved_list.filter(function(p) { return !p.claimed; }).forEach(function(p) { items.push({ type: 'pr', id: p.pr_number, title: p.pr_title, reward: p.reward / 1e18 }); });
-  if (items.length === 0 && !d.star.eligible) { if (el.approvedSection) el.approvedSection.style.display = 'none'; return; }
-  if (el.approvedSection) el.approvedSection.style.display = 'block';
-  if (d.star.eligible) {
-    var div = document.createElement('div');
-    div.className = 'approved-item';
-    div.innerHTML = '<span class="item-type star">STAR</span><span class="item-title">Repository Star</span><span class="item-reward">' + NoxContribute.formatNumber(d.rewards.star) + ' NOX</span><button class="claim-btn" data-type="star">Claim</button>';
-    div.querySelector('.claim-btn').addEventListener('click', NoxContribute.claimStarReward);
-    el.approvedList.appendChild(div);
-  }
-  items.forEach(function(item) {
-    var div = document.createElement('div');
-    div.className = 'approved-item';
-    div.innerHTML = '<span class="item-type ' + item.type + '">' + item.type.toUpperCase() + '</span><span class="item-title">#' + item.id + ' ' + (item.title || '') + '</span><span class="item-reward">' + NoxContribute.formatNumber(item.reward) + ' NOX</span><button class="claim-btn" data-type="' + item.type + '" data-id="' + item.id + '">Claim</button>';
-    div.querySelector('.claim-btn').addEventListener('click', function() { NoxContribute.claimItem(item.type, item.id); });
-    el.approvedList.appendChild(div);
+  var CONFIG = NoxContribute.CONFIG;
+  return state.provider.getNetwork().then(function(n) {
+    if (Number(n.chainId) !== CONFIG.CHAIN_ID) {
+      return window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x1' }] })
+        .catch(function() { NoxContribute.showToast('Switch to ' + CONFIG.CHAIN_NAME, 'error'); });
+    }
   });
+};
+
+NoxContribute.handleAccountsChanged = function(accounts) {
+  if (accounts.length === 0) NoxContribute.disconnectWallet();
+  else { NoxContribute.state.walletAddress = accounts[0]; NoxContribute.updateConnectedAddress(); }
+};
+
+NoxContribute.disconnectWallet = function() {
+  NoxContribute.resetState();
+  NoxContribute.showDisconnectedState();
+  NoxContribute.showToast('Disconnected', 'success');
 };
 
 window.NoxContribute = NoxContribute;
@@ -490,6 +430,95 @@ NoxContribute.submitPRClaim = function(data, prId) {
       if (receipt.status === 1) { NoxContribute.loadDashboard(); NoxContribute.loadContractStats(); NoxContribute.showToast('Claimed PR reward!', 'success'); }
       else throw new Error('Transaction failed');
     });
+};
+
+window.NoxContribute = NoxContribute;
+var NoxContribute = window.NoxContribute || {};
+
+NoxContribute.updateChecklist = function() {
+  var state = NoxContribute.state;
+  var el = NoxContribute.el;
+  if (!state.dashboard) return;
+  var d = state.dashboard;
+  // Star status: claimed > eligible > not starred
+  var starDone = d.star.claimed || d.star.eligible;
+  var starText = d.star.claimed ? 'Claimed' : (d.star.eligible ? 'Starred' : 'Not starred');
+  NoxContribute.setCheckItem(el.checkStar, starDone, starText, el.starStatus);
+  NoxContribute.setCheckItem(el.checkIssues, d.issues.approved > 0, d.issues.approved + ' approved', el.issueStatus);
+  NoxContribute.setCheckItem(el.checkPRs, d.prs.approved > 0, d.prs.approved + ' approved', el.prStatus);
+  if (el.issueReward) el.issueReward.textContent = NoxContribute.formatNumber(d.rewards.issue) + ' NOX';
+  if (el.prReward) el.prReward.textContent = NoxContribute.formatNumber(d.rewards.pr_default) + '+ NOX';
+};
+
+NoxContribute.setCheckItem = function(e, done, status, sEl) {
+  if (!e) return;
+  var i = e.querySelector('.checklist-icon');
+  if (i) { i.textContent = done ? '\u2713' : '\u25CB'; i.classList.toggle('completed', done); i.classList.toggle('pending', !done); }
+  if (sEl) sEl.textContent = status;
+};
+
+NoxContribute.updateClaimActions = function() {
+  var state = NoxContribute.state;
+  var el = NoxContribute.el;
+  if (!state.dashboard) return;
+  var d = state.dashboard;
+
+  // Calculate available to claim (unclaimed rewards)
+  var available = 0;
+  if (d.star.eligible) available += d.rewards.star;
+  d.issues.approved_list.filter(function(i) { return !i.claimed; }).forEach(function(i) { available += (i.reward || d.rewards.issue * 1e18) / 1e18; });
+  d.prs.approved_list.filter(function(p) { return !p.claimed; }).forEach(function(p) { available += (p.reward || d.rewards.pr_default * 1e18) / 1e18; });
+
+  // Calculate total earned (claimed rewards)
+  var earned = 0;
+  var contributions = 0;
+  if (d.star.claimed) { earned += d.rewards.star; contributions++; }
+  d.issues.approved_list.filter(function(i) { return i.claimed; }).forEach(function(i) { earned += (i.reward || d.rewards.issue * 1e18) / 1e18; contributions++; });
+  d.prs.approved_list.filter(function(p) { return p.claimed; }).forEach(function(p) { earned += (p.reward || d.rewards.pr_default * 1e18) / 1e18; contributions++; });
+
+  // Update UI
+  if (el.availableRewards) el.availableRewards.textContent = NoxContribute.formatNumber(available);
+  if (el.totalEarned) el.totalEarned.textContent = NoxContribute.formatNumber(earned);
+  if (el.contributionCount) el.contributionCount.textContent = contributions;
+
+  if (available > 0 && state.walletAddress) {
+    el.claimActions.style.display = 'block';
+    el.claimableAmount.textContent = NoxContribute.formatNumber(available);
+    el.claimRewardsBtn.disabled = false;
+  } else if (available > 0) {
+    el.claimActions.style.display = 'block';
+    el.claimableAmount.textContent = NoxContribute.formatNumber(available);
+    el.claimRewardsBtn.disabled = true;
+  } else {
+    el.claimActions.style.display = 'none';
+  }
+};
+
+NoxContribute.renderApproved = function() {
+  var state = NoxContribute.state;
+  var el = NoxContribute.el;
+  if (!state.dashboard || !el.approvedList) return;
+  var d = state.dashboard;
+  el.approvedList.innerHTML = '';
+  var items = [];
+  d.issues.approved_list.filter(function(i) { return !i.claimed; }).forEach(function(i) { items.push({ type: 'issue', id: i.issue_number, title: i.issue_title, reward: i.reward / 1e18 }); });
+  d.prs.approved_list.filter(function(p) { return !p.claimed; }).forEach(function(p) { items.push({ type: 'pr', id: p.pr_number, title: p.pr_title, reward: p.reward / 1e18 }); });
+  if (items.length === 0 && !d.star.eligible) { if (el.approvedSection) el.approvedSection.style.display = 'none'; return; }
+  if (el.approvedSection) el.approvedSection.style.display = 'block';
+  if (d.star.eligible) {
+    var div = document.createElement('div');
+    div.className = 'approved-item';
+    div.innerHTML = '<span class="item-type star">STAR</span><span class="item-title">Repository Star</span><span class="item-reward">' + NoxContribute.formatNumber(d.rewards.star) + ' NOX</span><button class="claim-btn" data-type="star">Claim</button>';
+    div.querySelector('.claim-btn').addEventListener('click', NoxContribute.claimStarReward);
+    el.approvedList.appendChild(div);
+  }
+  items.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'approved-item';
+    div.innerHTML = '<span class="item-type ' + item.type + '">' + item.type.toUpperCase() + '</span><span class="item-title">#' + item.id + ' ' + (item.title || '') + '</span><span class="item-reward">' + NoxContribute.formatNumber(item.reward) + ' NOX</span><button class="claim-btn" data-type="' + item.type + '" data-id="' + item.id + '">Claim</button>';
+    div.querySelector('.claim-btn').addEventListener('click', function() { NoxContribute.claimItem(item.type, item.id); });
+    el.approvedList.appendChild(div);
+  });
 };
 
 window.NoxContribute = NoxContribute;
