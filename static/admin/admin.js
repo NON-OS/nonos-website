@@ -1,16 +1,29 @@
 const API_URL = 'https://nonos.software/api';
 let authKey = '';
+let allIssues = [];
+let allPRs = [];
+let allContributors = [];
+let allClaims = [];
+let currentFilters = { issues: 'open', prs: 'open', claimsType: 'all', claimsStatus: 'all' };
 
+// Auth
 function authenticate() {
   authKey = document.getElementById('adminKey').value;
   if (!authKey) return showToast('Enter API key', 'error');
   document.getElementById('authSection').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  loadStats();
-  loadPending();
-  loadApproved();
+  loadAll();
+  setupTabs();
 }
 
+function logout() {
+  authKey = '';
+  document.getElementById('authSection').classList.remove('hidden');
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('adminKey').value = '';
+}
+
+// API
 async function api(endpoint, method = 'GET', body = null) {
   const opts = {
     method,
@@ -22,94 +35,299 @@ async function api(endpoint, method = 'GET', body = null) {
   return r.json();
 }
 
+// Load all data
+async function loadAll() {
+  loadStats();
+  loadContractStats();
+  loadPending();
+  loadActivity();
+  loadConfig();
+}
+
+// Tabs
+function setupTabs() {
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      tab.classList.add('active');
+      const tabId = 'tab-' + tab.dataset.tab;
+      document.getElementById(tabId).classList.remove('hidden');
+      // Load data for tab
+      if (tab.dataset.tab === 'github') { loadGitHubIssues(); loadGitHubPRs(); }
+      if (tab.dataset.tab === 'contributors') loadContributors();
+      if (tab.dataset.tab === 'claims') loadClaims();
+    });
+  });
+}
+
+// Stats
 async function loadStats() {
   try {
     const s = await api('/admin/stats');
-    document.getElementById('stats').innerHTML = `
-      <div class="stat"><div class="stat-value">${s.pending_issues}</div><div class="stat-label">Pending Issues</div></div>
-      <div class="stat"><div class="stat-value">${s.pending_prs}</div><div class="stat-label">Pending PRs</div></div>
-      <div class="stat"><div class="stat-value">${s.approved_issues}</div><div class="stat-label">Approved Issues</div></div>
-      <div class="stat"><div class="stat-value">${s.approved_prs}</div><div class="stat-label">Approved PRs</div></div>
-      <div class="stat"><div class="stat-value">${s.claimed_issues}</div><div class="stat-label">Claimed Issues</div></div>
-      <div class="stat"><div class="stat-value">${s.claimed_prs}</div><div class="stat-label">Claimed PRs</div></div>
+    const pending = s.pending_issues + s.pending_prs;
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card${pending > 0 ? ' warning' : ''}">
+        <div class="stat-card-value">${pending}</div>
+        <div class="stat-card-label">PENDING APPROVALS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">${s.approved_issues + s.approved_prs}</div>
+        <div class="stat-card-label">TOTAL APPROVED</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">${s.claimed_issues + s.claimed_prs + s.star_claims}</div>
+        <div class="stat-card-label">TOTAL CLAIMED</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">${s.star_claims}</div>
+        <div class="stat-card-label">STAR CLAIMS</div>
+      </div>
     `;
   } catch (e) { showToast('Failed to load stats', 'error'); }
 }
 
+async function loadContractStats() {
+  try {
+    const r = await fetch(`${API_URL}/contract/stats`);
+    const d = await r.json();
+    if (d.contract) {
+      document.getElementById('headerPool').textContent = Number(d.contract.pool_balance).toLocaleString();
+      document.getElementById('headerDistributed').textContent = Number(d.combined?.total_distributed || d.contract.total_distributed).toLocaleString();
+    }
+  } catch (e) {}
+}
+
+// Pending
 async function loadPending() {
   try {
     const d = await api('/admin/pending');
-    const el = document.getElementById('pendingList');
-    if (d.issues.length === 0 && d.prs.length === 0) {
-      el.innerHTML = '<div class="empty">No pending approvals</div>';
-      return;
-    }
-    el.innerHTML = '';
-    d.issues.forEach(i => {
-      el.innerHTML += `<div class="item">
-        <span class="item-user">@${i.github_username}</span>
-        <span class="item-title">Issue #${i.issue_number}: ${i.issue_title || 'No title'}</span>
-        <span>10K NOX</span>
-        <div class="item-actions">
-          <button class="btn btn-approve" onclick="approve('issue', '${i.github_username}', ${i.issue_number}, '${i.issue_title || ''}')">Approve</button>
-          <button class="btn btn-reject" onclick="reject('issue', '${i.github_username}', ${i.issue_number})">Reject</button>
-        </div>
-      </div>`;
-    });
-    d.prs.forEach(p => {
-      el.innerHTML += `<div class="item">
-        <span class="item-user">@${p.github_username}</span>
-        <span class="item-title">PR #${p.pr_number}: ${p.pr_title || 'No title'}</span>
-        <span>25K+ NOX</span>
-        <div class="item-actions">
-          <button class="btn btn-approve" onclick="approve('pr', '${p.github_username}', ${p.pr_number}, '${p.pr_title || ''}')">Approve</button>
-          <button class="btn btn-reject" onclick="reject('pr', '${p.github_username}', ${p.pr_number})">Reject</button>
-        </div>
-      </div>`;
-    });
+    renderPendingIssues(d.issues);
+    renderPendingPRs(d.prs);
   } catch (e) { showToast('Failed to load pending', 'error'); }
 }
 
-async function loadApproved() {
-  try {
-    const d = await api('/admin/approved');
-    const el = document.getElementById('approvedList');
-    const unclaimed = [...d.issues.filter(i => !i.claimed), ...d.prs.filter(p => !p.claimed)];
-    if (unclaimed.length === 0) {
-      el.innerHTML = '<div class="empty">No unclaimed approvals</div>';
-      return;
-    }
-    el.innerHTML = '';
-    d.issues.filter(i => !i.claimed).forEach(i => {
-      el.innerHTML += `<div class="item">
-        <span class="item-user">@${i.github_username}</span>
-        <span class="item-title">Issue #${i.issue_number}: ${i.issue_title || ''}</span>
-        <span>${(i.reward / 1e18).toLocaleString()} NOX</span>
-        <span style="color: var(--warning)">Pending claim</span>
-      </div>`;
-    });
-    d.prs.filter(p => !p.claimed).forEach(p => {
-      el.innerHTML += `<div class="item">
-        <span class="item-user">@${p.github_username}</span>
-        <span class="item-title">PR #${p.pr_number}: ${p.pr_title || ''}</span>
-        <span>${(p.reward / 1e18).toLocaleString()} NOX</span>
-        <span style="color: var(--warning)">Pending claim</span>
-      </div>`;
-    });
-  } catch (e) { showToast('Failed to load approved', 'error'); }
+function renderPendingIssues(issues) {
+  const el = document.getElementById('pendingIssues');
+  if (!issues.length) { el.innerHTML = '<div class="empty">No pending issues</div>'; return; }
+  el.innerHTML = issues.map(i => `
+    <div style="display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid var(--border);">
+      <span class="item-user">@${i.github_username}</span>
+      <span class="item-title" style="flex: 1;">#${i.issue_number}: ${i.issue_title || 'Untitled'}</span>
+      <span style="color: var(--muted);">10K NOX</span>
+      <button class="btn btn-success btn-sm" onclick="approve('issue', '${i.github_username}', ${i.issue_number}, '${escape(i.issue_title || '')}')">Approve</button>
+      <button class="btn btn-danger btn-sm" onclick="reject('issue', '${i.github_username}', ${i.issue_number})">Reject</button>
+    </div>
+  `).join('');
 }
 
+function renderPendingPRs(prs) {
+  const el = document.getElementById('pendingPRs');
+  if (!prs.length) { el.innerHTML = '<div class="empty">No pending PRs</div>'; return; }
+  el.innerHTML = prs.map(p => `
+    <div style="display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid var(--border);">
+      <span class="item-user">@${p.github_username}</span>
+      <span class="item-title" style="flex: 1;">#${p.pr_number}: ${p.pr_title || 'Untitled'}</span>
+      <span style="color: var(--muted);">25K+ NOX</span>
+      <button class="btn btn-success btn-sm" onclick="approve('pr', '${p.github_username}', ${p.pr_number}, '${escape(p.pr_title || '')}')">Approve</button>
+      <button class="btn btn-danger btn-sm" onclick="reject('pr', '${p.github_username}', ${p.pr_number})">Reject</button>
+    </div>
+  `).join('');
+}
+
+// Activity
+async function loadActivity() {
+  try {
+    const data = await api('/admin/activity?limit=10');
+    const el = document.getElementById('activityList');
+    if (!data.length) { el.innerHTML = '<div class="empty">No recent activity</div>'; return; }
+    el.innerHTML = data.map(a => {
+      const icon = a.action.includes('star') ? 'star' : a.action.includes('issue') ? 'issue' : 'pr';
+      const iconText = icon === 'star' ? '★' : icon === 'issue' ? '!' : '⎇';
+      const actionText = a.action.replace('_', ' ');
+      const time = new Date(a.timestamp).toLocaleString();
+      return `
+        <div class="activity-item">
+          <div class="activity-icon ${icon}">${iconText}</div>
+          <div class="activity-content">
+            <div class="activity-text"><span class="item-user">@${a.username}</span> - ${actionText} ${a.number ? '#' + a.number : ''}</div>
+            <div class="activity-time">${time} - ${a.reward_nox.toLocaleString()} NOX</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {}
+}
+
+// GitHub Issues/PRs
+async function loadGitHubIssues() {
+  try {
+    const el = document.getElementById('githubIssues');
+    el.innerHTML = '<div class="empty"><span class="loading"></span> Loading...</div>';
+    allIssues = await api('/admin/issues');
+    renderGitHubIssues();
+  } catch (e) { showToast('Failed to load issues', 'error'); }
+}
+
+async function loadGitHubPRs() {
+  try {
+    const el = document.getElementById('githubPRs');
+    el.innerHTML = '<div class="empty"><span class="loading"></span> Loading...</div>';
+    allPRs = await api('/admin/prs');
+    renderGitHubPRs();
+  } catch (e) { showToast('Failed to load PRs', 'error'); }
+}
+
+function renderGitHubIssues() {
+  const el = document.getElementById('githubIssues');
+  const search = document.getElementById('searchIssues').value.toLowerCase();
+  let filtered = allIssues;
+  if (currentFilters.issues !== 'all') filtered = filtered.filter(i => i.state === currentFilters.issues);
+  if (search) filtered = filtered.filter(i => i.title.toLowerCase().includes(search) || i.user.login.toLowerCase().includes(search));
+  if (!filtered.length) { el.innerHTML = '<div class="empty">No issues found</div>'; return; }
+  el.innerHTML = filtered.slice(0, 50).map(i => `
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+      <span style="color: ${i.state === 'open' ? 'var(--success)' : 'var(--error)'}; width: 60px; font-size: 11px;">${i.state.toUpperCase()}</span>
+      <span class="item-user" style="width: 100px;">@${i.user.login}</span>
+      <span class="item-title" style="flex: 1;">#${i.number}: ${i.title}</span>
+      <button class="btn btn-primary btn-sm" onclick="approveFromGH('issue', '${i.user.login}', ${i.number}, '${escape(i.title)}')">Add Reward</button>
+    </div>
+  `).join('');
+}
+
+function renderGitHubPRs() {
+  const el = document.getElementById('githubPRs');
+  const search = document.getElementById('searchPRs').value.toLowerCase();
+  let filtered = allPRs;
+  if (currentFilters.prs === 'open') filtered = filtered.filter(p => p.state === 'open');
+  else if (currentFilters.prs === 'merged') filtered = filtered.filter(p => p.merged_at);
+  if (search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search) || p.user.login.toLowerCase().includes(search));
+  if (!filtered.length) { el.innerHTML = '<div class="empty">No PRs found</div>'; return; }
+  el.innerHTML = filtered.slice(0, 50).map(p => `
+    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+      <span style="color: ${p.merged_at ? 'var(--accent)' : p.state === 'open' ? 'var(--success)' : 'var(--error)'}; width: 60px; font-size: 11px;">${p.merged_at ? 'MERGED' : p.state.toUpperCase()}</span>
+      <span class="item-user" style="width: 100px;">@${p.user.login}</span>
+      <span class="item-title" style="flex: 1;">#${p.number}: ${p.title}</span>
+      <button class="btn btn-primary btn-sm" onclick="approveFromGH('pr', '${p.user.login}', ${p.number}, '${escape(p.title)}')">Add Reward</button>
+    </div>
+  `).join('');
+}
+
+function filterGH(btn, type) {
+  btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilters[type] = btn.dataset.filter;
+  if (type === 'issues') renderGitHubIssues();
+  else renderGitHubPRs();
+}
+
+function filterGHSearch(type) {
+  if (type === 'issues') renderGitHubIssues();
+  else renderGitHubPRs();
+}
+
+// Contributors
+async function loadContributors() {
+  try {
+    const el = document.getElementById('contributorsTable');
+    el.innerHTML = '<tr><td colspan="6" class="empty"><span class="loading"></span> Loading...</td></tr>';
+    allContributors = await api('/admin/contributors');
+    renderContributors();
+  } catch (e) { showToast('Failed to load contributors', 'error'); }
+}
+
+function renderContributors() {
+  const el = document.getElementById('contributorsTable');
+  const search = document.getElementById('searchContributors').value.toLowerCase();
+  let filtered = allContributors;
+  if (search) filtered = filtered.filter(c => c.username.toLowerCase().includes(search));
+  if (!filtered.length) { el.innerHTML = '<tr><td colspan="6" class="empty">No contributors found</td></tr>'; return; }
+  el.innerHTML = filtered.map(c => `
+    <tr>
+      <td><span class="item-user">@${c.username}</span></td>
+      <td>${c.star ? '<span style="color: gold;">★</span>' : '-'}</td>
+      <td>${c.issues || '-'}</td>
+      <td>${c.prs || '-'}</td>
+      <td><span class="item-reward">${c.total_nox.toLocaleString()} NOX</span></td>
+      <td style="color: var(--muted); font-size: 12px;">${c.last_activity ? new Date(c.last_activity).toLocaleDateString() : '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterContributors() {
+  renderContributors();
+}
+
+// Claims
+async function loadClaims() {
+  try {
+    const el = document.getElementById('claimsTable');
+    el.innerHTML = '<tr><td colspan="6" class="empty"><span class="loading"></span> Loading...</td></tr>';
+    allClaims = await api('/admin/claims?limit=200');
+    renderClaims();
+  } catch (e) { showToast('Failed to load claims', 'error'); }
+}
+
+function renderClaims() {
+  const el = document.getElementById('claimsTable');
+  let filtered = allClaims;
+  if (currentFilters.claimsType !== 'all') filtered = filtered.filter(c => c.type === currentFilters.claimsType);
+  if (currentFilters.claimsStatus === 'claimed') filtered = filtered.filter(c => c.status === 'claimed');
+  else if (currentFilters.claimsStatus === 'pending') filtered = filtered.filter(c => c.status !== 'claimed');
+  if (!filtered.length) { el.innerHTML = '<tr><td colspan="6" class="empty">No claims found</td></tr>'; return; }
+  el.innerHTML = filtered.map(c => `
+    <tr>
+      <td><span style="text-transform: uppercase; font-size: 11px; color: ${c.type === 'star' ? 'gold' : c.type === 'issue' ? 'var(--accent)' : 'var(--success)'};">${c.type}</span></td>
+      <td><span class="item-user">@${c.username}</span></td>
+      <td>${c.type === 'star' ? 'Star Reward' : '#' + c.number + ': ' + (c.title || '').substring(0, 30)}</td>
+      <td><span class="item-reward">${c.reward_nox.toLocaleString()} NOX</span></td>
+      <td><span class="item-status ${c.status}">${c.status}</span></td>
+      <td style="color: var(--muted); font-size: 12px;">${c.approved_at ? new Date(c.approved_at).toLocaleDateString() : '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterClaims(btn) {
+  btn.parentElement.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilters.claimsType = btn.dataset.type;
+  renderClaims();
+}
+
+function filterClaimsStatus(btn) {
+  btn.parentElement.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilters.claimsStatus = btn.dataset.status;
+  renderClaims();
+}
+
+// Config
+async function loadConfig() {
+  try {
+    const cfg = await api('/admin/config');
+    document.getElementById('contractV2Link').href = `https://etherscan.io/address/${cfg.contract_v2}`;
+    document.getElementById('contractV2Link').textContent = cfg.contract_v2;
+    document.getElementById('contractV1Link').href = `https://etherscan.io/address/${cfg.contract_v1}`;
+    document.getElementById('contractV1Link').textContent = cfg.contract_v1;
+    document.getElementById('rewardStar').textContent = cfg.rewards.star.toLocaleString();
+    document.getElementById('rewardIssue').textContent = cfg.rewards.issue.toLocaleString();
+    document.getElementById('rewardPR').textContent = cfg.rewards.pr.toLocaleString();
+  } catch (e) {}
+}
+
+// Actions
 async function approve(type, username, number, title) {
   try {
     await api(`/admin/approve/${type}`, 'POST', { username, number, title });
     showToast(`${type} #${number} approved!`, 'success');
     loadStats();
     loadPending();
-    loadApproved();
+    loadActivity();
   } catch (e) { showToast('Approval failed', 'error'); }
 }
 
 async function reject(type, username, number) {
+  if (!confirm(`Reject ${type} #${number} from @${username}?`)) return;
   try {
     await api(`/admin/reject/${type}`, 'POST', { username, number });
     showToast(`${type} #${number} rejected`, 'success');
@@ -118,24 +336,43 @@ async function reject(type, username, number) {
   } catch (e) { showToast('Rejection failed', 'error'); }
 }
 
+async function approveFromGH(type, username, number, title) {
+  const reward = prompt(`Enter NOX reward for ${type} #${number}:`, type === 'issue' ? '10000' : '25000');
+  if (!reward) return;
+  try {
+    await api(`/admin/approve/${type}`, 'POST', { username, number, title, reward: parseInt(reward) * 1e18 });
+    showToast(`${type} #${number} approved for ${Number(reward).toLocaleString()} NOX!`, 'success');
+    loadStats();
+    loadActivity();
+  } catch (e) { showToast('Approval failed', 'error'); }
+}
+
 async function quickApprove() {
   const type = document.getElementById('approveType').value;
   const username = document.getElementById('approveUsername').value;
   const number = parseInt(document.getElementById('approveNumber').value);
   const title = document.getElementById('approveTitle').value;
   const rewardNox = parseInt(document.getElementById('approveReward').value) || (type === 'issue' ? 10000 : 25000);
-  const reward = rewardNox * 1e18;
   if (!username || !number) return showToast('Fill required fields', 'error');
   try {
-    await api(`/admin/approve/${type}`, 'POST', { username, number, title, reward });
+    await api(`/admin/approve/${type}`, 'POST', { username, number, title, reward: rewardNox * 1e18 });
     showToast(`${type} #${number} approved for ${rewardNox.toLocaleString()} NOX!`, 'success');
     document.getElementById('approveUsername').value = '';
     document.getElementById('approveNumber').value = '';
     document.getElementById('approveTitle').value = '';
     document.getElementById('approveReward').value = '';
     loadStats();
-    loadApproved();
+    loadActivity();
   } catch (e) { showToast('Approval failed', 'error'); }
+}
+
+async function exportCSV() {
+  window.open(`${API_URL}/admin/export/csv?authorization=Bearer ${authKey}`, '_blank');
+}
+
+// Utils
+function escape(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
 }
 
 function showToast(msg, type) {
@@ -144,3 +381,11 @@ function showToast(msg, type) {
   t.className = 'toast show ' + type;
   setTimeout(() => t.classList.remove('show'), 3000);
 }
+
+// Auto-refresh every 30s
+setInterval(() => {
+  if (authKey && !document.hidden) {
+    loadStats();
+    loadContractStats();
+  }
+}, 30000);

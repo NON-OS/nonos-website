@@ -5,80 +5,362 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NOX Rewards Admin</title>
   <style>
-    :root { --bg: #0a0a0a; --surface: #111; --border: #222; --text: #fff; --muted: #888; --accent: #0ff; --success: #0f0; --warning: #ff0; --error: #f00; }
+    :root { --bg: #0a0a0a; --surface: #111; --surface2: #161616; --border: #222; --border2: #333; --text: #fff; --muted: #888; --accent: #0ff; --success: #0f0; --warning: #fa0; --error: #f44; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    h1 { color: var(--accent); margin-bottom: 30px; font-size: 24px; }
-    .auth-section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    .auth-section input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 15px; width: 300px; margin-right: 10px; }
-    .auth-section button { background: var(--accent); color: var(--bg); border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-    .stat { background: var(--surface); border: 1px solid var(--border); padding: 15px; border-radius: 8px; text-align: center; }
-    .stat-value { font-size: 28px; color: var(--accent); font-weight: bold; }
-    .stat-label { color: var(--muted); font-size: 12px; margin-top: 5px; }
-    .section { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    .section-title { color: var(--accent); font-size: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .item { display: grid; grid-template-columns: 100px 1fr 100px 150px; gap: 15px; padding: 12px; border-bottom: 1px solid var(--border); align-items: center; }
-    .item:last-child { border-bottom: none; }
+    body { font-family: 'JetBrains Mono', 'SF Mono', monospace; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* Auth */
+    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .auth-box { background: var(--surface); border: 1px solid var(--border); padding: 40px; border-radius: 12px; text-align: center; }
+    .auth-box h1 { color: var(--accent); margin-bottom: 30px; font-size: 20px; }
+    .auth-box input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; width: 300px; margin-bottom: 15px; font-family: inherit; }
+    .auth-box button { background: var(--accent); color: var(--bg); border: none; padding: 12px 30px; cursor: pointer; font-weight: bold; font-family: inherit; }
+    .auth-box button:hover { opacity: 0.9; }
+
+    /* Header */
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo { color: var(--accent); font-size: 16px; font-weight: bold; }
+    .header-stats { display: flex; gap: 25px; }
+    .header-stat { text-align: center; }
+    .header-stat-value { color: var(--accent); font-size: 18px; font-weight: bold; }
+    .header-stat-label { color: var(--muted); font-size: 10px; }
+    .header-right { display: flex; align-items: center; gap: 15px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; cursor: pointer; font-size: 12px; }
+    .btn-logout:hover { border-color: var(--error); color: var(--error); }
+
+    /* Tabs */
+    .tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 30px; display: flex; gap: 5px; }
+    .tab { padding: 15px 25px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Main */
+    .main { padding: 25px 30px; max-width: 1400px; margin: 0 auto; }
+    .hidden { display: none !important; }
+
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 20px; border-radius: 8px; }
+    .stat-card-value { font-size: 32px; color: var(--accent); font-weight: bold; }
+    .stat-card-label { color: var(--muted); font-size: 12px; margin-top: 5px; }
+    .stat-card.warning .stat-card-value { color: var(--warning); }
+
+    /* Section */
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; }
+    .section-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .section-title { color: var(--accent); font-size: 14px; font-weight: bold; }
+    .section-actions { display: flex; gap: 10px; }
+    .section-body { padding: 15px 20px; }
+
+    /* Table */
+    .table { width: 100%; border-collapse: collapse; }
+    .table th { text-align: left; padding: 10px 12px; color: var(--muted); font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .table td { padding: 12px; border-bottom: 1px solid var(--border); }
+    .table tr:last-child td { border-bottom: none; }
+    .table tr:hover { background: var(--surface2); }
+
+    /* Item rows */
     .item-user { color: var(--accent); }
-    .item-title { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .item-actions { display: flex; gap: 8px; }
-    .btn { padding: 6px 12px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; }
-    .btn-approve { background: var(--success); color: var(--bg); }
-    .btn-reject { background: var(--error); color: var(--bg); }
-    .btn-refresh { background: var(--border); color: var(--text); }
-    .empty { color: var(--muted); text-align: center; padding: 30px; }
-    .approve-form { display: flex; gap: 10px; padding: 15px; background: var(--bg); border-radius: 8px; margin-top: 15px; }
-    .approve-form input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; }
-    .approve-form input[type="number"] { width: 120px; flex: none; }
-    .hidden { display: none; }
-    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); padding: 15px 25px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; }
+    .item-title { color: var(--muted); max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-reward { color: var(--success); }
+    .item-status { padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+    .item-status.claimed { background: rgba(0,255,0,0.1); color: var(--success); }
+    .item-status.pending { background: rgba(255,170,0,0.1); color: var(--warning); }
+
+    /* Buttons */
+    .btn { padding: 6px 14px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; border-radius: 4px; font-family: inherit; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-success { background: var(--success); color: var(--bg); }
+    .btn-danger { background: var(--error); color: var(--bg); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Form */
+    .form-row { display: flex; gap: 10px; align-items: center; padding: 15px 20px; background: var(--surface2); border-radius: 6px; margin-top: 15px; }
+    .form-row input, .form-row select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; font-family: inherit; }
+    .form-row input { flex: 1; }
+    .form-row input[type="number"] { width: 100px; flex: none; }
+    .form-row select { width: 100px; }
+
+    /* Filters */
+    .filters { display: flex; gap: 10px; padding: 15px 20px; border-bottom: 1px solid var(--border); }
+    .filter-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border); color: var(--muted); cursor: pointer; font-size: 12px; border-radius: 4px; }
+    .filter-btn:hover { border-color: var(--text); color: var(--text); }
+    .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .search-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; width: 200px; font-family: inherit; margin-left: auto; }
+
+    /* Activity */
+    .activity-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .activity-icon.star { background: rgba(255,215,0,0.2); color: gold; }
+    .activity-icon.issue { background: rgba(0,255,255,0.2); color: var(--accent); }
+    .activity-icon.pr { background: rgba(0,255,0,0.2); color: var(--success); }
+    .activity-content { flex: 1; }
+    .activity-text { font-size: 13px; }
+    .activity-time { color: var(--muted); font-size: 11px; }
+
+    /* Empty state */
+    .empty { color: var(--muted); text-align: center; padding: 40px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); padding: 15px 25px; border-radius: 8px; opacity: 0; transition: opacity 0.3s; z-index: 1000; }
     .toast.show { opacity: 1; }
     .toast.success { border-color: var(--success); }
     .toast.error { border-color: var(--error); }
+
+    /* Loading */
+    .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Two column layout */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 1000px) { .two-col { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>// NOX REWARDS ADMIN</h1>
-    <div class="auth-section" id="authSection">
-      <input type="password" id="adminKey" placeholder="Admin API Key">
+  <!-- Auth -->
+  <div class="auth-container" id="authSection">
+    <div class="auth-box">
+      <h1>// NOX REWARDS ADMIN</h1>
+      <input type="password" id="adminKey" placeholder="Admin API Key" onkeypress="if(event.key==='Enter')authenticate()">
+      <br>
       <button onclick="authenticate()">Authenticate</button>
     </div>
-    <div id="dashboard" class="hidden">
-      <div class="stats" id="stats"></div>
-      <div class="section">
-        <div class="section-title">
-          <span>Pending Approvals</span>
-          <button class="btn btn-refresh" onclick="loadPending()">Refresh</button>
-        </div>
-        <div id="pendingList"></div>
-      </div>
-      <div class="section">
-        <div class="section-title">Quick Approve</div>
-        <div class="approve-form">
-          <select id="approveType">
-            <option value="issue">Issue</option>
-            <option value="pr">PR</option>
-          </select>
-          <input type="text" id="approveUsername" placeholder="GitHub username">
-          <input type="number" id="approveNumber" placeholder="Issue/PR #">
-          <input type="text" id="approveTitle" placeholder="Title (optional)">
-          <input type="number" id="approveReward" placeholder="Reward (NOX)">
-          <button class="btn btn-approve" onclick="quickApprove()">Approve</button>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">
-          <span>Approved (Unclaimed)</span>
-          <button class="btn btn-refresh" onclick="loadApproved()">Refresh</button>
-        </div>
-        <div id="approvedList"></div>
-      </div>
-    </div>
   </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">// NOX ADMIN</span>
+        <div class="header-stats">
+          <div class="header-stat">
+            <div class="header-stat-value" id="headerPool">-</div>
+            <div class="header-stat-label">POOL BALANCE</div>
+          </div>
+          <div class="header-stat">
+            <div class="header-stat-value" id="headerDistributed">-</div>
+            <div class="header-stat-label">DISTRIBUTED</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="status-dot"></span>
+        <span style="color: var(--success); font-size: 12px;">LIVE</span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <div class="tab active" data-tab="overview">Overview</div>
+      <div class="tab" data-tab="github">GitHub</div>
+      <div class="tab" data-tab="contributors">Contributors</div>
+      <div class="tab" data-tab="claims">Claims</div>
+      <div class="tab" data-tab="settings">Settings</div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Overview Tab -->
+      <div class="tab-content" id="tab-overview">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Pending Issues</span>
+              <button class="btn btn-ghost btn-sm" onclick="loadPending()">Refresh</button>
+            </div>
+            <div class="section-body" id="pendingIssues"><div class="empty">Loading...</div></div>
+          </div>
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Pending PRs</span>
+            </div>
+            <div class="section-body" id="pendingPRs"><div class="empty">Loading...</div></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Quick Approve</span>
+          </div>
+          <div class="form-row">
+            <select id="approveType">
+              <option value="issue">Issue</option>
+              <option value="pr">PR</option>
+            </select>
+            <input type="text" id="approveUsername" placeholder="GitHub username">
+            <input type="number" id="approveNumber" placeholder="#">
+            <input type="text" id="approveTitle" placeholder="Title (optional)">
+            <input type="number" id="approveReward" placeholder="NOX">
+            <button class="btn btn-success" onclick="quickApprove()">Approve</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Recent Activity</span>
+          </div>
+          <div class="section-body" id="activityList"><div class="empty">Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- GitHub Tab -->
+      <div class="tab-content hidden" id="tab-github">
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Repository Issues</span>
+              <button class="btn btn-ghost btn-sm" onclick="loadGitHubIssues()">Refresh</button>
+            </div>
+            <div class="filters">
+              <button class="filter-btn active" data-filter="open" onclick="filterGH(this, 'issues')">Open</button>
+              <button class="filter-btn" data-filter="closed" onclick="filterGH(this, 'issues')">Closed</button>
+              <button class="filter-btn" data-filter="all" onclick="filterGH(this, 'issues')">All</button>
+              <input type="text" class="search-input" placeholder="Search..." id="searchIssues" oninput="filterGHSearch('issues')">
+            </div>
+            <div class="section-body" id="githubIssues"><div class="empty">Loading...</div></div>
+          </div>
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Pull Requests</span>
+              <button class="btn btn-ghost btn-sm" onclick="loadGitHubPRs()">Refresh</button>
+            </div>
+            <div class="filters">
+              <button class="filter-btn active" data-filter="open" onclick="filterGH(this, 'prs')">Open</button>
+              <button class="filter-btn" data-filter="merged" onclick="filterGH(this, 'prs')">Merged</button>
+              <button class="filter-btn" data-filter="all" onclick="filterGH(this, 'prs')">All</button>
+              <input type="text" class="search-input" placeholder="Search..." id="searchPRs" oninput="filterGHSearch('prs')">
+            </div>
+            <div class="section-body" id="githubPRs"><div class="empty">Loading...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contributors Tab -->
+      <div class="tab-content hidden" id="tab-contributors">
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">All Contributors</span>
+            <div class="section-actions">
+              <input type="text" class="search-input" placeholder="Search username..." id="searchContributors" oninput="filterContributors()">
+              <button class="btn btn-ghost btn-sm" onclick="loadContributors()">Refresh</button>
+            </div>
+          </div>
+          <div class="section-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Star</th>
+                  <th>Issues</th>
+                  <th>PRs</th>
+                  <th>Total Earned</th>
+                  <th>Last Activity</th>
+                </tr>
+              </thead>
+              <tbody id="contributorsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claims Tab -->
+      <div class="tab-content hidden" id="tab-claims">
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Claims History</span>
+            <div class="section-actions">
+              <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button>
+              <button class="btn btn-ghost btn-sm" onclick="loadClaims()">Refresh</button>
+            </div>
+          </div>
+          <div class="filters">
+            <button class="filter-btn active" data-type="all" onclick="filterClaims(this)">All</button>
+            <button class="filter-btn" data-type="star" onclick="filterClaims(this)">Stars</button>
+            <button class="filter-btn" data-type="issue" onclick="filterClaims(this)">Issues</button>
+            <button class="filter-btn" data-type="pr" onclick="filterClaims(this)">PRs</button>
+            <span style="color: var(--border); margin: 0 10px;">|</span>
+            <button class="filter-btn active" data-status="all" onclick="filterClaimsStatus(this)">All</button>
+            <button class="filter-btn" data-status="claimed" onclick="filterClaimsStatus(this)">Claimed</button>
+            <button class="filter-btn" data-status="pending" onclick="filterClaimsStatus(this)">Pending</button>
+          </div>
+          <div class="section-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>User</th>
+                  <th>Item</th>
+                  <th>Reward</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="claimsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div class="tab-content hidden" id="tab-settings">
+        <div class="two-col">
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Contract Configuration</span>
+            </div>
+            <div class="section-body" id="configInfo">
+              <div style="margin-bottom: 15px;">
+                <div style="color: var(--muted); font-size: 11px; margin-bottom: 5px;">V2 CONTRACT</div>
+                <a href="#" id="contractV2Link" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 13px;"></a>
+              </div>
+              <div style="margin-bottom: 15px;">
+                <div style="color: var(--muted); font-size: 11px; margin-bottom: 5px;">V1 CONTRACT (Legacy)</div>
+                <a href="#" id="contractV1Link" target="_blank" style="color: var(--muted); text-decoration: none; font-size: 13px;"></a>
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header">
+              <span class="section-title">Reward Rates</span>
+            </div>
+            <div class="section-body">
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div style="text-align: center; padding: 15px; background: var(--surface2); border-radius: 6px;">
+                  <div style="color: gold; font-size: 24px; font-weight: bold;" id="rewardStar">5,000</div>
+                  <div style="color: var(--muted); font-size: 11px;">STAR REWARD</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: var(--surface2); border-radius: 6px;">
+                  <div style="color: var(--accent); font-size: 24px; font-weight: bold;" id="rewardIssue">10,000</div>
+                  <div style="color: var(--muted); font-size: 11px;">ISSUE REWARD</div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: var(--surface2); border-radius: 6px;">
+                  <div style="color: var(--success); font-size: 24px; font-weight: bold;" id="rewardPR">25,000</div>
+                  <div style="color: var(--muted); font-size: 11px;">PR REWARD</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Admin Actions</span>
+          </div>
+          <div class="section-body">
+            <button class="btn btn-ghost" onclick="loadAll()" style="margin-right: 10px;">Refresh All Data</button>
+            <button class="btn btn-ghost" onclick="exportCSV()">Export All Claims (CSV)</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
   <div class="toast" id="toast"></div>
-  <script src="admin.js"></script>
+  <script src="admin.js?v=20260402"></script>
 </body>
 </html>
