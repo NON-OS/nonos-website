@@ -524,11 +524,33 @@ NoxContribute.renderApproved = function() {
 window.NoxContribute = NoxContribute;
 var NoxContribute = window.NoxContribute || {};
 
+NoxContribute.showUpgradeBanner = function() {
+  var banner = document.createElement('div');
+  banner.id = 'upgradeBanner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#0d9488,#14b8a6);color:#fff;padding:16px 20px;text-align:center;z-index:9999;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,0.3);';
+  banner.innerHTML = '<strong>Contract Upgraded to V3</strong> — Now using immutable GitHub ID for claims. Enhanced security against username exploits. <span style="opacity:0.8;margin-left:10px;">Dismissing in <span id="bannerCountdown">15</span>s</span>';
+  document.body.prepend(banner);
+  var count = 15;
+  var interval = setInterval(function() {
+    count--;
+    var cd = document.getElementById('bannerCountdown');
+    if (cd) cd.textContent = count;
+    if (count <= 0) {
+      clearInterval(interval);
+      banner.style.transition = 'opacity 0.5s';
+      banner.style.opacity = '0';
+      setTimeout(function() { banner.remove(); }, 500);
+    }
+  }, 1000);
+  banner.onclick = function() { clearInterval(interval); banner.remove(); };
+};
+
 NoxContribute.init = function() {
   NoxContribute.cacheElements();
   NoxContribute.bindEvents();
   NoxContribute.loadStats();
   NoxContribute.handleOAuthCallback();
+  NoxContribute.showUpgradeBanner();
 };
 
 NoxContribute.claimNextReward = function() {
