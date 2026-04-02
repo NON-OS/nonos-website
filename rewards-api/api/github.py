@@ -1,6 +1,9 @@
 import httpx
+from datetime import datetime, timezone
 from fastapi import HTTPException
 from config import REPO_OWNER, REPO_NAME
+
+MIN_ACCOUNT_AGE_DAYS = 3
 
 async def get_github_user(token: str) -> dict:
     async with httpx.AsyncClient() as client:
@@ -15,6 +18,23 @@ async def get_github_user(token: str) -> dict:
         if response.status_code != 200:
             raise HTTPException(401, "Invalid GitHub token")
         return response.json()
+
+def get_account_age_days(user: dict) -> int:
+    """Calculate account age in days from user's created_at field"""
+    created_at = user.get("created_at")
+    if not created_at:
+        return 0
+    try:
+        created = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        now = datetime.now(timezone.utc)
+        return (now - created).days
+    except:
+        return 0
+
+def check_account_age(user: dict) -> tuple[bool, int]:
+    """Check if account is old enough. Returns (is_valid, age_days)"""
+    age = get_account_age_days(user)
+    return age >= MIN_ACCOUNT_AGE_DAYS, age
 
 async def check_star_status_with_token(token: str) -> bool:
     async with httpx.AsyncClient() as client:

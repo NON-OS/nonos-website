@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from web3 import Web3
 from config import STAR_REWARD, ISSUE_REWARD, DEFAULT_PR_REWARD
 from models import ClaimRequest, ClaimResponse, VerifyResponse
-from github import get_github_user, check_star_status, check_star_status_with_token, get_user_issues, get_user_prs
+from github import get_github_user, check_star_status, check_star_status_with_token, get_user_issues, get_user_prs, check_account_age, MIN_ACCOUNT_AGE_DAYS
 from signing import github_hash, generate_nonce, sign_star_claim, sign_issue_claim, sign_pr_claim
 from rate_limiter import rate_limiter
 from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs, record_star_claim, record_star_tx, record_issue_tx, record_pr_tx
@@ -69,6 +69,10 @@ async def claim_star_reward(request: ClaimRequest):
         raise HTTPException(400, "Invalid wallet address")
     user = await get_github_user(request.github_token)
     username = user["login"]
+    # Check account age
+    is_old_enough, age_days = check_account_age(user)
+    if not is_old_enough:
+        raise HTTPException(400, f"GitHub account must be at least {MIN_ACCOUNT_AGE_DAYS} days old. Your account is {age_days} days old.")
     has_starred = await check_star_status_with_token(request.github_token)
     if not has_starred:
         has_starred = await check_star_status(username)
