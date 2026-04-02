@@ -70,6 +70,10 @@ def init_db():
             db.execute("ALTER TABLE star_claims ADD COLUMN tx_hash TEXT")
         except:
             pass
+        try:
+            db.execute("ALTER TABLE star_claims ADD COLUMN github_user_id INTEGER")
+        except:
+            pass
         db.commit()
 
 @contextmanager
@@ -187,13 +191,24 @@ def record_pr_tx(username: str, pr_number: int, tx_hash: str):
         )
         db.commit()
 
-def record_star_claim(username: str, wallet_address: str, tx_hash: str = None):
+def record_star_claim(username: str, wallet_address: str, github_user_id: int = None, tx_hash: str = None):
     with get_db() as db:
         db.execute(
-            "INSERT OR REPLACE INTO star_claims (github_username, wallet_address, tx_hash) VALUES (?, ?, ?)",
-            (username.lower(), wallet_address, tx_hash)
+            "INSERT OR REPLACE INTO star_claims (github_username, wallet_address, github_user_id, tx_hash) VALUES (?, ?, ?, ?)",
+            (username.lower(), wallet_address, github_user_id, tx_hash)
         )
         db.commit()
+
+def has_user_id_claimed_star(github_user_id: int) -> bool:
+    """Check if this GitHub user ID has already claimed star reward"""
+    if not github_user_id:
+        return False
+    with get_db() as db:
+        row = db.execute(
+            "SELECT 1 FROM star_claims WHERE github_user_id = ?",
+            (github_user_id,)
+        ).fetchone()
+        return row is not None
 
 def record_star_tx(username: str, tx_hash: str):
     with get_db() as db:

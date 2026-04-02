@@ -5,7 +5,7 @@ from models import ClaimRequest, ClaimResponse, VerifyResponse
 from github import get_github_user, check_star_status, check_star_status_with_token, get_user_issues, get_user_prs, check_account_age, MIN_ACCOUNT_AGE_DAYS
 from signing import github_hash, generate_nonce, sign_star_claim, sign_issue_claim, sign_pr_claim
 from rate_limiter import rate_limiter
-from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs, record_star_claim, record_star_tx, record_issue_tx, record_pr_tx
+from database import get_approved_issues, get_approved_prs, mark_issue_claimed, mark_pr_claimed, get_user_pending_issues, get_user_pending_prs, record_star_claim, record_star_tx, record_issue_tx, record_pr_tx, has_user_id_claimed_star
 from contract import check_star_claimed_onchain, check_issue_claimed_onchain, check_pr_claimed_onchain
 
 router = APIRouter()
@@ -74,6 +74,10 @@ async def claim_star_reward(request: ClaimRequest):
         raise HTTPException(400, "Invalid wallet address")
     user = await get_github_user(request.github_token)
     username = user["login"]
+    user_id = user.get("id")
+    # Check if this GitHub user ID already claimed (prevents username change exploit)
+    if has_user_id_claimed_star(user_id):
+        raise HTTPException(400, "Star reward already claimed")
     # Check account age
     is_old_enough, age_days = check_account_age(user)
     if not is_old_enough:
@@ -84,7 +88,7 @@ async def claim_star_reward(request: ClaimRequest):
     if not has_starred:
         raise HTTPException(400, "Star the repository to claim your 5,000 NOX reward")
     gh_hash = github_hash(username)
-    # Check if already claimed on-chain
+    # Check if already claimed on-chain (by current username)
     if check_star_claimed_onchain(gh_hash):
         raise HTTPException(400, "Star reward already claimed")
     can_claim, message = rate_limiter.can_claim(gh_hash)
@@ -96,7 +100,7 @@ async def claim_star_reward(request: ClaimRequest):
     except Exception as e:
         raise HTTPException(500, f"Failed to sign claim: {str(e)}")
     rate_limiter.record_claim(gh_hash)
-    record_star_claim(username, wallet)
+    record_star_claim(username, wallet, github_user_id=user_id)
     return ClaimResponse(success=True, amount=str(STAR_REWARD), nonce=nonce, github_hash=gh_hash, signature=signature, message="Star claim ready. Submit to contract.")
 
 @router.post("/claim/issue/{issue_id}", response_model=ClaimResponse)
