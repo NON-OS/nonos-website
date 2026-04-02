@@ -48,10 +48,15 @@ async def get_user_dashboard(github_token: str):
     approved_prs = get_approved_prs(username)
     pending_issues = get_user_pending_issues(username)
     pending_prs = get_user_pending_prs(username)
-    # Check on-chain if star already claimed
+    # Check on-chain status
     gh_hash = github_hash(username)
     star_already_claimed = check_star_claimed_onchain(gh_hash)
     star_eligible = has_starred and not star_already_claimed
+    # Verify issue/PR claimed status on-chain (override DB if TX failed)
+    for issue in approved_issues:
+        issue["claimed"] = check_issue_claimed_onchain(gh_hash, issue["issue_number"])
+    for pr in approved_prs:
+        pr["claimed"] = check_pr_claimed_onchain(gh_hash, pr["pr_number"])
     return {
         "username": username,
         "github_hash": gh_hash,
