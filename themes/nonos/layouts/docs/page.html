@@ -1,0 +1,20 @@
+{{ define "main" }}
+<div class="wrap doc-layout">
+  {{ partial "docs-sidebar.html" . }}
+  <article class="doc-body">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      {{ range .Ancestors.Reverse }}{{ if not .IsHome }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a><span>/</span>{{ end }}{{ end }}
+      <b>{{ .LinkTitle }}</b>
+    </nav>
+    <header class="doc-head">
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}<p class="doc-lede">{{ . }}</p>{{ end }}
+    </header>
+    {{ .Content }}
+    {{ partial "doc-pager.html" . }}
+  </article>
+  {{ if gt (len .TableOfContents) 60 }}
+  <aside class="doc-toc"><h4>On this page</h4>{{ .TableOfContents }}</aside>
+  {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,11 @@
+{{ $src := "" }}
+{{ with .File }}{{ $src = printf "https://github.com/NON-OS/nonos-micro-kernel/blob/main/docs/%s" .Path }}{{ end }}
+{{ if $src }}
+<div class="doc-source">
+  <a href="{{ $src }}" rel="noopener noreferrer">View this page's source &rarr;</a>
+</div>
+{{ end }}
+<div class="doc-pager">
+  {{ with .PrevInSection }}<a class="prev" href="{{ .RelPermalink }}"><span>Previous</span>{{ .LinkTitle }}</a>{{ end }}
+  {{ with .NextInSection }}<a class="next" href="{{ .RelPermalink }}"><span>Next</span>{{ .LinkTitle }}</a>{{ end }}
+</div>

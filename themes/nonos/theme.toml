@@ -1,0 +1,4 @@
+name = "nonos"
+license = "AGPL-3.0"
+description = "NONOS project site theme"
+min_version = "0.146.0"

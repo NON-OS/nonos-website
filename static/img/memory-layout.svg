@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#0a0c0e"/>
+  <text x="200" y="25" font-family="system-ui" font-size="14" fill="#66FFFF" text-anchor="middle" font-weight="600">64-bit Virtual Address Space</text>
+  <rect x="80" y="40" width="240" height="30" rx="2" fill="#66FFFF" fill-opacity="0.15" stroke="#66FFFF"/>
+  <text x="200" y="60" font-family="monospace" font-size="10" fill="#fff" text-anchor="middle">Kernel Space (Higher Half)</text>
+  <rect x="80" y="75" width="240" height="20" rx="2" fill="#333" stroke="#444"/>
+  <text x="200" y="89" font-family="monospace" font-size="9" fill="#666" text-anchor="middle">Non-canonical Gap</text>
+  <rect x="80" y="100" width="240" height="30" rx="2" fill="#2a3035" stroke="#444"/>
+  <text x="200" y="120" font-family="monospace" font-size="10" fill="#888" text-anchor="middle">Stack (grows down)</text>
+  <rect x="80" y="135" width="240" height="35" rx="2" fill="#252a2e" stroke="#444"/>
+  <text x="200" y="158" font-family="monospace" font-size="10" fill="#888" text-anchor="middle">mmap / Libraries</text>
+  <rect x="80" y="175" width="240" height="30" rx="2" fill="#202428" stroke="#444"/>
+  <text x="200" y="195" font-family="monospace" font-size="10" fill="#888" text-anchor="middle">Heap (grows up)</text>
+  <rect x="80" y="210" width="240" height="25" rx="2" fill="#1a1e22" stroke="#444"/>
+  <text x="200" y="227" font-family="monospace" font-size="10" fill="#888" text-anchor="middle">BSS / Data / Text</text>
+  <rect x="80" y="240" width="240" height="20" rx="2" fill="#151818" stroke="#333"/>
+  <text x="200" y="254" font-family="monospace" font-size="9" fill="#555" text-anchor="middle">NULL trap (reserved)</text>
+  <text x="70" y="55" font-family="monospace" font-size="8" fill="#66FFFF" text-anchor="end">0xFFFF...</text>
+  <text x="70" y="120" font-family="monospace" font-size="8" fill="#888" text-anchor="end">0x7FFF...</text>
+  <text x="70" y="195" font-family="monospace" font-size="8" fill="#888" text-anchor="end">0x0001...</text>
+  <text x="70" y="254" font-family="monospace" font-size="8" fill="#555" text-anchor="end">0x0000...</text>
+  <text x="200" y="285" font-family="system-ui" font-size="10" fill="#555" text-anchor="middle">KASLR | Guard Pages | NX Stack</text>
+</svg>

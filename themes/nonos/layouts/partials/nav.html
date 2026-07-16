@@ -1,0 +1,66 @@
+<header class="topnav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="NØNOS home">
+      <img src="/img/logomark.svg" alt="" width="28" height="28">
+      <span>N<b>Ø</b>NOS</span>
+    </a>
+    <input type="checkbox" id="menu-toggle" aria-hidden="true">
+    <label for="menu-toggle" class="hamburger" aria-label="Menu"><span></span><span></span><span></span></label>
+    <nav>
+      <div class="dd">
+        <a class="dd-top" href="/docs/" aria-haspopup="true">Documentation<i class="caret" aria-hidden="true"></i></a>
+        <div class="dd-menu">
+          <a href="/docs/architecture/mission/">The mission</a>
+          <a href="/docs/architecture/overview/">Architecture overview</a>
+          <a href="/docs/architecture/verification/">Verification</a>
+          <a href="/docs/subsystems/">Subsystems</a>
+          <a href="/docs/security/">Security</a>
+          <a href="/docs/userland/">Userland</a>
+          <a href="/docs/abi/">Syscall ABI</a>
+          <a href="/docs/arch/">CPU backends</a>
+          <a href="/docs/build/">Building</a>
+        </div>
+      </div>
+      <div class="dd">
+        <a class="dd-top live-link" href="/docs/run/" aria-haspopup="true"><span class="live-dot" aria-hidden="true"></span>Run it<i class="caret" aria-hidden="true"></i></a>
+        <div class="dd-menu">
+          <a href="{{ .Site.Params.live_url }}">Boot in your browser</a>
+          <a href="/docs/run/virtualbox/">VirtualBox</a>
+          <a href="/docs/run/qemu/">QEMU</a>
+          <a href="/docs/run/utm/">UTM (macOS)</a>
+          <a href="/docs/run/docker/">Docker / Podman</a>
+          <a href="/docs/run/">All run options</a>
+          <a href="/download/">Download the image</a>
+        </div>
+      </div>
+      <div class="dd">
+        <a class="dd-top" href="/roadmap/" aria-haspopup="true">Project<i class="caret" aria-hidden="true"></i></a>
+        <div class="dd-menu">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/news/">News</a>
+          <a href="/team/">Team</a>
+          <a href="/events/">Events</a>
+          <a href="/fund/">Fund NØNOS</a>
+          <a href="/faq/">FAQ</a>
+          <a href="/contribute/">Contribute</a>
+          <a href="/trademarks/">Trademarks</a>
+          <a href="{{ .Site.Params.github }}" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </div>
+      <a href="/fund/">Fund</a>
+      <div class="dd">
+        <a class="dd-top" href="/docs/staking/" aria-haspopup="true">Staking<i class="caret" aria-hidden="true"></i></a>
+        <div class="dd-menu">
+          <a href="https://staking.nonos.software" rel="noopener noreferrer">Open the dashboard</a>
+          <a href="/docs/staking/">Staking overview</a>
+          <a href="/docs/staking/quickstart/">Quickstart</a>
+          <a href="/docs/staking/dashboard/">Dashboard docs</a>
+          <a href="/docs/staking/sdk/">SDK docs</a>
+          <a href="/docs/staking/guides/">Guides</a>
+          <a href="https://www.npmjs.com/package/@nonos/nox-staking-sdk" rel="noopener noreferrer">npm packages</a>
+        </div>
+      </div>
+      <a class="cta" href="/download/">Download</a>
+    </nav>
+  </div>
+</header>

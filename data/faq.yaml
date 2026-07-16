@@ -1,0 +1,105 @@
+groups:
+  - title: The basics
+    items:
+      - q: What is NØNOS?
+        a: >
+          NØNOS is a sovereign operating system: a from-scratch, `no_std`
+          microkernel written in Rust, where every program is a signed,
+          attested capsule. Authority is granted by capability, state lives in
+          RAM and vanishes on power-off, and the security-critical path is
+          small enough to machine-check. It is built for the machine that holds
+          a key, signs a transaction, or runs an autonomous agent, not just the
+          laptop that browses the web.
+      - q: Is it free and open source?
+        a: >
+          Yes. The kernel, the bootloader, the proofs, the signing tools, the
+          documentation, and the staking stack are all licensed AGPL-3.0 and
+          public on GitHub. You can read it, build it, run it, and host it
+          yourself. Nothing runs on our servers that you cannot run on yours.
+      - q: When does it release?
+        a: >
+          Version 1.0 releases on July 22, 2026. The source and documentation
+          are public before then.
+      - q: Can I try it without installing anything?
+        a: >
+          Yes. The live boot streams a real, throwaway NØNOS guest to your
+          browser: you drive it with your own keyboard and mouse, and it is
+          destroyed with its memory when you leave. For the real thing, download
+          it and boot it on your own hardware or in a VM.
+
+  - title: Security and verification
+    items:
+      - q: What does "proven" actually mean here?
+        a: >
+          The security-critical surfaces are machine-checked in one refinement
+          chain: Lean 4 states what must be true, the shipping Rust is tied to
+          that specification by machine-checked extraction with Charon and
+          Aeneas, Verus and Kani prove the implementation over every input, and
+          the cryptographic primitives are pinned to NIST and RFC test vectors.
+          The proofs compile against the kernel source itself, never a copy, so
+          a divergence is a build error.
+      - q: What is NOT proven?
+        a: >
+          Plenty, and we say so on the verification page. The proofs cover
+          specific surfaces (the capability algebra, the IPC length gate, paging
+          permissions, boot anti-rollback, path normalisation, the parsers, the
+          crypto primitives), not the whole system. Hardware, firmware, and the
+          parts of userland outside those surfaces are not formally verified. A
+          proof is a bounded claim; read the scope before you trust it.
+      - q: Is this like seL4?
+        a: >
+          It shares the conviction that the trusted path should be small and
+          machine-checked, and it uses several of the same tools. It differs in
+          aim: NØNOS is a complete, RAM-resident desktop OS with a signed-capsule
+          userland, a hardware broker, an attestation gate, and a networking and
+          graphics stack, built for sovereign and cryptographic workloads. seL4
+          is a verified microkernel; NØNOS is a system built around one.
+      - q: Do I have to trust your build?
+        a: >
+          No. Every proof result reproduces from a clean checkout, the release
+          artifacts carry BLAKE3 checksums, and the build is reproducible so you
+          can rebuild and diff against what we publish. The whole point is that
+          you verify instead of trust.
+
+  - title: Running software
+    items:
+      - q: Can it run real applications?
+        a: >
+          Yes. NØNOS implements a platform layer for the Rust standard library,
+          so unmodified Rust applications compile for the `x86_64-nonos` target
+          and install as signed capsules, threads, sockets, filesystem and all.
+          The desktop ships a compositor, a terminal, an editor with an IDE
+          shell, and a browser engine that renders real pages over TLS.
+      - q: What hardware does it run on?
+        a: >
+          It boots on real x86_64 laptops, not only in QEMU, and the
+          documentation states plainly which drivers are proven on hardware and
+          which are still in bring-up. aarch64 and riscv64 are architecture-ready
+          behind a shared arch boundary, with x86_64 as the production-first
+          target.
+      - q: Is the crypto or the NOX token load-bearing for the OS?
+        a: >
+          No. The kernel does not depend on any token or chain to boot or run.
+          NOX staking grants ecosystem rights; runtime authority on a NØNOS
+          machine flows through the signed capsule manifest and the kernel's
+          capability system, never through a token. The two trust chains are
+          deliberately separate.
+
+  - title: Using and contributing
+    items:
+      - q: Can I use NØNOS commercially?
+        a: >
+          Yes, under the AGPL-3.0. That license grants the right to use, study,
+          share, and modify the software, with the obligation to pass those same
+          rights on, including to users who interact with a modified version
+          over a network. If the AGPL does not fit your deployment, reach out.
+      - q: How do I contribute?
+        a: >
+          Read the documentation, build it, and open issues or pull requests on
+          GitHub. The codebase is modular by design and every documentation page
+          is cross-referenced to the source it describes, so it is navigable
+          from day one.
+      - q: How do I report a security issue?
+        a: >
+          Report vulnerabilities privately first, not in a public issue. See the
+          security policy for the disclosure process.

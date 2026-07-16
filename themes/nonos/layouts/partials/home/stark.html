@@ -1,0 +1,28 @@
+<section class="stark band" id="zk">
+  <div class="act">
+    <div class="scene-bg" data-scene="merkle" data-shift="right" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>A zero-knowledge gate on every spawn.</h2>
+        </div>
+        <p>The kernel carries its own transparent STARK: Goldilocks field arithmetic with a
+        quadratic extension, Poseidon hashing verified against the Plonky2 reference
+        vectors, FRI commitments with proof-of-work grinding. No trusted setup, no
+        ceremony, nothing to leak.</p>
+        <p>A capsule arrives with a proof binding its BLAKE3 hash, its capability mask and
+        the policy epoch. The kernel verifies membership in the enrolled policy before a
+        single instruction runs.</p>
+        <div class="chips">
+          <span>Goldilocks + Fp2</span>
+          <span>Poseidon</span>
+          <span>FRI + grinding</span>
+          <span>recursive verifier</span>
+          <span>no trusted setup</span>
+        </div>
+        <a class="btn" href="/docs/subsystems/proof-system/">Inside the proof system</a>
+      </div>
+    </div>
+    <span class="scene-note">a capsule proves membership under the policy root &middot; the path verifies, the root flashes, the spawn proceeds</span>
+  </div>
+</section>

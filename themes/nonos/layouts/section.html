@@ -1,0 +1,18 @@
+{{ define "main" }}
+<div class="wrap prose-page">
+  <article class="prose">
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="doc-lede">{{ . }}</p>{{ end }}
+    {{ .Content }}
+    <div class="post-list">
+      {{ range .RegularPages.ByDate.Reverse }}
+      <a class="post-row" href="{{ .RelPermalink }}">
+        <time>{{ .Date.Format "Jan 2, 2006" }}</time>
+        <span class="t">{{ .Title }}</span>
+        <span class="d">{{ .Description }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </article>
+</div>
+{{ end }}

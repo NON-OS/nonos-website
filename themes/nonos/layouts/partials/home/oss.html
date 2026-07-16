@@ -1,0 +1,88 @@
+<section class="oss band" id="opensource">
+  <div class="act">
+    <div class="scene-bg" data-scene="localstake" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>Everything is public. Kernel to staking.</h2>
+        </div>
+        <p>The kernel, the proofs, the signing tools, the documentation, and the staking
+        stack are all AGPL and all on GitHub. Nothing runs on our servers that you cannot
+        run on yours.</p>
+        <p>Stake NOX from your own machine: the receipt is signed locally as EIP-712 and
+        lands on mainnet with no backend in the path.</p>
+        <a class="btn" href="/docs/staking/">Staking documentation</a>
+      </div>
+    </div>
+    <span class="scene-note">signed on your machine &middot; lands on mainnet &middot; nothing in between</span>
+  </div>
+
+  <div class="wrap below">
+    {{ partial "languages.html" . }}
+
+    <div class="oss-grid">
+      <div class="glass pkg reveal">
+        <div class="pkg-head">
+          <h3>@nonos/nox-dashboard</h3>
+          <span class="ver">v0.1.2</span>
+        </div>
+        <p>Local-first staking dashboard for NOX. Run it on your own machine, connect your
+        own RPC and wallet, and stake without trusting a website.</p>
+        <div class="cmd-row">
+          <code>npx @nonos/nox-dashboard</code>
+          <button class="copy" type="button" data-copy="npx @nonos/nox-dashboard" aria-label="Copy command">copy</button>
+        </div>
+        <div class="pkg-links">
+          <a href="/docs/staking/dashboard/">docs</a>
+          <a href="https://www.npmjs.com/package/@nonos/nox-dashboard" rel="noopener noreferrer">npm</a>
+          <a href="https://staking.nonos.software" rel="noopener noreferrer">hosted dashboard</a>
+        </div>
+      </div>
+
+      <div class="glass pkg reveal d1">
+        <div class="pkg-head">
+          <h3>@nonos/nox-staking-sdk</h3>
+          <span class="ver">v0.2.2</span>
+        </div>
+        <p>Local-first TypeScript SDK for NOX staking. EIP-712 receipts, namespaces, tiers,
+        and a pinned mainnet deployment, so integrations verify instead of trust.</p>
+        <div class="cmd-row">
+          <code>npm install @nonos/nox-staking-sdk</code>
+          <button class="copy" type="button" data-copy="npm install @nonos/nox-staking-sdk" aria-label="Copy command">copy</button>
+        </div>
+        <div class="pkg-links">
+          <a href="/docs/staking/sdk/">docs</a>
+          <a href="https://www.npmjs.com/package/@nonos/nox-staking-sdk" rel="noopener noreferrer">npm</a>
+          <a href="https://x.com/nonossystems/status/2074486397445050735" rel="noopener noreferrer">read the write-up</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="repo-grid">
+      <a class="glass repo reveal" href="https://github.com/NON-OS/nonos-micro-kernel" rel="noopener noreferrer">
+        <h3>nonos-micro-kernel</h3>
+        <p>The kernel itself: Rust microkernel, bootloader, userland capsules, and the
+        Lean, Verus and Kani proofs in one tree.</p>
+        <span class="repo-tag">Rust &middot; AGPL-3.0</span>
+      </a>
+      <a class="glass repo reveal d1" href="https://github.com/NON-OS/nonos-docs" rel="noopener noreferrer">
+        <h3>nonos-docs</h3>
+        <p>The full documentation, written against the source it describes and versioned
+        with the kernel.</p>
+        <span class="repo-tag">Docs &middot; AGPL-3.0</span>
+      </a>
+      <a class="glass repo reveal d2" href="https://github.com/NON-OS/nonos-sign" rel="noopener noreferrer">
+        <h3>nonos-sign</h3>
+        <p>The host-side capsule signer and verifier. Hybrid Ed25519 and ML-DSA-65, the
+        same trust chain the kernel enforces.</p>
+        <span class="repo-tag">Rust &middot; AGPL-3.0</span>
+      </a>
+      <a class="glass repo reveal d3" href="https://github.com/NON-OS/nonos-trust-keystore" rel="noopener noreferrer">
+        <h3>nonos-trust-keystore</h3>
+        <p>Trust anchor, publisher keys, sealed policy and the signed capsule ledger.
+        The roots of the chain, in public.</p>
+        <span class="repo-tag">Keys &middot; AGPL-3.0</span>
+      </a>
+    </div>
+  </div>
+</section>

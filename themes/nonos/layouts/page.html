@@ -1,0 +1,48 @@
+{{ define "main" }}
+{{ if eq .Layout "live" }}
+<div class="wrap prose-page">
+  <article class="prose" style="text-align:center; padding-top:40px;">
+    <h1>Boot NØNOS live</h1>
+    <p class="doc-lede">A real, throwaway NØNOS guest, streamed to your browser. Signed,
+    RAM-resident, and gone when you close the tab.</p>
+    <p><a class="btn primary" href="{{ .Site.Params.live_url }}">Open the live boot</a></p>
+    <p style="margin-top:24px;"><a href="/download/">Get the image to boot it yourself</a></p>
+  </article>
+</div>
+{{ else if eq .Layout "download" }}
+{{ partial "download.html" . }}
+{{ else if eq .Layout "fund" }}
+{{ partial "fund.html" . }}
+{{ else if eq .Layout "faq" }}
+<div class="wrap prose-page faq-page">
+  <header class="doc-head">
+    <h1>{{ .Title }}</h1>
+    <p class="doc-lede">{{ .Description }}</p>
+  </header>
+  <div class="faq">
+    {{ range .Site.Data.faq.groups }}
+    <section class="faq-group">
+      <h2>{{ .title }}</h2>
+      {{ range .items }}
+      <details class="faq-item">
+        <summary>{{ .q }}</summary>
+        <div class="faq-a">{{ .a | markdownify }}</div>
+      </details>
+      {{ end }}
+    </section>
+    {{ end }}
+  </div>
+  <p class="faq-foot">Still stuck? The <a href="/docs/">documentation</a> answers most
+  things in depth, and the <a href="/docs/architecture/verification/">verification page</a>
+  states exactly what is and is not proven.</p>
+</div>
+{{ else }}
+<div class="wrap prose-page">
+  <article class="prose">
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="doc-lede">{{ . }}</p>{{ end }}
+    {{ .Content }}
+  </article>
+</div>
+{{ end }}
+{{ end }}

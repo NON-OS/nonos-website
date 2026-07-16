@@ -1,0 +1,9 @@
+{{ if .IsHome }}
+<script src="/js/three.min.js" defer></script>
+<script type="module" src="/js/hero/main.js"></script>
+<script type="module" src="/js/scenes/main.js"></script>
+{{ else if or (eq .Layout "download") (eq .Layout "fund") }}
+<script src="/js/three.min.js" defer></script>
+<script type="module" src="/js/scenes/main.js"></script>
+{{ end }}
+<script type="module" src="/js/ui/main.js"></script>

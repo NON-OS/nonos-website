@@ -1,0 +1,7 @@
+{
+  "name": "nonos-site",
+  "private": true,
+  "scripts": {
+    "audit": "node scripts/audit.mjs"
+  }
+}

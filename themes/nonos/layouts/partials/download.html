@@ -1,0 +1,215 @@
+{{ $d := .Site.Data.downloads }}
+<div class="dl">
+
+  <section class="dl-hero">
+    <div class="scene-bg" data-scene="dlseal" aria-hidden="true"></div>
+    <div class="wrap dl-hero-in">
+      <p class="eyebrow">NØNOS {{ $d.version }} &middot; signature-verified &middot; x86_64 UEFI</p>
+      <h1>Get the operating system<br>that <span class="hl">proves</span> what it runs.</h1>
+      <p class="dl-lede">A RAM-resident, capability-secured OS. Every image is signed,
+      checksummed, and reproducible, so you verify exactly what you boot instead of trusting
+      us for it.</p>
+      <div class="dl-actions">
+        <a class="btn primary" href="{{ .Site.Params.live_url }}">Boot it live now</a>
+        <a class="btn" href="#artifacts">Get the image</a>
+        <a class="btn ghost-btn" href="#verify">How to verify</a>
+      </div>
+      {{ if eq $d.status "upcoming" }}
+      <div class="dl-badge"><span class="rel-dot"></span>The <strong>{{ $d.version }}</strong> image releases <strong>{{ dateFormat "January 2, 2006" $d.released }}</strong>. Boot it live in your browser today; source and docs are already public.</div>
+      {{ end }}
+      <ul class="hero-trust">
+        <li>SHA-256 + BLAKE3 checksums</li>
+        <li>Ed25519 + ML-DSA-65 signed</li>
+        <li>Reproducible build</li>
+        <li>RAM-resident &middot; AGPL</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="dl-body">
+
+    <section class="dl-steps">
+      <div class="wrap">
+        <ol class="steps3">
+          <li><span class="s-n">1</span><div><b>Download the image</b><span>The disk image for your VM or a USB stick.</span></div></li>
+          <li><span class="s-n">2</span><div><b>Verify the checksums</b><span>Confirm the bytes match what we published.</span></div></li>
+          <li><span class="s-n">3</span><div><b>Boot it</b><span>The trust chain checks every step before it runs.</span></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="artifacts" class="dl-block">
+      <div class="scene-bg sec-scene" data-scene="dldisk" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="shead">
+          <h2>What to download</h2>
+          <p class="dl-sub">Every artifact boots the same verified system. Pick the one that
+          matches how you want to <a href="/docs/run/">run it</a>.</p>
+        </div>
+        <div class="dl-grid">
+          {{ range $d.artifacts }}
+          <div class="dl-card glass{{ if .recommended }} rec{{ end }}">
+            {{ if .recommended }}<span class="rec-tag">Recommended</span>{{ end }}
+            <h3>{{ .name }}</h3>
+            <p class="dl-for">{{ .for }}</p>
+            <div class="dl-file">
+              <code>{{ .file }}</code>
+              <span class="dl-size">{{ .size }}</span>
+            </div>
+            {{ if eq $d.status "released" }}
+            <a class="btn primary small" href="{{ $d.base_url }}/{{ .file }}">Download</a>
+            {{ else }}
+            <span class="btn small disabled">Available at release</span>
+            {{ end }}
+          </div>
+          {{ end }}
+        </div>
+        <div class="dl-sums">
+          <span>Checksums and provenance</span>
+          <div class="dl-sums-links">
+          {{ range $d.checksums }}
+            <a href="{{ if eq $d.status "released" }}{{ $d.base_url }}/{{ .file }}{{ else }}#verify{{ end }}"><code>{{ .file }}</code><em>{{ .label }}</em></a>
+          {{ end }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="verify" class="dl-block alt">
+      <div class="scene-bg sec-scene" data-scene="dlhash" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="shead">
+          <h2>Confirm you booted what we published</h2>
+          <p class="dl-sub">Do not skip this. The whole point of NØNOS is that you verify
+          instead of trust. Two checks take ten seconds; the deeper ones prove the entire
+          trust chain from a clean checkout.</p>
+        </div>
+
+        <div class="verify-grid">
+          <div class="verify-step">
+            <div class="vs-head"><span class="vs-n">1</span><h3>Check the hash</h3></div>
+            <p>Confirm the bytes you downloaded match the published checksums. Either
+            algorithm is sufficient; both are provided.</p>
+            <div class="term">
+              <div class="term-bar"><span></span><span></span><span></span><em>verify &middot; hash</em></div>
+              <pre><code><span class="c">$</span> b3sum -c BLAKE3SUMS
+nonos-1.0.img: <span class="ok">OK</span>
+<span class="c">$</span> sha256sum -c SHA256SUMS
+nonos-1.0.img: <span class="ok">OK</span></code></pre>
+            </div>
+            <p class="vs-note">Every line must report <code>OK</code>. A mismatch means the
+            download is corrupt or tampered. Do not boot it.</p>
+          </div>
+
+          <div class="verify-step">
+            <div class="vs-head"><span class="vs-n">2</span><h3>Verify the trust chain</h3></div>
+            <p>With the kernel checked out, decode and verify every signed capsule against
+            the baked trust anchor, the same check the running kernel performs.</p>
+            <div class="term">
+              <div class="term-bar"><span></span><span></span><span></span><em>verify &middot; trust-chain</em></div>
+              <pre><code><span class="c">$</span> cargo run -p nonos-verify -- trust-chain
+anchor: ed25519 + ml-dsa-65 <span class="ok">ok</span>
+capsules: 14/14 verified <span class="ok">ok</span></code></pre>
+            </div>
+            <p class="vs-note">Confirms the hybrid Ed25519 and ML-DSA-65 signatures on the
+            kernel and every capsule manifest resolve to the published anchor.</p>
+          </div>
+
+          <div class="verify-step">
+            <div class="vs-head"><span class="vs-n">3</span><h3>Reproduce the build</h3></div>
+            <p>Rebuild from a clean worktree and compare hashes. If your build matches ours,
+            the image is exactly the source, with nothing added.</p>
+            <div class="term">
+              <div class="term-bar"><span></span><span></span><span></span><em>verify &middot; reproducible</em></div>
+              <pre><code><span class="c">$</span> cargo run -p nonos-verify -- reproducible
+build A == build B <span class="ok">ok</span>
+image == source <span class="ok">ok</span></code></pre>
+            </div>
+            <p class="vs-note">A reproducible build lets you trust the binary without trusting
+            us. The image is the source, byte for byte.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dl-block">
+      <div class="scene-bg sec-scene" data-scene="dlgate" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="shead">
+          <h2>What gates the boot</h2>
+          <p class="dl-sub">Downloading is the easy part. Here is what has to pass before a
+          single instruction of your download runs, and why an old or altered image cannot
+          slip through.</p>
+        </div>
+
+        <ol class="pipeline">
+          <li>
+            <span class="pl-mark">i</span>
+            <div class="pl-body">
+              <h3>Signed kernel</h3>
+              <p>The bootloader authenticates the kernel's hybrid signature: Ed25519 for
+              speed, ML-DSA-65 for post-quantum strength. The signed message is
+              <code>blake3(kernel) || rollback_index</code>, so the hash and the version are
+              bound together and cannot be separated.</p>
+              <a href="/docs/security/signing-and-mac/">Signing and MAC &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <span class="pl-mark">ii</span>
+            <div class="pl-body">
+              <h3>Anti-rollback</h3>
+              <p>The rollback index is enforced against a TPM monotonic counter that only
+              moves forward. Once a newer kernel has booted, the floor rises for good.
+              Re-flashing yesterday's vulnerable image to reopen yesterday's hole fails: the
+              signature is valid, the index is not, and it does not boot.</p>
+              <a href="/docs/security/attestation/">Attestation &rarr;</a>
+            </div>
+          </li>
+          <li>
+            <span class="pl-mark">iii</span>
+            <div class="pl-body">
+              <h3>Capsule attestation</h3>
+              <p>At spawn, the kernel's transparent STARK gate verifies each capsule's
+              proof. It binds the capsule's BLAKE3 hash, its capability mask, and the policy
+              epoch, and checks membership in the enrolled policy before the capsule runs.
+              No trusted setup, nothing to leak.</p>
+              <a href="/docs/subsystems/proof-system/">The proof system &rarr;</a>
+            </div>
+          </li>
+        </ol>
+
+        <div class="chain-flow">
+          <span>download</span><i>&rarr;</i>
+          <span>hash matches</span><i>&rarr;</i>
+          <span>kernel signature</span><i>&rarr;</i>
+          <span>index &ge; TPM floor</span><i>&rarr;</i>
+          <span>measured launch</span><i>&rarr;</i>
+          <span>capsule attestation</span><i>&rarr;</i>
+          <span class="ok">runs</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dl-block alt">
+      <div class="scene-bg sec-scene" data-scene="dldisk" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="shead">
+          <h2>Then boot it, your way</h2>
+          <p class="dl-sub">The image runs anywhere a UEFI machine does.</p>
+        </div>
+        <div class="run-links">
+          <a href="{{ .Site.Params.live_url }}">In your browser</a>
+          <a href="/docs/run/virtualbox/">VirtualBox</a>
+          <a href="/docs/run/qemu/">QEMU</a>
+          <a href="/docs/run/utm/">UTM</a>
+          <a href="/docs/run/docker/">Docker / Podman</a>
+          <a href="/docs/run/">All options</a>
+        </div>
+        <p class="dl-req">Requirements: an x86_64 machine or VM with UEFI firmware, 2 GB of
+        memory, and virtio or AHCI storage. There is no legacy BIOS path. Secure Boot should
+        be off, since NØNOS carries its own signature chain rather than the vendor's keys.</p>
+      </div>
+    </section>
+
+  </div>
+</div>

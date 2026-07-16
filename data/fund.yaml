@@ -1,0 +1,72 @@
+target: "1M+"
+budget_total: "1,000,000"
+period: "12 months"
+
+# Direct crypto donations. REPLACE the eth address with your real public
+# donation wallet before this page goes live. Leave it as-is and the page
+# shows a "publishing soon" state instead of a fake address.
+donate:
+  eth: "0xREPLACE_WITH_YOUR_PUBLIC_DONATION_WALLET"
+  ens: ""            # optional, e.g. nonos.eth
+  chain: "Ethereum mainnet"
+  note: "A public, multisig-controlled donation wallet. Funds are spent against the budget below and reported openly. On-chain, so anyone can audit where it goes."
+
+# where a year of funding goes, summing to the target
+budget:
+  - line: "Core engineering"
+    detail: "Three full-time systems engineers on the kernel, the trusted path, and driver capsules."
+    amount: 450000
+    pct: 45
+  - line: "Formal verification"
+    detail: "Proof engineering across Lean, Verus, and Kani, and the CI that keeps every proof green."
+    amount: 130000
+    pct: 13
+  - line: "Security audits"
+    detail: "Two independent external audits of the bootloader, the capability system, and the crypto stack."
+    amount: 150000
+    pct: 15
+  - line: "Hardware bring-up"
+    detail: "A real-device lab: x86_64 laptops, ARM and RISC-V boards, and the rigs to prove drivers on silicon."
+    amount: 90000
+    pct: 9
+  - line: "Reproducible builds and infrastructure"
+    detail: "Independent verification, reproducible-build infra, CI, and the live in-browser boot servers."
+    amount: 100000
+    pct: 10
+  - line: "Docs, design, and community"
+    detail: "Keeping the documentation verified against the source, and growing the contributor base."
+    amount: 80000
+    pct: 8
+
+# funding unlocks, in order
+milestones:
+  - at: "$250k"
+    title: "Close the trusted path"
+    body: "A full-time verification engineer and the first external audit. The security-critical surfaces reach audited, machine-checked coverage."
+  - at: "$500k"
+    title: "Prove it on hardware"
+    body: "The driver-capsule program and the hardware lab: WiFi, storage, and USB proven on real x86_64 devices, not only in QEMU."
+  - at: "$1M"
+    title: "A year of the full team"
+    body: "The complete team for twelve months: an audited, hardware-proven, formally-verified trusted path shipping in v1.x."
+  - at: "$1M+"
+    title: "Multi-architecture to production"
+    body: "Sustained funding carries aarch64 and riscv64 from architecture-ready to production behind the same proofs."
+
+channels:
+  - name: "Grants"
+    body: "NØNOS is exactly what public-interest technology funds exist for: a privacy-first, verified, open operating system. We are pursuing NLnet and NGI Zero, the Ethereum Foundation ecosystem program for the sovereign-compute and agentic-payments angle, the Sovereign Tech Fund, and crypto public-goods rounds."
+    cta: "Introduce a grant"
+    href: "mailto:team@nonos.systems?subject=NONOS%20grant"
+  - name: "Venture and strategic"
+    body: "For funds and strategic partners: NØNOS is a sovereign OS with a native agentic-payment rail (NOX) live on Ethereum mainnet. We are open to strategic rounds with crypto-infrastructure and deep-tech investors who back verified systems, on terms that keep the kernel AGPL and the trust chain independent."
+    cta: "Talk to us"
+    href: "mailto:team@nonos.systems?subject=NONOS%20strategic%20round"
+  - name: "Sponsorship"
+    body: "Companies that depend on a trustworthy computing base can sponsor the work directly. Sponsorship funds the roadmap in the open, with named recognition and a direct line to the maintainers, and buys no control over the AGPL project."
+    cta: "Become a sponsor"
+    href: "mailto:team@nonos.systems?subject=NONOS%20sponsorship"
+  - name: "Direct and individual"
+    body: "Donate on-chain to the public wallet above, or support the work recurringly through the repository. Every contribution is public-goods funding, not equity, and the whole project stays AGPL."
+    cta: "Support on GitHub"
+    href: "https://github.com/NON-OS"

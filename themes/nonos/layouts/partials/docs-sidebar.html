@@ -1,0 +1,27 @@
+{{ $current := . }}
+{{ $docs := .Site.GetPage "/docs" }}
+<aside class="doc-side">
+  <input type="search" class="side-filter" id="side-filter" placeholder="Filter pages..." aria-label="Filter documentation pages">
+  <nav aria-label="Documentation">
+    <a class="side-root{{ if eq $current.RelPermalink $docs.RelPermalink }} active{{ end }}" href="{{ $docs.RelPermalink }}">Documentation</a>
+    {{ range $docs.Sections }}
+      {{ template "side-branch" (dict "sec" . "current" $current) }}
+    {{ end }}
+  </nav>
+</aside>
+
+{{ define "side-branch" }}
+  {{ $sec := .sec }}{{ $current := .current }}
+  {{ $open := or ($current.IsDescendant $sec) (eq $current.RelPermalink $sec.RelPermalink) }}
+  <details{{ if $open }} open{{ end }}>
+    <summary><a href="{{ $sec.RelPermalink }}"{{ if eq $current.RelPermalink $sec.RelPermalink }} class="active"{{ end }}>{{ $sec.LinkTitle }}</a></summary>
+    <ul>
+      {{ range $sec.RegularPages }}
+      <li><a href="{{ .RelPermalink }}"{{ if eq $current.RelPermalink .RelPermalink }} class="active"{{ end }}>{{ .LinkTitle }}</a></li>
+      {{ end }}
+      {{ range $sec.Sections }}
+      <li>{{ template "side-branch" (dict "sec" . "current" $current) }}</li>
+      {{ end }}
+    </ul>
+  </details>
+{{ end }}

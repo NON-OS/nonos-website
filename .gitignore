@@ -1,0 +1,26 @@
+# Hugo build output (generated; never commit)
+/public/
+/resources/
+.hugo_build.lock
+
+# Node deps (audit tooling installs nothing, but be safe)
+/node_modules/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# logs and local env
+*.log
+.env
+.env.*
+
+# never commit any guest images, firmware, keys, or certs
+*.iso
+*.img
+*.fd
+*.pem
+*.key
+*.p12

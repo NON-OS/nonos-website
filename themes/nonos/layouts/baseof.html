@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ partial "head.html" . }}
+<body class="{{ if .IsHome }}home{{ else if or (eq .Layout "download") (eq .Layout "fund") }}dark{{ else if eq .Section "docs" }}docs{{ end }}">
+{{ partial "nav.html" . }}
+<main>
+{{ block "main" . }}{{ end }}
+</main>
+{{ partial "footer.html" . }}
+{{ partial "scripts.html" . }}
+</body>
+</html>

@@ -1,0 +1,71 @@
+<section class="features band" id="trust">
+  <div class="act flip">
+    <div class="scene-bg" data-scene="verify" data-shift="left" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>Security is the architecture, not a feature.</h2>
+        </div>
+        <p>Most systems trust what they load and audit later. NØNOS inverts that: programs
+        ship as sealed capsules with a manifest, a signature, and the exact capabilities
+        they may hold. The kernel refuses anything it cannot verify. There is no path
+        around the check.</p>
+        <a class="btn" href="/docs/security/capsules-and-trust/">Capsules and trust</a>
+      </div>
+    </div>
+    <span class="scene-note">ed25519 verify at the gate &middot; invalid images never execute</span>
+  </div>
+
+  <div class="act" id="capabilities">
+    <div class="scene-bg" data-scene="tokens" data-shift="right" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>No ambient authority. Ever.</h2>
+        </div>
+        <p>A capsule without the network capability cannot open a socket. One without
+        storage rights cannot touch the filesystem. Authority is granted token by token,
+        named in the signed manifest, and checked on every call.</p>
+        <p>Grants are explicit, auditable, and revocable at runtime. What was never
+        granted does not exist for that capsule, and there is nothing to escalate.</p>
+        <a class="btn" href="/docs/security/capabilities-and-tokens/">Capabilities and tokens</a>
+      </div>
+    </div>
+    <span class="scene-note">granted tokens dock &middot; everything else is repelled at the shield</span>
+  </div>
+
+  <div class="act flip" id="antirollback">
+    <div class="scene-bg" data-scene="ratchet" data-shift="left" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>Old images do not boot again.</h2>
+        </div>
+        <p>Every kernel carries a rollback index, and the bootloader enforces it against a
+        TPM monotonic counter that only moves forward. Once a newer kernel has booted, the
+        floor has risen for good.</p>
+        <p>A downgrade attack, flashing yesterday's vulnerable image to reopen yesterday's
+        hole, dies at the gate. The signature is valid; the index is not. It does not run.</p>
+        <a class="btn" href="/docs/security/attestation/">Attestation and rollback</a>
+      </div>
+    </div>
+    <span class="scene-note">the counter only moves forward &middot; index 300 bounces off the ratchet</span>
+  </div>
+
+  <div class="act" id="zerostate">
+    <div class="scene-bg" data-scene="wipe" data-shift="right" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>Power off is a cryptographic event.</h2>
+        </div>
+        <p>The system is RAM-resident. Nothing persists unless you decide it should, and
+        memory that held secrets is zeroized on release, not merely freed.</p>
+        <p>A reboot is a clean slate: no stale credentials, no forensic residue, no state
+        an attacker can seed today and harvest tomorrow.</p>
+        <a class="btn" href="/docs/subsystems/memory/zeroization/">How zeroization works</a>
+      </div>
+    </div>
+    <span class="scene-note">the sweep is the wipe &middot; power off &rarr; zeroized</span>
+  </div>
+</section>

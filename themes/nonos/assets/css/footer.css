@@ -1,0 +1,31 @@
+.site-footer { background: var(--dark); color: rgba(255, 255, 255, 0.6); }
+body.home .site-footer { border-top: 1px solid var(--dark-line); }
+.site-footer .cols { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding: 60px 24px 44px; }
+.site-footer .brand { color: #fff; margin-bottom: 14px; }
+.site-footer .brand b { color: var(--cyan); }
+.site-footer .about p { font-size: 0.88rem; max-width: 34ch; }
+.site-footer h4 {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 14px;
+}
+.site-footer .col a { display: block; font-size: 0.9rem; color: rgba(255, 255, 255, 0.6); padding: 4px 0; }
+.site-footer .col a:hover { color: var(--cyan); }
+.site-footer .legal {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px 24px;
+  border-top: 1px solid var(--dark-line);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+.site-footer .legal a { color: rgba(255, 255, 255, 0.6); text-decoration: none; }
+.site-footer .legal a:hover { color: var(--cyan); }
+
+@media (max-width: 860px) {
+  .site-footer .cols { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,56 @@
+baseURL = "https://nonos.software/"
+languageCode = "en"
+title = "NØNOS"
+theme = "nonos"
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "NØNOS is a sovereign operating system: a Rust microkernel where every program is a signed, attested capsule. Capability security, RAM-resident state, verified from bootloader to userland."
+  github = "https://github.com/NON-OS"
+  mainsite = "https://nonos.systems"
+  linkhub = "https://nonos.dev"
+  release_date = "2026-07-22"
+  live_url = "http://localhost:3000"
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  style = "github-dark"
+  lineNos = false
+  tabWidth = 4
+
+[markup.tableOfContents]
+  startLevel = 2
+  endLevel = 3
+
+[[menus.main]]
+  name = "Documentation"
+  url = "/docs/"
+  weight = 10
+
+[[menus.main]]
+  name = "Architecture"
+  url = "/docs/architecture/"
+  weight = 20
+
+[[menus.main]]
+  name = "Security"
+  url = "/docs/security/"
+  weight = 30
+
+[[menus.main]]
+  name = "Staking"
+  url = "/docs/staking/"
+  weight = 35
+
+[[menus.main]]
+  name = "Roadmap"
+  url = "/roadmap/"
+  weight = 40
+
+[[menus.main]]
+  name = "News"
+  url = "/news/"
+  weight = 50

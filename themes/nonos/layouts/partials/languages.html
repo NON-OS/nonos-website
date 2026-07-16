@@ -1,0 +1,16 @@
+{{ $langs := .Site.Data.languages.languages }}
+<div class="langs reveal">
+  <div class="lang-3d" data-scene="langlogos" data-langs="{{ $langs | jsonify }}" aria-hidden="true"></div>
+  <div class="lang-info">
+    <h3>Written in the open, in these languages.</h3>
+    <p class="lang-lede">Rust across the kernel, tools, and userland. The rest is the Lean 4
+    proofs, the build system, arch-specific assembly, and the pqclean reference C for the
+    post-quantum ML-DSA-65 signature the bootloader verifies.</p>
+    <div class="lang-legend">
+      {{ range $langs }}
+      <span class="lang-item"><i style="background: {{ .color }}"></i><b>{{ .name }}</b><em>{{ .pct }}%</em></span>
+      {{ end }}
+    </div>
+    <a class="lang-gh" href="https://github.com/NON-OS/nonos-micro-kernel" rel="noopener noreferrer">See it on GitHub &rarr;</a>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<section class="arch band" id="kernel">
+  <div class="act">
+    <div class="scene-bg" data-scene="stack" aria-hidden="true"></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>A real microkernel, drawn with hard lines.</h2>
+        </div>
+        <p>The kernel keeps primitives: address spaces, scheduling, IPC, capabilities.
+        Policy lives in userland capsules. Drivers claim hardware through a broker that
+        mediates MMIO, port I/O, DMA and interrupts, and revokes a grant the moment a
+        driver misbehaves.</p>
+        <p>The design is documented page by page, verified against the source it
+        describes.</p>
+        <a class="btn" href="/docs/architecture/">Explore the architecture</a>
+      </div>
+    </div>
+    <span class="scene-note">syscall pulses cross the boundary &middot; denied calls stop at the kernel &middot; the broker grants hardware</span>
+  </div>
+</section>

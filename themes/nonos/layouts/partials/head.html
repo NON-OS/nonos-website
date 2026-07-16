@@ -1,0 +1,30 @@
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+{{ $title := .Title }}{{ if .IsHome }}{{ $title = "NØNOS · the sovereign operating system" }}{{ else }}{{ $title = printf "%s · NØNOS" .Title }}{{ end }}
+<title>{{ $title }}</title>
+<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="NØNOS">
+<meta property="og:image" content="{{ "img/og.png" | absURL }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NØNOS · the operating system that proves what it runs">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $title }}">
+<meta name="twitter:description" content="{{ with .Description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+<meta name="twitter:image" content="{{ "img/og.png" | absURL }}">
+<meta name="twitter:site" content="@nonossystems">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="canonical" href="{{ .Permalink }}">
+{{ $sheets := slice "css/tokens.css" "css/base.css" "css/nav.css" "css/home.css" "css/docs.css" "css/pages.css" "css/download.css" "css/footer.css" }}
+{{ $styles := slice }}
+{{ range $sheets }}{{ $styles = $styles | append (resources.Get .) }}{{ end }}
+{{ $css := $styles | resources.Concat "css/site.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}">
+</head>

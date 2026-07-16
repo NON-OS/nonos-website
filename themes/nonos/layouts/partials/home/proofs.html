@@ -1,0 +1,28 @@
+<section class="proofs band" id="proofs">
+  <div class="act flip">
+    <div class="scene-bg" data-scene="reactor" data-shift="left" aria-hidden="true" data-items='["no_rollback_after_boot","attenuation_confines","no_wx_when_permission_rejects_wx","no_impersonation","leading_dotdot_neutralized","an_honest_opening_verifies","empty_token_grants_nothing","update_never_lowers_floor","accepted_message_is_bounded","field_mul_is_associative","sender_iff_caller","revoke_is_monotonic"]'></div>
+    <div class="wrap act-wrap">
+      <div class="act-copy reveal">
+        <div class="shead">
+          <h2>Not audited. Proven.</h2>
+        </div>
+        <p>Audits sample; proofs cover. Lean 4 states what must be true, the shipping Rust
+        is tied to that spec by machine-checked extraction with Charon and Aeneas, Verus
+        and Kani prove the implementation over every input, and the primitives underneath
+        are pinned to NIST and RFC vectors.</p>
+        <p>The proofs compile against the kernel source itself, never a copy, so a
+        divergence is a build error. Writing them found and fixed two real bugs in the
+        kernel's ZK verifier.</p>
+        <a class="btn" href="/docs/security/">The verification map</a>
+      </div>
+    </div>
+    <div class="act-stats">
+      <div class="wrap facts">
+        <div><strong data-count="517">517</strong><span>Lean 4 theorems, checked in CI on every push</span></div>
+        <div><strong data-count="67">67</strong><span>Kani harnesses: every input, not a test set</span></div>
+        <div><strong data-count="25">25</strong><span>Verus SMT results, zero errors</span></div>
+        <div><strong data-count="27">27</strong><span>proof crates, 400+ runnable proofs</span></div>
+      </div>
+    </div>
+  </div>
+</section>

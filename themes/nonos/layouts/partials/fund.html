@@ -1,0 +1,194 @@
+{{ $f := .Site.Data.fund }}
+<div class="dl fund">
+
+  <section class="dl-hero">
+    <div class="scene-bg" data-scene="fund" aria-hidden="true"></div>
+    <div class="wrap dl-hero-in">
+      <p class="eyebrow">Fund the work &middot; public goods, in the open</p>
+      <h1>Build the <span class="hl">sovereign</span> base layer.</h1>
+      <p class="dl-lede">A verified, RAM-resident, capability-secured operating system is
+      infrastructure the whole ecosystem gets to keep. It is AGPL, it takes no equity, and it
+      is funded transparently. This is the scope, the budget, and the milestones behind it.</p>
+      <p class="fund-target">Our fundraise target is <b>{{ $f.target | printf "$%s" }}</b>. The
+      first $1M funds a full year of the team; beyond it carries NØNOS to multi-architecture
+      production, on the same proofs.</p>
+      <div class="dl-actions">
+        <a class="btn primary" href="#donate">Donate in ETH</a>
+        <a class="btn" href="#budget">See the budget</a>
+        <a class="btn" href="#give">Ways to fund</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="dl-body">
+
+    <section class="why-act">
+      <div class="scene-bg" data-scene="foundation" aria-hidden="true"></div>
+      <div class="wrap why-wrap">
+        <div class="why-copy">
+          <div class="shead">
+            <h2>The machine that holds value needs a trustworthy base.</h2>
+          </div>
+          <p class="why-lede">Every mainstream OS rests on three assumptions. Each is fine for a
+          laptop that browses the web, and a liability for the machine that holds a key, signs
+          a transaction, or runs an agent that spends money.</p>
+          <ul class="why-list">
+            <li><b>Drivers are trusted.</b> One driver bug is a full-system compromise.</li>
+            <li><b>Authority is ambient.</b> Everything is reachable until something bolts on to stop it.</li>
+            <li><b>You cannot prove what runs.</b> Nothing tells you the code is the code you audited.</li>
+          </ul>
+          <p class="why-answer-line"><b>NØNOS inverts all three:</b> a small trusted path,
+          machine-checked and attested, where drivers are confined and the system proves what
+          it runs before it runs it. Building it right takes funded, full-time work.</p>
+          <a class="btn" href="/docs/architecture/mission/">Read the mission</a>
+        </div>
+      </div>
+      <span class="scene-note">userland over the kernel over hardware &middot; the base layer, drawn with hard lines</span>
+    </section>
+
+    <section id="budget" class="dl-block alt">
+      <div class="wrap">
+        <div class="shead">
+          <h2>What the first {{ $f.budget_total | printf "$%s" }} funds, over {{ $f.period }}</h2>
+          <p class="dl-sub">Every line is work, not overhead. This is what a year of building
+          NØNOS to an audited, hardware-proven, formally-verified v1.x actually costs. It sums to
+          exactly the first {{ $f.budget_total | printf "$%s" }} of the {{ $f.target | printf "$%s" }} target.</p>
+        </div>
+        <div class="budget-split">
+          <div class="budget">
+            {{ range $i, $b := $f.budget }}
+            <div class="budget-row reveal">
+              <div class="br-head">
+                <span class="br-line"><span class="br-dot" data-seg="{{ $i }}"></span>{{ $b.line }}</span>
+                <span class="br-amt">{{ $b.amount | lang.FormatNumberCustom 0 }} &middot; {{ $b.pct }}%</span>
+              </div>
+              <div class="br-bar"><i style="width: {{ $b.pct }}%"></i></div>
+              <p class="br-detail">{{ $b.detail }}</p>
+            </div>
+            {{ end }}
+          </div>
+          <div class="budget-viz reveal d1">
+            {{ $r := 54.0 }}
+            {{ $c := mul 6.28318 $r }}
+            {{ $acc := 0.0 }}
+            <svg viewBox="0 0 140 140" class="donut" role="img" aria-label="Budget allocation">
+              <circle cx="70" cy="70" r="{{ $r }}" class="donut-track"/>
+              {{ range $i, $b := $f.budget }}
+              {{ $len := mul $c (div (float $b.pct) 100.0) }}
+              {{ $off := mul $c (div $acc 100.0) }}
+              <circle cx="70" cy="70" r="{{ $r }}" class="donut-seg" data-seg="{{ $i }}"
+                stroke-dasharray="{{ $len }} {{ sub $c $len }}"
+                stroke-dashoffset="-{{ $off }}"
+                style="animation-delay: {{ mul $i 0.12 }}s"/>
+              {{ $acc = add $acc $b.pct }}
+              {{ end }}
+              <text x="70" y="65" class="donut-total">${{ $f.target }}</text>
+              <text x="70" y="83" class="donut-sub">target &middot; {{ $f.period }}</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dl-block">
+      <div class="wrap">
+        <div class="shead">
+          <h2>Funded in tranches, delivered in the open</h2>
+          <p class="dl-sub">Each tranche unlocks concrete, verifiable work. Progress is
+          reported publicly, and every claim reproduces from a clean checkout.</p>
+        </div>
+        <ol class="pipeline reveal">
+          {{ range $f.milestones }}
+          <li>
+            <span class="pl-mark">{{ .at }}</span>
+            <div class="pl-body">
+              <h3>{{ .title }}</h3>
+              <p>{{ .body }}</p>
+            </div>
+          </li>
+          {{ end }}
+        </ol>
+      </div>
+    </section>
+
+    <section id="donate" class="dl-block alt">
+      <div class="wrap">
+        <div class="shead">
+          <h2>Fund it directly, in ETH</h2>
+          <p class="dl-sub">The fastest way to help right now. Send ETH or ERC-20 tokens to
+          the public donation wallet. It is on-chain, so anyone can audit where every
+          contribution goes.</p>
+        </div>
+        {{ $eth := .Site.Data.fund.donate.eth }}
+        {{ if and (hasPrefix $eth "0x") (eq (len $eth) 42) (not (in $eth "REPLACE")) }}
+        <div class="donate-box glass reveal">
+          <div class="donate-main">
+            <span class="donate-label">{{ .Site.Data.fund.donate.chain }}{{ with .Site.Data.fund.donate.ens }} &middot; {{ . }}{{ end }}</span>
+            <div class="donate-addr">
+              <code>{{ $eth }}</code>
+              <button class="copy" type="button" data-copy="{{ $eth }}" aria-label="Copy donation address">copy</button>
+            </div>
+          </div>
+          <p class="donate-note">{{ .Site.Data.fund.donate.note }}</p>
+        </div>
+        {{ else }}
+        <div class="donate-box glass pending">
+          <span class="donate-label">{{ .Site.Data.fund.donate.chain }}</span>
+          <p class="donate-note">The public donation wallet is published at launch. It will be
+          a multisig-controlled address, on-chain and auditable.</p>
+        </div>
+        {{ end }}
+      </div>
+    </section>
+
+    <section id="give" class="dl-block">
+      <div class="wrap">
+        <div class="shead">
+          <h2>Grants, venture, sponsorship, and support</h2>
+          <p class="dl-sub">All of it is public-goods funding: AGPL, no equity in the kernel,
+          no control over the project bought with a cheque.</p>
+        </div>
+        <div class="fund-grid">
+          {{ range $f.channels }}
+          <div class="fund-card glass reveal">
+            <h3>{{ .name }}</h3>
+            <p>{{ .body }}</p>
+            <a class="btn small" href="{{ .href }}" rel="noopener">{{ .cta }}</a>
+          </div>
+          {{ end }}
+        </div>
+      </div>
+    </section>
+
+    <section class="dl-block">
+      <div class="wrap">
+        <div class="shead">
+          <h2>The pledge</h2>
+        </div>
+        <ul class="pledge reveal">
+          <li>The project stays AGPL-3.0. Funding sustains it; it does not privatise it.</li>
+          <li>No equity changes hands. This is public-goods infrastructure, not a startup round.</li>
+          <li>The budget and the milestone progress are reported publicly.</li>
+          <li>Sponsorship buys recognition and a direct line to the maintainers, never control
+          over what ships or what the proofs must say.</li>
+          <li>The NOX ecosystem is funded and governed separately from the kernel. Kernel
+          authority never flows through a token.</li>
+        </ul>
+        <p class="fund-foot">Want to talk numbers, a grant, or a sponsorship?
+        <a href="mailto:team@nonos.systems?subject=NONOS%20funding">Get in touch.</a></p>
+      </div>
+    </section>
+
+    <section class="fund-cta">
+      <div class="wrap">
+        <h2>Fund the base layer the ecosystem gets to keep.</h2>
+        <p>Public goods, in the open. AGPL, no equity, every dollar reported.</p>
+        <div class="dl-actions">
+          <a class="btn primary" href="#donate">Donate in ETH</a>
+          <a class="btn" href="mailto:team@nonos.systems?subject=NONOS%20funding">Talk to us</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

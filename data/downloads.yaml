@@ -1,0 +1,36 @@
+version: "1.0"
+released: "2026-07-22"
+status: "upcoming"   # upcoming | released
+base_url: "https://nonos.software/iso"
+
+artifacts:
+  - name: "Disk image"
+    file: "nonos-1.0.img"
+    kind: "img"
+    size: "~180 MB"
+    for: "VirtualBox, VMware, real hardware (write to USB)"
+    recommended: true
+  - name: "EFI system partition"
+    file: "nonos-1.0-esp.tar.zst"
+    kind: "esp"
+    size: "~120 MB"
+    for: "QEMU, libvirt, and the reference run scripts"
+  - name: "Setup wizard image"
+    file: "nonos-1.0-wizard.img"
+    kind: "img"
+    size: "~180 MB"
+    for: "First-boot guided install and disk provisioning"
+
+checksums:
+  - file: "SHA256SUMS"
+    label: "SHA-256"
+  - file: "BLAKE3SUMS"
+    label: "BLAKE3"
+  - file: "release-manifest.json"
+    label: "Signed manifest"
+
+# example lines, replaced with the real output of `nonos-verify release` at cut
+sample_blake3: |
+  a1b2c3d4e5f6...  nonos-1.0.img
+  9f8e7d6c5b4a...  nonos-1.0-esp.tar.zst
+  001122334455...  nonos-1.0-wizard.img

@@ -1,0 +1,20 @@
+# GitHub language composition. Colors are the GitHub linguist palette.
+languages:
+  - name: Rust
+    pct: 97.0
+    color: "#dea584"
+  - name: Lean
+    pct: 1.7
+    color: "#4b8bbe"
+  - name: Makefile
+    pct: 0.8
+    color: "#427819"
+  - name: Shell
+    pct: 0.2
+    color: "#89e051"
+  - name: Assembly
+    pct: 0.2
+    color: "#a67219"
+  - name: C
+    pct: 0.1
+    color: "#8a8a8a"

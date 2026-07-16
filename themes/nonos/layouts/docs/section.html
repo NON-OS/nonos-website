@@ -1,0 +1,55 @@
+{{ define "main" }}
+<div class="wrap doc-layout">
+  {{ partial "docs-sidebar.html" . }}
+  <article class="doc-body">
+    {{ if eq .RelPermalink "/docs/" }}
+    <header class="doc-head">
+      <h1>Documentation</h1>
+      <p class="doc-lede">Reference for the NØNOS microkernel, written against the source
+      tree with file and line references. If a page describes behaviour, that behaviour
+      exists in the code at the cited location.</p>
+    </header>
+
+    <div class="docs-index">
+      <h2>Start here</h2>
+      <ol class="start-list">
+        <li><a href="/docs/architecture/mission/"><b>The mission</b><span>What NØNOS is for and why it differs from monolithic systems, other microkernels, and secure-OS products.</span></a></li>
+        <li><a href="/docs/architecture/overview/"><b>Architecture overview</b><span>The whole-system model in one document: the map every other page zooms into.</span></a></li>
+        <li><a href="/docs/architecture/verification/"><b>Verification</b><span>Exactly what NØNOS proves and does not prove, and how to reproduce every claim.</span></a></li>
+      </ol>
+
+      <h2>By area</h2>
+      <div class="area-list">
+        {{ range .Sections }}
+        <a href="{{ .RelPermalink }}">
+          <span class="al-title">{{ .LinkTitle }}<em>{{ len .Pages }}</em></span>
+          <span class="al-desc">{{ .Description }}</span>
+        </a>
+        {{ end }}
+      </div>
+    </div>
+    {{ else }}
+    <nav class="crumbs" aria-label="Breadcrumb">
+      {{ range .Ancestors.Reverse }}{{ if not .IsHome }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a><span>/</span>{{ end }}{{ end }}
+      <b>{{ .LinkTitle }}</b>
+    </nav>
+    <header class="doc-head">
+      <h1>{{ .Title }}</h1>
+      {{ with .Description }}<p class="doc-lede">{{ . }}</p>{{ end }}
+    </header>
+    {{ .Content }}
+    {{ if or .RegularPages .Sections }}
+    <div class="toc-cards">
+      {{ range .Sections }}
+      <a class="card" href="{{ .RelPermalink }}"><h3>{{ .LinkTitle }}</h3><p>{{ .Description }}</p></a>
+      {{ end }}
+      {{ range .RegularPages }}
+      <a class="card" href="{{ .RelPermalink }}"><h3>{{ .LinkTitle }}</h3><p>{{ .Description }}</p></a>
+      {{ end }}
+    </div>
+    {{ end }}
+    {{ partial "doc-pager.html" . }}
+    {{ end }}
+  </article>
+</div>
+{{ end }}
